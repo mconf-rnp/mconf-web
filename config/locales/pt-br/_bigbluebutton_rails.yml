@@ -71,7 +71,7 @@ pt-br:
         update: 
           success: "Sua gravação foi atualizada com sucesso."
     rooms: 
-      default_welcome_msg: "Bem-vindo(a) à conferência <b>%{name}!</b><br/><br/>Para entrar na conferência de áudio a partir de um telefone SIP, disque %{voice_number}.<br/><br/>Se você precisa ajuda para usar esta aplicação <u><a href=\"http://www.bigbluebutton.org/videos/\">veja estes vídeos</a></u>."
+      default_welcome_msg: "Bem-vindo(a) à conferência <b>%{name}!</b><br/><br/>Para entrar na conferência de áudio a partir de um telefone SIP, disque %{voice_number}.<br/><br/>Se você precisa ajuda para usar esta aplicação <u><a href=\"http://mconf.org/m/rnp/documentacao\">veja a documentação</a></u>."
       errors: 
         auth: 
           cannot_create: "Você não tem permissões para iniciar esta reunião."
