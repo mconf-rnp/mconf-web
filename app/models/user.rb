@@ -295,8 +295,25 @@ class User < ActiveRecord::Base
   # Returns whether this user can record a meeting in `room` or not after BigbluebuttonRails
   # decided that the user's role in this room is `role`.
   def can_record_meeting?(room=nil, role=nil)
-    # currently only superusers can record (any room)
-    superuser
+
+    if room
+      # rooms that belong to spaces can be recorded by members
+      if room.owner_type == "Space"
+        room.owner.users.include?(self) or self.superuser
+
+      # rooms that belong to a user can be recorded by the owner only
+      elsif room.owner_type == "User"
+        room.owner == self or self.superuser
+
+      # other "owner_type"? should never happen
+      else
+        self.superuser
+      end
+
+    # no target room? should never happen
+    else
+      self.superuser
+    end
   end
 
 end
