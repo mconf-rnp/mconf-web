@@ -104,6 +104,9 @@ class User < ActiveRecord::Base
   attr_accessor :_full_name
   attr_accessible :_full_name
 
+  attr_accessor :institution_name
+  attr_accessible :institution_name
+
   # BigbluebuttonRoom requires an identifier with 3 chars generated from :name
   # So we'll require :_full_name and :username to have length >= 3
   # TODO: review, see issue #737
@@ -173,9 +176,22 @@ class User < ActiveRecord::Base
     end
   end
 
+  def set_institution
+    # Try to find institution by acronym then by name
+    i   = Institution.find_by_acronym(institution_name)
+    i ||= Institution.find_by_name(institution_name)
+
+    # Create the institution if it doesn't exist and add the user to it
+    i ||= Institution.create(:name => institution_name)
+    permission = i.permissions.build(:user_id => self.id, :role => Role.default_role)
+    permission.save!
+  end
 
   after_create do |user|
     user.create_profile :full_name => user._full_name
+
+    # Try to set institution information
+    user.set_institution if user.institution_name
 
     # If user joined for participating in an event,
     # create a join request and add him to the space
@@ -243,6 +259,10 @@ class User < ActiveRecord::Base
 
   def enable
     self.update_attribute(:disabled,false)
+  end
+
+  def institution
+    Permission.where(:user_id => id, :subject_type => 'Institution').first.subject
   end
 
   # Use profile.logo for users logo when present

@@ -21,6 +21,8 @@ class Profile < ActiveRecord::Base
     logo_image.recreate_versions! if crop_x.present?
   end
 
+  has_one :institution, :through => :user
+
   belongs_to :user
   accepts_nested_attributes_for :user
 

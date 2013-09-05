@@ -9,6 +9,8 @@
   - if @event_id
     = f.hidden_field :special_event_id, :value => @event_id
 
+  = f.input :institution_name, :label => t('user.institution'), :required => true
+
   = f.input :password, :label => t('user.password'), :required => true
   = f.input :password_confirmation, :label => t('user.password_confirmation'), :required => true
   = f.button :wrapped, :value => t("register.one")

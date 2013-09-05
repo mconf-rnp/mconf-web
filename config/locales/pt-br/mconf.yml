@@ -1558,6 +1558,7 @@ pt-br:
     group_invite_email: "Convidar por e-mail"
     id: "ID do Usuário"
     include_registered: "Incluir usuários registrados"
+    institution: Instituição
     invite: "Convidar pessoas"
     invite_email: "Convide pessoas por e-mail"
     invited: "Usuários já convidados"
