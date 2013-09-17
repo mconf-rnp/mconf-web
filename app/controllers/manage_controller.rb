@@ -18,6 +18,10 @@ class ManageController < ApplicationController
     @spaces = Space.find_with_disabled(:all,:order => "name").paginate(:page => params[:page], :per_page => 20)
   end
 
+  def institutions
+    @institutions = Institution.find(:all, :order => "name").paginate(:page => params[:page], :per_page => 20)
+  end
+
   def spam
     @spam_events = Event.where(:spam => true).all
     @spam_posts = Post.where(:spam => true).all

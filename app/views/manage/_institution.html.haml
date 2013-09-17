@@ -1,0 +1,16 @@
+.institution
+  %ul.group-links
+    = link_to (edit_institution_path(institution)) do
+      = icon_edit(:alt => t('edit'), :title => t('edit'))
+    = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
+      = icon_delete(:alt => t('disable'), :title => t('institution.destroy'))
+
+  .institution-data
+    %ul
+      %li.main-text
+        %span.unified-institution
+          = sanitize link_to(institution.acronym, institution_path(institution))
+      %li.main_text
+        = sanitize institution.name
+
+      = t('institution.user', :count => institution.users.count).capitalize

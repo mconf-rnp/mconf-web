@@ -729,6 +729,15 @@ pt-br:
   internet:
     on_the: "Na Internet"
     ppal: Internet
+  institution:
+    user:
+      zero: nenhum membro
+      one: um membro
+      other: %{count} membros
+    destroy: Apagar instituição
+  institutions:
+    form:
+      new: Nova instituição
   invitation:
     accept: "Aceitar o convite"
     access_space: "Você agora é um membro da comunidade %{spacename} e pode acessá-la em <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -887,6 +896,7 @@ pt-br:
       title: "Gerenciamento do Site"
       users: "Usuários"
       webconf: "Webconferência"
+      institutions: Instituições
     spam:
       event:
         delete_confirmation: "Remover este evento permanentemente?"

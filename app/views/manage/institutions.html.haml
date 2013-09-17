@@ -1,0 +1,13 @@
+= render :partial => 'menu'
+
+= content_for :sidebar do
+  = render :partial => 'institutions/form', :locals => { :@institution => Institution.new }
+
+#manage
+  #institutions
+  - for institution in @institutions
+    = render :partial => 'institution', :locals => { :institution => institution }
+
+- nav = page_navigation_links @institutions
+- unless nav.nil?
+  .content-block-footer= nav

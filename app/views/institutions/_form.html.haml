@@ -1,0 +1,10 @@
+#institution-sidebar
+  %h3
+    = t('.new')
+
+  = simple_form_for(@institution) do |f|
+    = f.label :name
+    = f.text_field :name
+    = f.label :acronym
+    = f.text_field :acronym
+    = f.submit

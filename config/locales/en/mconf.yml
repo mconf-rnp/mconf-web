@@ -731,9 +731,18 @@ en:
     information3: "These are the latest messages or events that you have created"
     information5: "These are the upcoming events of other spaces."
     reduce: "Reduce List.."
-  internet: 
+  internet:
     on_the: "On the Internet"
     ppal: Internet
+  institution:
+    user:
+      zero: no members
+      one: one member
+      other: %{count} members
+    destroy: Delete institution
+  institutions:
+    form:
+      new: New institution
   invitation:
     accept: "Accept invitation"
     access_space: "You are now a member of %{spacename} and now you can access it on <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -897,6 +906,7 @@ en:
       title: "Site Management"
       users: "Users"
       webconf: "Web Conference"
+      institutions: Institutions
     spam:
       event:
         delete_confirmation: "Remove this event permanently?"

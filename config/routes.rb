@@ -51,6 +51,8 @@ Mconf::Application.routes.draw do
   match '/secure/info', :to => 'shibboleth#info', :as => "shibboleth_info"
   post '/secure/associate', :to => 'shibboleth#create_association', :as => "shibboleth_create_association"
 
+  resources :institutions
+
   resources :spaces do
 
     collection do
@@ -161,8 +163,7 @@ Mconf::Application.routes.draw do
   resource :site, :only => [:show, :edit, :update]
 
   # Management routes
-
-  ['users', 'spaces', 'spam'].each do |resource|
+  ['users', 'spaces', 'spam', 'institutions'].each do |resource|
     match "/manage/#{resource}", :to => "manage##{resource}", :as => "manage_#{resource}"
   end
 
