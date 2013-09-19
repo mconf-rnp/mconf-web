@@ -1,7 +1,7 @@
 .institution
   %ul.group-links
     = link_to (edit_institution_path(institution)) do
-      = icon_edit(:alt => t('edit'), :title => t('edit'))
+      = icon_edit(:class => 'open-modal', :alt => t('edit'), :title => t('edit'))
     = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
       = icon_delete(:alt => t('disable'), :title => t('institution.destroy'))
 
@@ -13,4 +13,4 @@
       %li.main_text
         = sanitize institution.name
 
-      = t('institution.user', :count => institution.users.count).capitalize
+      = link_to t('institution.user', :count => institution.users.count).capitalize, institution_users_path(institution)

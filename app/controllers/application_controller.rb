@@ -38,6 +38,10 @@ class ApplicationController < ActionController::Base
     @space ||= Space.find_with_param(params[:space_id])
   end
 
+  def institution
+    @institution ||= Institution.find_by_permalink(params[:institution_id])
+  end
+
   # Splits a comma separated list of emails into a list of emails without trailing spaces
   def split_emails email_string
     email_string.split(/[\s,;]/).select { |e| !e.empty? }

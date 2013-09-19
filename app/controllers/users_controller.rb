@@ -8,9 +8,6 @@
 require "digest/sha1"
 class UsersController < ApplicationController
 
-  before_filter :space!, :only => [:index]
-  before_filter :webconf_room!, :only => [:index]
-
   load_and_authorize_resource :find_by => :username
 
   # Rescue username not found rendering a 404
@@ -21,9 +18,20 @@ class UsersController < ApplicationController
   respond_to :xml, :only => [:current]
 
   def index
-    @users = space.users.sort {|x,y| x.name <=> y.name }
-    respond_to do |format|
-      format.html { render :layout => 'spaces_show' }
+    if space
+      space!
+      webconf_room!
+      @users = space.users.sort {|x,y| x.name <=> y.name }
+
+      respond_to do |format|
+        format.html { render :layout => 'spaces_show' }
+      end
+    elsif institution
+      @users = institution.users.sort {|x,y| x.name <=> y.name }
+
+      respond_to do |format|
+        format.html { render :layout => 'institution_users' }
+      end
     end
   end
 
