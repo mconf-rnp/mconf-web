@@ -183,15 +183,26 @@ class User < ActiveRecord::Base
 
     # Create the institution if it doesn't exist and add the user to it
     i ||= Institution.create(:name => institution_name)
-    permission = i.permissions.build(:user_id => self.id, :role => Role.default_role)
+
+    # Try to see if user has another institution already
+    permission = Permission.where(:user_id => id, :subject_type => 'Institution').first
+
+    if permission
+      permission.subject = i
+    else
+      permission = i.permissions.build(:user_id => self.id, :role => Role.default_role)
+    end
+
     permission.save!
+  end
+
+  after_commit do |user|
+    # Try to set institution information
+    user.set_institution if user.institution_name
   end
 
   after_create do |user|
     user.create_profile :full_name => user._full_name
-
-    # Try to set institution information
-    user.set_institution if user.institution_name
 
     # If user joined for participating in an event,
     # create a join request and add him to the space
@@ -262,7 +273,8 @@ class User < ActiveRecord::Base
   end
 
   def institution
-    Permission.where(:user_id => id, :subject_type => 'Institution').first.subject
+    p = Permission.where(:user_id => id, :subject_type => 'Institution').first
+    p ? p.subject : nil
   end
 
   # Use profile.logo for users logo when present

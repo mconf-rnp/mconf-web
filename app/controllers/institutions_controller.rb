@@ -1,6 +1,6 @@
 class InstitutionsController < ApplicationController
 
-  load_and_authorize_resource
+  load_and_authorize_resource :find_by => :permalink
   skip_load_resource :only => :index
 
   def index

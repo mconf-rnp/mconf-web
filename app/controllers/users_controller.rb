@@ -28,11 +28,8 @@ class UsersController < ApplicationController
       end
     elsif institution
       @users = institution.users.sort {|x,y| x.name <=> y.name }
-
-      respond_to do |format|
-        format.html { render :layout => 'institution_users' }
-      end
     end
+
   end
 
   def show

@@ -1,7 +1,6 @@
 .institution
   %ul.group-links
-    = link_to (edit_institution_path(institution)) do
-      = icon_edit(:class => 'open-modal', :alt => t('edit'), :title => t('edit'))
+    = link_to icon_edit(:alt => t('edit'), :title => t('edit')), edit_institution_path(institution), :class => 'open-modal'
     = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
       = icon_delete(:alt => t('disable'), :title => t('institution.destroy'))
 
@@ -9,7 +8,8 @@
     %ul
       %li.main-text
         %span.unified-institution
-          = sanitize link_to(institution.acronym, institution_path(institution))
+          %h3
+            = institution.acronym
       %li.main_text
         = sanitize institution.name
 

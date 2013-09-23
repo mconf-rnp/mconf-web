@@ -1,9 +1,4 @@
-- spaces_menu_at :users
-= render :partial => 'spaces/menu'
-
-#user-list.content-block
-  .content-block-header
-    %h3= t('user.index.user_list.header', :count => @users.size)
-  .content-block-middle
-    - for user in @users
-      = render :partial => 'users/detailed_user', :locals => { :user => user }
+- if params[:space_id]
+  = render 'space_users'
+- elsif params[:institution_id]
+  = render 'institution_users'

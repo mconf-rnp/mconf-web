@@ -1616,7 +1616,8 @@ en:
     institution: Institution
     index:
       user_list:
-        header: "Users in this space: %{count}"
+        header_spaces: "Users in this space: %{count}"
+        header_institutions: "Users in this institution: %{count}"
     invite: "Invite people"
     invite_email: "Invite people by email"
     invited: "Users already invited"
