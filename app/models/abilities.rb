@@ -158,6 +158,12 @@ module Abilities
       #   end
       # end
 
+      # Institutions
+      can [:read], Institution
+      can [:update], Institution do |i|
+        i.admins.include?(user)
+      end
+
       # Permissions
       # Only space admins can update user roles/permissions
       can [:read, :edit, :update], Permission do |perm|
@@ -323,6 +329,7 @@ module Abilities
       can :show, News, :space => { :public => true }
       can :read, Event, :space => { :public => true }
       can :read, Attachment, :space => { :public => true, :repository => true }
+      can [:read], Institution
     end
 
     private
