@@ -34,6 +34,26 @@ describe Institution do
     it { Institution.search('BS').count.should be(2) }
   end
 
+  describe ".add_member!" do
+
+    context "when user has no previous institution" do
+      let (:user) { FactoryGirl.create(:user) }
+      let (:target) { FactoryGirl.create(:institution) }
+
+      it { expect { target.add_member!(user) }.to change(target.users, :count).by(+1) }
+    end
+
+    context "when user has a previous institution" do
+      let (:user) { FactoryGirl.create(:user) }
+      let (:target) { FactoryGirl.create(:institution) }
+      let (:previous) { FactoryGirl.create(:institution) }
+      before(:each) { previous.add_member!(user) }
+
+      it { expect { target.add_member!(user) }.to change(target.users, :count).by(+1) }
+      it { expect { target.add_member!(user) }.to change(previous.users, :count).by(-1) }
+    end
+  end
+
   describe ".correct_duplicate" do
   end
 
@@ -51,6 +71,10 @@ describe Institution do
       let(:user) { FactoryGirl.create(:user) }
 
       context "that's a member of the institution" do
+        before do
+          target.add_member!(user, Role.default_role.name)
+        end
+
         it { should_not be_able_to_do_anything_to(target).except(:read) }
       end
 
@@ -59,7 +83,7 @@ describe Institution do
       end
 
       context "that's an institutional admin of the institution" do
-        before { target.add_admin!(user) }
+        before { target.add_member!(user, 'Admin') }
         it { should_not be_able_to_do_anything_to(target).except([:read, :update]) }
       end
     end

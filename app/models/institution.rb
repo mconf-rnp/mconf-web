@@ -30,21 +30,30 @@ class Institution < ActiveRecord::Base
     duplicate.destroy
   end
 
+  def self.find_or_create_by_name_or_acronym name
+    # Try to find institution by acronym then by name
+    i   = find_by_acronym(name)
+    i ||= find_by_name(name)
+
+    # Create the institution if it doesn't exist and add the user to it
+    i ||= create(:name => name)
+  end
+
   def admins
     permissions.where(:role_id => Role.find_by_name('Admin').id).map(&:user)
   end
 
-  def add_admin! u
+  def add_member! u, role = 'User'
     # Adds the user to the institution and sets his role as admin
     p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
     p ||= Permission.new :user_id => u.id
     p.subject = self
-    p.role = Role.find_by_name('Admin')
+    p.role = Role.find_by_name(role)
     p.save!
   end
 
   def to_json
-    { :name => "#{name} (#{acronym})", :id => name}
+    { :text => "#{name} (#{acronym})", :id => name}
   end
 
 end

@@ -176,29 +176,14 @@ class User < ActiveRecord::Base
     end
   end
 
-  def set_institution
-    # Try to find institution by acronym then by name
-    i   = Institution.find_by_acronym(institution_name)
-    i ||= Institution.find_by_name(institution_name)
-
-    # Create the institution if it doesn't exist and add the user to it
-    i ||= Institution.create(:name => institution_name)
-
-    # Try to see if user has another institution already
-    permission = Permission.where(:user_id => id, :subject_type => 'Institution').first
-
-    if permission
-      permission.subject = i
-    else
-      permission = i.permissions.build(:user_id => self.id, :role => Role.default_role)
-    end
-
-    permission.save!
+  def set_institution name
+    i = Institution.find_or_create_by_name_or_acronym(name)
+    i.add_member!(self, Role.default_role.name)
   end
 
   after_commit do |user|
     # Try to set institution information
-    user.set_institution if user.institution_name
+    user.set_institution(user.institution_name) if user.institution_name
   end
 
   after_create do |user|

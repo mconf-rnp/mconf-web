@@ -26,7 +26,7 @@ describe User do
   it { should validate_presence_of(:username) }
 
   [ :email, :password, :password_confirmation,
-    :remember_me, :login, :username, :receive_digest ].each do |attribute|
+    :remember_me, :login, :username, :receive_digest, :institution_name ].each do |attribute|
     it { should allow_mass_assignment_of(attribute) }
   end
 
@@ -80,6 +80,35 @@ describe User do
       it { user.bigbluebutton_room.param.should be(user.username) }
       it { user.bigbluebutton_room.name.should be(user.username) }
     end
+
+    context "sets user institution by name" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:institution) { FactoryGirl.create(:institution) }
+      before(:each) do
+        user.update_attributes :institution_name => institution.name
+        user.run_callbacks(:commit)
+      end
+
+      it { user.institution.should eq(institution) }
+    end
+
+    context "sets user institution by name when institution doesn't exist" do
+      let!(:user) { FactoryGirl.create(:user) }
+      before(:each) do
+        user.update_attributes :institution_name => 'Boost Sandwhiches'
+        user.run_callbacks(:commit)
+      end
+
+      it { user.institution.name.should eq('Boost Sandwhiches') }
+      # it { should change(Institution, :count).by(1) }
+    end
+
+    # context "sets user institution by name when user already has one" do
+    #   let(:user) { FactoryGirl.create(:user) }
+    #   before(:each) { user.update_attributes(:institution_name => 'Boost Sandwhiches') }
+    #   it { user.institution.should be(institution) }
+    #   it { should change(Institution, :count).by(1) }
+    # end
 
   end
 

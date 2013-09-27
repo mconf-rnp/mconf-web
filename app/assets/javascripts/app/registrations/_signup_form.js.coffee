@@ -25,11 +25,20 @@ class mconf.SignupForm
 id = '#user_institution_name'
 url = '/institutions/select.json'
 
-$(id).tokenInput url,
-  crossDomain: false
-  theme: 'facebook'
-  tokenLimit: 1
-  # hintText: $('#hidden-data #hint').value
-  # noResultsText: $('#hidden-data #no-results').value
-  # searchingText: $('#hidden-data #searching').value
+$(id).select2
+  minimumInputLength: 1
+  width: 'resolve'
+  multiple: false
+  formatSearching: () -> I18n.t('invite_people.users.searching')
+  formatInputTooShort: () -> I18n.t('invite_people.users.hint')
+  ajax:
+    url: url
+    dataType: "json"
+    data: (term, page) ->
+      q: term # search term
+    results: (data, page) -> # parse the results into the format expected by Select2.
+      results: data
 
+  createSearchChoice: (term, data) ->
+    id: term
+    text: term
