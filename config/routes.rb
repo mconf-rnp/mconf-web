@@ -53,6 +53,10 @@ Mconf::Application.routes.draw do
 
   resources :institutions do
     resources :users, :only => [:index]
+    collection do
+      get :select
+      get :correct_duplicate
+    end
   end
 
   resources :spaces do

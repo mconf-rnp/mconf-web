@@ -67,4 +67,18 @@ class InstitutionsController < ApplicationController
       format.js
     end
   end
+
+  def correct_duplicate
+  end
+
+  def select
+    @institutions = Institution.search(params[:q])
+
+    respond_to do |format|
+      format.json {
+        render :json => @institutions.map(&:to_json)
+      }
+    end
+  end
+
 end

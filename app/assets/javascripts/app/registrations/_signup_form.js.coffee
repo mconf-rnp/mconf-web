@@ -20,3 +20,16 @@ class mconf.SignupForm
     $username.attr "value", stringToSlug($fullname.val())
     $fullname.on "input keyup", () ->
       $username.attr "value", stringToSlug($fullname.val())
+
+# Dynamic search for institutions
+id = '#user_institution_name'
+url = '/institutions/select.json'
+
+$(id).tokenInput url,
+  crossDomain: false
+  theme: 'facebook'
+  tokenLimit: 1
+  # hintText: $('#hidden-data #hint').value
+  # noResultsText: $('#hidden-data #no-results').value
+  # searchingText: $('#hidden-data #searching').value
+
