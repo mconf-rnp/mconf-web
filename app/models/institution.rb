@@ -24,8 +24,7 @@ class Institution < ActiveRecord::Base
   # Useful in cases where users have joined a duplicate institution by mistake
   def self.correct_duplicate original, duplicate
     duplicate.permissions.each do |p|
-      p.subject = original
-      p.save!
+      original.permissions.create(:user_id => p.user_id, :role_id => p.role_id)
     end
     duplicate.destroy
   end

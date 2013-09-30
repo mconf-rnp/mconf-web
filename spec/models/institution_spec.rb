@@ -55,6 +55,20 @@ describe Institution do
   end
 
   describe ".correct_duplicate" do
+    let (:original) { FactoryGirl.create(:institution, :name => 'National Snooping Agency', :acronym => 'NSA') }
+    let (:copy) { FactoryGirl.create(:institution, :name => 'NSA', :acronym => 'NSA') }
+    let (:admin){ FactoryGirl.create(:user, :username => 'thecopyadmin')}
+    before :each do
+      original.add_member!(FactoryGirl.create(:user))
+      copy.add_member!(FactoryGirl.create(:user))
+      copy.add_member!(admin, 'Admin')
+    end
+    subject { Institution.correct_duplicate(original, copy) }
+
+    it { expect {subject}.to change(Institution, :count).by(-1) }
+    it { expect {subject}.to change(original.users, :count).by(+2) }
+    it { expect {subject}.to change(copy.users, :count).by(-2) }
+    it { original.admins.include? admin }
   end
 
   describe "abilities" do
