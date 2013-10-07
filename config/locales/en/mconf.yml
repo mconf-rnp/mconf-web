@@ -740,6 +740,8 @@ en:
       one: one member
       other: %{count} members
     destroy: Delete institution
+    duplicate: This institution is a duplicate...
+    select-duplicate: ... of this one
   institutions:
     form:
       new: New institution

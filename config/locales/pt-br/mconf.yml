@@ -735,6 +735,7 @@ pt-br:
       one: um membro
       other: %{count} membros
     destroy: Apagar instituição
+    duplicate: Esta instituição está duplicada
   institutions:
     form:
       new: Nova instituição

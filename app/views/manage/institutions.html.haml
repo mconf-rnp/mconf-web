@@ -5,8 +5,8 @@
 
 #manage
   #institutions
-  - for institution in @institutions
-    = render :partial => 'institution', :locals => { :institution => institution }
+    - for institution in @institutions
+      = render :partial => 'institution', :locals => { :institution => institution }
 
 - nav = page_navigation_links @institutions
 - unless nav.nil?
