@@ -14,6 +14,10 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
+  def self.roles
+    ['User', 'Admin'].map { |r| Role.find_by_name(r) }
+  end
+
   # Search by both name and acronym
   def self.search name
     return [] if name.blank?

@@ -739,6 +739,7 @@ en:
       zero: no members
       one: one member
       other: %{count} members
+    users: Users in this institution
     destroy: Delete institution
     duplicate: This institution is a duplicate...
     select-duplicate: ... of this one

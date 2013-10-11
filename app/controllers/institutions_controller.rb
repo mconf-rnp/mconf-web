@@ -71,6 +71,14 @@ class InstitutionsController < ApplicationController
   def correct_duplicate
   end
 
+  def user_permissions
+    @users = @institution.users.order("name ASC")
+    @permissions = @institution.permissions.sort{
+      |x,y| x.user.name <=> y.user.name
+    }
+    @roles = Institution.roles
+  end
+
   def select
     @institutions = Institution.search(params[:q])
 

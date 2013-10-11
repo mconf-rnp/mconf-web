@@ -52,7 +52,9 @@ Mconf::Application.routes.draw do
   post '/secure/associate', :to => 'shibboleth#create_association', :as => "shibboleth_create_association"
 
   resources :institutions do
-    resources :users, :only => [:index]
+    member do
+      get :user_permissions
+    end
     collection do
       get :select
       get :correct_duplicate
