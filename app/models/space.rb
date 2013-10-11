@@ -38,6 +38,8 @@ class Space < ActiveRecord::Base
   has_many :join_requests, :foreign_key => "group_id",
            :conditions => { :join_requests => {:group_type => 'Space'} }
 
+  belongs_to :institution
+
   # for the associated BigbluebuttonRoom
   attr_accessible :bigbluebutton_room_attributes
   accepts_nested_attributes_for :bigbluebutton_room

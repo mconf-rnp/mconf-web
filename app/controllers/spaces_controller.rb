@@ -122,6 +122,7 @@ class SpacesController < ApplicationController
 
         # the user that created the space is always an admin
         @space.add_member!(current_user, 'Admin')
+        current_user.institution.spaces << @space
 
         flash[:success] = t('space.created')
         format.html { redirect_to :action => "show", :id => @space  }

@@ -145,4 +145,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def approve
+    @user.approve!
+
+    flash[:notice] = t('user.approved', :username => @user.username)
+    redirect_to manage_users_path
+  end
+
 end

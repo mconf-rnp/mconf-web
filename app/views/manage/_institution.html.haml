@@ -17,4 +17,7 @@
       %li.main_text
         = sanitize institution.name
 
-      = link_to t('institution.user', :count => institution.users.count).capitalize, user_permissions_institution_path(institution)
+      %p
+        = link_to t('institution.user', :count => institution.users.count).capitalize, user_permissions_institution_path(institution)
+      %p
+        = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institutions_path(institution)

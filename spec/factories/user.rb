@@ -15,11 +15,16 @@ FactoryGirl.define do
     u.updated_at { Time.now }
     u.confirmed_at { Time.now }
     u.disabled false
+    u.approved true
     u.superuser false
     u.receive_digest { User::RECEIVE_DIGEST_NEVER }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
-    after(:create) { |u2| u2.confirm! }
+    u.sequence(:institution_name) { |n| Forgery::Name.unique_full_name(n) }
+    after(:create) do |u2|
+      u2.confirm!
+      u2.set_institution(u2.institution_name)
+    end
   end
 
   factory :superuser, :parent => :user do |u|

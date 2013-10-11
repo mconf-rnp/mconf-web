@@ -366,14 +366,15 @@ ActiveRecord::Schema.define(:version => 20131105194122) do
     t.string   "name"
     t.integer  "parent_id"
     t.boolean  "deleted"
-    t.boolean  "public",      :default => false
+    t.boolean  "public",         :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description"
     t.string   "permalink"
-    t.boolean  "disabled",    :default => false
-    t.boolean  "repository",  :default => false
+    t.boolean  "disabled",       :default => false
+    t.boolean  "repository",     :default => false
     t.string   "logo_image"
+    t.integer  "institution_id"
   end
 
   create_table "statistics", :force => true do |t|
@@ -426,6 +427,7 @@ ActiveRecord::Schema.define(:version => 20131105194122) do
     t.string   "confirmation_token"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email"
+    t.boolean  "approved"
     t.boolean  "can_record"
   end
 

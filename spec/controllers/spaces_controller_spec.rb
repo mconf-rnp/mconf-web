@@ -195,6 +195,12 @@ describe SpacesController do
         it { Space.last.admins.should include(user) }
       end
 
+      describe "sets the user's institution as the space's institution" do
+        before(:each) { post :create, :space => space.attributes }
+        it { Space.last.institution.should eq(user.institution) }
+        it { user.institution.spaces.should include(Space.last) }
+      end
+
       it "creates a new activity for the space created"
     end
 

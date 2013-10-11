@@ -739,6 +739,10 @@ en:
       zero: no members
       one: one member
       other: %{count} members
+    space:
+      zero: no spaces
+      one: one space
+      other: %{count} spaces
     users: Users in this institution
     destroy: Delete institution
     duplicate: This institution is a duplicate...
@@ -1586,6 +1590,7 @@ en:
     add_more: "Add users >>"
     admin: Admin
     administrators: Administrators
+    approved: "%{username} was approved to use the website"
     assist: Attending
     by_email: "By email"
     by_private_message: "By private message"

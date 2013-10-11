@@ -7,6 +7,7 @@
       = icon_edit(:alt => t('edit'), :title => t('edit'))
     = link_to user_path(user), :confirm => t('are_you_sure'), :method => :delete do
       = icon_delete(:alt => t('disable'), :title => t('user.disable'))
+    = link_to t('user.approve'), approve_user_path(user), :confirm => t('are_you_sure') if !user.approved?
 
   .user_data
     %ul

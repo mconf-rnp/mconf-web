@@ -8,6 +8,7 @@ describe Institution do
   end
 
   it { should have_many(:permissions).dependent(:destroy) }
+  it { should have_many(:spaces) }
   it { should have_many(:users) }
 
   it { should validate_presence_of(:name) }
@@ -32,6 +33,18 @@ describe Institution do
     it { Institution.search('Nat').count.should be(2) }
     it { Institution.search('Black Sabbath').count.should be(1) }
     it { Institution.search('BS').count.should be(2) }
+  end
+
+  describe ".spaces" do
+    let (:target) do
+        target = FactoryGirl.create(:institution)
+        target.spaces << FactoryGirl.create(:space)
+        target.spaces << FactoryGirl.create(:space)
+        target
+    end
+
+    it { target.spaces.size.should be(2) }
+    it { expect {target.spaces << FactoryGirl.create(:space)}.to change(target.spaces, :count).by(+1) }
   end
 
   describe ".add_member!" do

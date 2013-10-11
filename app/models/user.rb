@@ -107,6 +107,9 @@ class User < ActiveRecord::Base
   attr_accessor :institution_name
   attr_accessible :institution_name
 
+  # For approved users
+  attr_accessible :approved
+
   # BigbluebuttonRoom requires an identifier with 3 chars generated from :name
   # So we'll require :_full_name and :username to have length >= 3
   # TODO: review, see issue #737
@@ -309,6 +312,23 @@ class User < ActiveRecord::Base
   # Returns the number of unread private messages for this user
   def unread_private_messages
     PrivateMessage.inbox(self).select{|msg| !msg.checked}
+  end
+
+  def approve!
+    self.approved = true
+    save!
+  end
+
+  def active_for_authentication?
+    super && approved?
+  end
+
+  def inactive_message
+    if !approved?
+      :not_approved
+    else
+      super # Use whatever other message
+    end
   end
 
 end

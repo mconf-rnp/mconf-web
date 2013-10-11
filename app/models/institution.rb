@@ -9,6 +9,8 @@ class Institution < ActiveRecord::Base
 
   has_many :users, :through => :permissions
 
+  has_many :spaces
+
   extend FriendlyId
   friendly_id :name, :use => :slugged, :slug_column => :permalink
 

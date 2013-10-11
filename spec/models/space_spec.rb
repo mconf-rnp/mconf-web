@@ -32,6 +32,8 @@ describe Space do
   it { space.bigbluebutton_room.owner.should be(space) } # :as => :owner
   it { should accept_nested_attributes_for(:bigbluebutton_room) }
 
+  it { should belong_to(:institution) }
+
   it "has many permissions"
   it "has and belongs to many users"
   it "has and belongs to many admins" # there's a partial test for #admins below
