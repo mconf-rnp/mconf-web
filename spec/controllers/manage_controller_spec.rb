@@ -20,6 +20,10 @@ describe ManageController do
     it "renders with the layout application"
   end
 
+  describe "#institutions" do
+    it "is successful"
+  end
+
   describe "#spam" do
     it "is successful"
     it "sets @spam_events to all events marked as spam"

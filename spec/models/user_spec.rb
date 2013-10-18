@@ -39,6 +39,15 @@ describe User do
     end
   end
 
+  describe "#institution" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    it "user has one after being created" do
+      user.institution.should_not be_nil
+      user.institution.should be_an_instance_of(Institution)
+    end
+  end
+
   describe "#bigbluebutton_room" do
     let(:user) { FactoryGirl.create(:user) }
     it { should have_one(:bigbluebutton_room).dependent(:destroy) }
