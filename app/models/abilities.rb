@@ -51,6 +51,21 @@ module Abilities
       can [:read, :fellows, :current, :select], User, :disabled => false
       can [:edit, :update, :destroy], User, :id => user.id, :disabled => false
 
+      # Institutional admins can approve users in their institution
+      can :approve, User do |user_object|
+        user_object.institution == user.institution &&
+        user.institution.admins.include?(user)
+      end
+
+      # The ManageController permissions
+      can :users, :manage do
+        user.institution.admins.include?(user)
+      end
+
+      can :spaces, :manage do
+        user.institution.admins.include?(user)
+      end
+
       # User profiles
       # Visible according to options selected by the user, editable by their owners
       can :read, Profile do |profile|

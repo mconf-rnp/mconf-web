@@ -1,8 +1,8 @@
 .institution
   %ul.group-links
-    %div.duplicate{:data => institution.permalink}
-      .activate
-        = link_to t('institution.duplicate').capitalize, '#'
+    / %div.duplicate{:data => institution.permalink}
+    /   .activate
+    /     = link_to t('institution.duplicate').capitalize, '#'
 
     = link_to icon_edit(:alt => t('edit'), :title => t('edit')), edit_institution_path(institution), :class => 'open-modal'
     = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do

@@ -9,13 +9,26 @@ class ManageController < ApplicationController
   authorize_resource :class => false
 
   def users
-    @users = User.find_by_id_with_disabled(:all,:order => "username")
-                 .paginate(:page => params[:page], :per_page => 20)
+    @users =
+      if current_user.superuser?
+        User.find_by_id_with_disabled(:all,:order => "username")
+      else
+        current_user.institution.users.find(:all, :order => "username")
+      end
+
+    @users = @users.paginate(:page => params[:page], :per_page => 20)
+
     render :layout => 'no_sidebar'
   end
 
   def spaces
-    @spaces = Space.find_with_disabled(:all,:order => "name").paginate(:page => params[:page], :per_page => 20)
+    @spaces =
+      if current_user.superuser?
+        Space.find_with_disabled(:all,:order => "name")
+      else
+        current_user.institution.spaces.find(:all, :order => "name")
+      end
+    @spaces = @spaces.paginate(:page => params[:page], :per_page => 20)
   end
 
   def institutions
