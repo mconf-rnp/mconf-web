@@ -735,6 +735,7 @@ en:
     on_the: "On the Internet"
     ppal: Internet
   institution:
+    created: Institution created successfully.
     user:
       zero: no members
       one: one member

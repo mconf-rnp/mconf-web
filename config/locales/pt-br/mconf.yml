@@ -730,6 +730,7 @@ pt-br:
     on_the: "Na Internet"
     ppal: Internet
   institution:
+    created: Instituição criada com sucesso
     user:
       zero: nenhum membro
       one: um membro

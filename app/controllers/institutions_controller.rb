@@ -3,20 +3,6 @@ class InstitutionsController < ApplicationController
   load_and_authorize_resource :find_by => :permalink
   skip_load_resource :only => :index
 
-  def index
-    @institutions = Institution.find(:all, :order => "name").paginate(:page => params[:page], :per_page => 20)
-
-    respond_to do |format|
-      format.html
-    end
-  end
-
-  def show
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def new
     @institution = Institution.new
   end
@@ -26,11 +12,11 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.save
-        flash[:success] = t('.created')
-        format.html { redirect_to request.referer }
+        flash[:success] = t('institution.created')
+        format.html { redirect_to manage_institutions_path }
       else
-        flash[:error] = t('.error.create')
-        format.html { redirect_to request.referer }
+        flash[:error] = t('institution.error.create')
+        format.html { redirect_to new_institution_path }
       end
     end
 
@@ -40,29 +26,27 @@ class InstitutionsController < ApplicationController
     if @institution.update_attributes(params[:institution])
       respond_to do |format|
         format.html {
-          flash[:success] = t('.updated')
+          flash[:success] = t('institution.updated')
           redirect_to manage_institutions_path
         }
       end
 
     else
-      flash[:error] = t('.error.update')
-      redirect_to institutions_path
+      flash[:error] = t('institution.error.update')
+      redirect_to manage_institutions_path
     end
   end
 
   def edit
     respond_to do |format|
-      format.html {
-        render :partial => "form"
-      }
+      format.html
     end
   end
 
   def destroy
     @institution.destroy
     respond_to do |format|
-      flash[:notice] = t('.deleted')
+      flash[:notice] = t('institution.deleted')
       format.html { redirect_to request.referer }
       format.js
     end

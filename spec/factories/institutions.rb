@@ -1,7 +1,7 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 def name_to_acronym n
-    n.scan(/\w+/).map{|w| w[0]}.join
+    n.to_s.scan(/\w+/).map{|w| w[0]}.join
 end
 
 FactoryGirl.define do
