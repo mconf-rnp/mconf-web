@@ -19,6 +19,11 @@
         = link_to site_path do
           = icon_superuser()
           = t('.manage')
+    - elsif can?(:users, :manage)
+      %li
+        = link_to manage_users_path do
+          = icon_superuser()
+          = t('.manage')
 
 -# the right menu is not shown in the home page
 - if at_home?
