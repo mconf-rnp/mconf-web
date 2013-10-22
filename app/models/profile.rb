@@ -21,8 +21,6 @@ class Profile < ActiveRecord::Base
     logo_image.recreate_versions! if crop_x.present?
   end
 
-  has_one :institution, :through => :user
-
   belongs_to :user
   accepts_nested_attributes_for :user
 
@@ -46,6 +44,10 @@ class Profile < ActiveRecord::Base
 
   def prefix
     self.prefix_key.include?("title_formal.") ? I18n.t(self.prefix_key) : self.prefix_key
+  end
+
+  def institution
+    user.institution
   end
 
   def from_vcard

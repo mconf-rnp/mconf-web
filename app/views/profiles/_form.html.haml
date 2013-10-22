@@ -12,7 +12,7 @@
     - titles = [[t('title_formal.mr'), 'title_formal.mr'], [t('title_formal.mrs'), 'title_formal.mrs'], [t('title_formal.ms'), 'title_formal.ms']]
     = f.input :prefix_key, :label => t('name.prefix'), :collection => titles, :include_blank => true
     = f.input :full_name, :label => t('name.full'), :required => true
-    = f.input :organization, :label => t('organization'), :place_holder => @profile.institution.name, :required => true
+    = f.input :organization, :label => t('organization'), :placeholder => @profile.institution.name, :disabled => true, :required => true
     = f.input :city, :label => t('city')
     = f.input :province, :label => t('province')
     = f.input :country, :as => :string, :label => t('country')

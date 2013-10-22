@@ -51,6 +51,11 @@ module Abilities
       can [:read, :fellows, :current, :select], User, :disabled => false
       can [:edit, :update, :destroy], User, :id => user.id, :disabled => false
 
+      # Institutional admins can edit their institution user's
+      can [:edit, :update, :destroy], User do |u|
+        u.institution.admins.include?(user)
+      end
+
       # Institutional admins can approve users in their institution
       can :approve, User do |user_object|
         user_object.institution == user.institution &&
@@ -83,6 +88,11 @@ module Abilities
         end
       end
       can [:read, :edit, :update], Profile, :user_id => user.id
+
+      # Institutional admins can edit their institution user's
+      can [:read, :edit, :update], Profile do |p|
+        p.user.institution.admins.include?(user)
+      end
 
       # Private messages
       can :create, PrivateMessage

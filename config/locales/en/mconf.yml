@@ -748,6 +748,7 @@ en:
     destroy: Delete institution
     duplicate: This institution is a duplicate...
     select-duplicate: ... of this one
+    user_permissions: User Permissions
   institutions:
     form:
       new: New institution
