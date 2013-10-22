@@ -749,6 +749,9 @@ en:
     duplicate: This institution is a duplicate...
     select-duplicate: ... of this one
     user_permissions: User Permissions
+    user_registered:
+      title: "I have registered for your institution"
+      body_html: "Your <a href=\"%{url}\">approval</a> is needed for '%{name}' to be able to log in. You can do this in the management interface."
   institutions:
     form:
       new: New institution

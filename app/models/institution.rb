@@ -57,6 +57,10 @@ class Institution < ActiveRecord::Base
     p.save!
   end
 
+  def unapproved_users
+    users.where :approved => [nil, false]
+  end
+
   def to_json
     { :text => "#{name} (#{acronym})", :id => name}
   end

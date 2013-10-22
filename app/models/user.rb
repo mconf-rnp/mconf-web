@@ -192,6 +192,12 @@ class User < ActiveRecord::Base
   after_create do |user|
     user.create_profile :full_name => user._full_name
 
+    # Send message to the institutional admin
+    institution = Institution.find_by_name(user.institution_name)
+    if institution
+      PrivateSender.user_registered_notification(user, institution)
+    end
+
     # If user joined for participating in an event,
     # create a join request and add him to the space
     if user.special_event_id

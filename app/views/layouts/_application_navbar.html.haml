@@ -21,6 +21,8 @@
           = t('.manage')
     - elsif can?(:users, :manage)
       %li
+        - if current_user.institution.unapproved_users.size > 0
+          .label.label-important= current_user.institution.unapproved_users.size
         = link_to manage_users_path do
           = icon_superuser()
           = t('.manage')

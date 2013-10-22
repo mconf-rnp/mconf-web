@@ -56,10 +56,15 @@ class InstitutionsController < ApplicationController
   end
 
   def user_permissions
-    @users = @institution.users.order("name ASC")
-    @permissions = @institution.permissions.sort{
-      |x,y| x.user.name <=> y.user.name
-    }
+    @users = @institution.users.where(:approved => true)
+
+    @permissions = @users.map do |u|
+      u.permissions.where(:subject_type => 'Institution', :subject_id => @institution.id).first
+    end
+
+    @permissions.sort! do |x,y|
+      x.user.name <=> y.user.name
+    end
     @roles = Institution.roles
   end
 
