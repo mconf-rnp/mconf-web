@@ -730,13 +730,18 @@ pt-br:
     on_the: "Na Internet"
     ppal: Internet
   institution:
-    created: Instituição criada com sucesso
+    created: Instituição criada com sucesso.
     user:
       zero: nenhum membro
       one: um membro
       other: %{count} membros
     destroy: Apagar instituição
-    duplicate: Esta instituição está duplicada
+    duplicate: Esta instituição é duplicata
+    select-duplicate: ... desta aqui
+    user_permissions: Permissões de membros
+    user_registered:
+      title: "Eu me registrei em sua instituição"
+      body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
   institutions:
     form:
       new: Nova instituição

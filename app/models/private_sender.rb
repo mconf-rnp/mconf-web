@@ -45,9 +45,10 @@ class PrivateSender
   def self.user_registered_notification(user, institution)
     institution.admins.each do |receiver|
       m = PrivateMessage.new(
-        :title => I18n.t("institution.user_registered.title"),
+        :title => I18n.t("institution.user_registered.title", :locale => receiver.locale),
         :body => I18n.t("institution.user_registered.body_html",
-          :name => user.full_name, :url => Rails.application.routes.url_helpers.manage_users_path
+          :name => user.full_name, :url => Rails.application.routes.url_helpers.manage_users_path,
+          :locale => receiver.locale
         )
       )
       m.receiver = receiver

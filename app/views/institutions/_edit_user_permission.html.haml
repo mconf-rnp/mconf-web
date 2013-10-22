@@ -13,5 +13,5 @@
         = simple_form_for :permission, :url => permission_path(permission), :html => { :method => :put } do |f|
           .label
             = t('role.one')
-          = select :join_request, :role_id, Institution.roles.map { |r| [ r.name, r.id ] }, :selected => permission.role_id
+          = select :join_request, :role_id, Institution.roles.map { |r| [ t("space.performances.#{r.name.downcase}"), r.id ] }, :selected => permission.role_id
           = f.submit t('update'), :class => "btn btn-small"
