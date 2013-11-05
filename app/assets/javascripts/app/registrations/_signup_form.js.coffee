@@ -29,8 +29,6 @@ $(id).select2
   minimumInputLength: 1
   width: 'resolve'
   multiple: false
-  formatSearching: () -> I18n.t('invite_people.users.searching')
-  formatInputTooShort: () -> I18n.t('invite_people.users.hint')
   ajax:
     url: url
     dataType: "json"
