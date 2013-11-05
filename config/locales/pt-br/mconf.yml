@@ -85,6 +85,9 @@ pt-br:
         location: "Localização"
         name: "Nome"
         start_date: "Data e horário de início"
+      institution:
+        name: Nome
+        acronym: Sigla
       site:
         analytics_code: "Código do Google Analytics"
         chat_enabled: "Habilitar Chat"
@@ -145,6 +148,7 @@ pt-br:
     models:
       event: "Evento"
       space: "Comunidade"
+      institution: Instituição
   address: Endereço
   admin:
     one: Administrador
@@ -735,6 +739,10 @@ pt-br:
       zero: nenhum membro
       one: um membro
       other: %{count} membros
+    space:
+      zero: nenhuma comunidade
+      one: uma comunidade
+      other: %{count} comunidades
     destroy: Apagar instituição
     duplicate: Esta instituição é duplicata
     select-duplicate: ... desta aqui
@@ -846,7 +854,7 @@ pt-br:
     application_navbar:
       inbox: "Caixa de entrada"
       login: "Login"
-      manage: "Gerenciar"
+      manage: "Administração"
       register: "Registro"
     footer:
       copyright: "© 2010-2013 %{site}."
@@ -1552,6 +1560,9 @@ pt-br:
     add_more: "Adicionar usuários >>"
     admin: Administrador
     administrators: Administradores
+    approve: Aprovar
+    approved: "%{username} foi aprovado para usar o website."
+    approve_confirm: Este usuário será aprovado para usar o website.
     assist: Participantes
     by_email: "Por e-mail"
     by_private_message: "Por mensagem privada"

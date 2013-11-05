@@ -39,6 +39,7 @@ $(id).select2
     results: (data, page) -> # parse the results into the format expected by Select2.
       results: data
 
-  createSearchChoice: (term, data) ->
-    id: term
-    text: term
+# Uncommenting this makes it possible to add a new institution by suggesting a new name
+#  createSearchChoice: (term, data) ->
+#    id: term
+#    text: term

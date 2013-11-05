@@ -4,9 +4,7 @@
 body.manage.users {
 
   .user {
-    border-bottom: solid 1px #ccc;
     padding-top: 5px;
-    height: 40px;
   }
 
   .group_links {
@@ -27,6 +25,10 @@ body.manage.users {
     .user_data {
       padding-top: 8px;
     }
+  }
+
+  li.main_text.institution-name {
+    font-weight: bold;
   }
 
 }

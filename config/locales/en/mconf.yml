@@ -1597,6 +1597,7 @@ en:
     administrators: Administrators
     approve: Approve
     approved: "%{username} was approved to use the website"
+    approve_confirm: This user will be approved for using the website.
     assist: Attending
     by_email: "By email"
     by_private_message: "By private message"
