@@ -1633,6 +1633,7 @@ en:
       user_list:
         header_spaces: "Users in this space: %{count}"
         header_institutions: "Users in this institution: %{count}"
+    institutional_admin: Institutional Admin
     invite: "Invite people"
     invite_email: "Invite people by email"
     invited: "Users already invited"

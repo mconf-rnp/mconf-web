@@ -196,6 +196,16 @@ module ApplicationHelper
     obj
   end
 
+  def user_category_name user
+    if user.superuser
+      t('user.admin')
+    elsif user.institution && user.institution.admins.include?(user)
+      t('user.institutional_admin')
+    else
+      t('user.normal_user')
+    end
+  end
+
   # Every time a form needs to point a role as default (User, admin, guest, ...)
   def default_role
     Role.default_role

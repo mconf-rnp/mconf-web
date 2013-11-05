@@ -1591,6 +1591,7 @@ pt-br:
       user_list:
         header_spaces: "Usuários nesta comunidade: %{count}"
         header_institutions: "Usuários nesta instituição: %{count}"
+    institutional_admin: Administrador de instituição
     invite: "Convidar pessoas"
     invite_email: "Convide pessoas por e-mail"
     invited: "Usuários já convidados"

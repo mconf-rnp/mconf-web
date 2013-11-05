@@ -17,6 +17,6 @@
           = sanitize link_to(user.name, user_path(user))
       %li.main_text
         = t('user.category') + ":"
-        = user.superuser? ? t('user.admin') : t('user.normal_user')
+        = user_category_name(user)
       %li.main_text.institution-name
         = user.institution.name if user.institution
