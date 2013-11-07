@@ -17,6 +17,7 @@ en:
     hints:
       institution:
         acronym: Adding an acronym will help users find the right institution when registering.
+        user_limit: Optional. Enter a number to limit how much users can register.
       site:
         analytics_code: "Code for your Google Analytics account. Leave it blank to disable. Example: \"UA-12345678-9\""
         exception_notifications: "Send debugging emails whenever the application crashes"

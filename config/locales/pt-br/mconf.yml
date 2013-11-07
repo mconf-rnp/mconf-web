@@ -88,6 +88,7 @@ pt-br:
       institution:
         name: Nome
         acronym: Sigla
+        user_limit: Número Máximo de membros
       site:
         analytics_code: "Código do Google Analytics"
         chat_enabled: "Habilitar Chat"
@@ -747,10 +748,14 @@ pt-br:
     ppal: Internet
   institution:
     created: Instituição criada com sucesso.
+    updated: Atualizada com sucesso
+    error:
+      update: As informações não puderam ser atualizadas
     user:
       zero: nenhum membro
       one: um membro
       other: %{count} membros
+    user_limit: de no máximo %{limit}
     space:
       zero: nenhuma comunidade
       one: uma comunidade

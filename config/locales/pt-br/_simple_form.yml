@@ -17,6 +17,7 @@ pt-br:
     hints:
       institution:
         acronym: Adicionar uma sigla ajuda os usuários a encontrarem a instituição correta ao se registrar.
+        user_limit: Opcional. Informe um número caso deseje limitar o número de membros que podem se registrar.
       site:
         analytics_code: "Código para sua conta do Google Analytics. Deixe em branco para desabilitar. Exemplo: \"UA-12345678-9\""
         exception_notifications: "Enviar e-mails de depuração sempre que ocorrer um erro grave na aplicação"

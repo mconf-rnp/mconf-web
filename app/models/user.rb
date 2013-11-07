@@ -181,6 +181,10 @@ class User < ActiveRecord::Base
     i.add_member!(self, Role.default_role.name)
   end
 
+  before_update do |user|
+    user.institution && !user.institution.full?
+  end
+
   after_commit do |user|
     # Try to set institution information
     user.set_institution(user.institution_name) if user.institution_name

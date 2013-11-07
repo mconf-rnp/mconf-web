@@ -32,14 +32,14 @@ class InstitutionsController < ApplicationController
       end
 
     else
-      flash[:error] = t('institution.error.update')
-      redirect_to manage_institutions_path
+      flash[:error] = t('error.change')
+      redirect_to edit_institution_path(@institution)
     end
   end
 
   def edit
     respond_to do |format|
-      format.html
+      format.html { render :layout => !request.xhr? }
     end
   end
 
