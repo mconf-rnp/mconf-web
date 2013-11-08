@@ -1151,6 +1151,8 @@ en:
       change_pic: "Change your picture"
       edit_your_profile: "Edit your profile"
       view_your_profile: "View your profile"
+    form:
+      no_organization: "<no organization set>"
   province: Province
   public: Public
   read_more: "Read more"

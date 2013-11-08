@@ -1139,6 +1139,8 @@ pt-br:
       change_pic: "Mudar sua foto"
       edit_your_profile: "Editar o seu perfil"
       view_your_profile: "Visualizar o seu perfil"
+    form:
+      no_organization: "<nenhuma organização atribuída>"
   province: Estado
   public: Público
   read_more: "Ler mais"
