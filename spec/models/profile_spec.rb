@@ -8,6 +8,8 @@ require "spec_helper"
 
 describe Profile do
 
+  it "#institution"
+
   describe "abilities", :abilities => true do
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -84,6 +86,20 @@ describe Profile do
       }
       it_should_behave_like "a profile's ability",
         [:everybody, :members, :public_fellows, :private_fellows]
+    end
+
+    context "when is an admin of the user's institution" do
+      let(:user) { FactoryGirl.create(:user) }
+      before { target.institution.add_member!(user, 'Admin') }
+      context "regardless of the profile's visibility" do
+        Profile::VISIBILITY.each do |visibility|
+          before { target.visibility = Profile::VISIBILITY.index(visibility) }
+          it { should be_able_to(:read, target) }
+          it { should be_able_to(:update, target) }
+          it { should be_able_to(:index, target) }
+          it { should be_able_to(:edit, target) }
+        end
+      end
     end
   end
 

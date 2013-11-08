@@ -26,7 +26,8 @@ describe User do
   it { should validate_presence_of(:username) }
 
   [ :email, :password, :password_confirmation,
-    :remember_me, :login, :username, :receive_digest, :institution_name ].each do |attribute|
+    :remember_me, :login, :username, :receive_digest,
+    :institution_name, :approved ].each do |attribute|
     it { should allow_mass_assignment_of(attribute) }
   end
 
@@ -315,8 +316,24 @@ describe User do
     end
   end
 
+  it "#set_institution"
+
+  describe "on commit" do
+    it "sets the institution from #institution_name"
+  end
+
+  describe "on create" do
+    it "sends a message to the institution admins"
+  end
+
+  it "#approve!"
+
+  it "#active_for_authentication?"
+
+  it "#inactive_message"
+
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([:fellows, :current, :select])
+    set_custom_ability_actions([:fellows, :current, :select, :approve])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -356,6 +373,21 @@ describe User do
 
       context "he can do anything" do
         it { should be_able_to(:manage, :all) }
+      end
+    end
+
+    context "when is an admin of the user's institution" do
+      let(:user) { FactoryGirl.create(:user) }
+      before { target.institution.add_member!(user, 'Admin') }
+
+      it {
+        allowed = [:read, :edit, :update, :destroy, :fellows, :current, :select, :approve]
+        should_not be_able_to_do_anything_to(target).except(allowed)
+      }
+
+      context "and the target user is disabled" do
+        before { target.disable() }
+        it { should_not be_able_to_do_anything_to(target) }
       end
     end
 

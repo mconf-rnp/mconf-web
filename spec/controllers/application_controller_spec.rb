@@ -11,6 +11,11 @@ require "spec_helper"
 
 describe ApplicationController do
 
+  describe "#institution" do
+    it "returns the stored institution, if any"
+    it "if there's no institution stored, gets by permalink from the url params"
+  end
+
   describe "#set_time_zone" do
 
     # TODO: not sure if tested here or in every action in every controller (sounds bad)

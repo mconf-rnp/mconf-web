@@ -19,7 +19,7 @@ class UsersController < ApplicationController
 
   def index
     if space
-      space!
+      space! # TODO: useless?
       webconf_room!
       @users = space.users.sort {|x,y| x.name <=> y.name }
 

@@ -51,7 +51,7 @@ class Institution < ActiveRecord::Base
   def add_member! u, role = 'User'
     # Adds the user to the institution and sets his role as admin
     p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
-    p ||= Permission.new :user_id => u.id
+    p ||= Permission.new :user => u
     p.subject = self
     p.role = Role.find_by_name(role)
     p.save!

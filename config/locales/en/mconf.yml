@@ -731,7 +731,7 @@ en:
     information3: "These are the latest messages or events that you have created"
     information5: "These are the upcoming events of other spaces."
     reduce: "Reduce List.."
-  internet:
+  internet: 
     on_the: "On the Internet"
     ppal: Internet
   institution:

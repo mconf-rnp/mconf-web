@@ -141,4 +141,10 @@ describe ApplicationHelper do
     it "returns a localized string"
   end
 
+  describe "#user_category_name" do
+    it "for a superuser"
+    it "for an institution admin"
+    it "for a normal user"
+  end
+
 end

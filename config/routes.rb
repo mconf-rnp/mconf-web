@@ -52,7 +52,7 @@ Mconf::Application.routes.draw do
   match '/secure/info', :to => 'shibboleth#info', :as => "shibboleth_info"
   post '/secure/associate', :to => 'shibboleth#create_association', :as => "shibboleth_create_association"
 
-  resources :institutions do
+  resources :institutions, :except => [:index, :show] do
     member do
       get :user_permissions
     end

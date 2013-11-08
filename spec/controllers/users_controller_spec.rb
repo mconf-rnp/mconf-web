@@ -10,11 +10,16 @@ describe UsersController do
   render_views
 
   describe "#index" do
-    it "loads the space"
-    it "loads the webconference room information"
-    it "sets @users to all users in the space ordered by name"
-    it "renders users/index"
-    it "renders with the layout spaces_show"
+    context "if has @space set" do
+      it "loads the space"
+      it "loads the webconference room information"
+      it "sets @users to all users in the space ordered by name"
+      it "renders users/index"
+      it "renders with the layout spaces_show"
+    end
+    context "if has @institution set" do
+      it "sets @users to all users in the institution ordered by name"
+    end
   end
 
   describe "#show" do

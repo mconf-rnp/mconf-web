@@ -18,7 +18,23 @@ describe Institution do
   it { should allow_mass_assignment_of(:name) }
   it { should allow_mass_assignment_of(:acronym) }
 
+  describe ".spaces" do
+    let(:target) do
+      target = FactoryGirl.create(:institution)
+      target.spaces << FactoryGirl.create(:space)
+      target.spaces << FactoryGirl.create(:space)
+      target
+    end
+
+    it { target.spaces.size.should be(2) }
+    it { expect {target.spaces << FactoryGirl.create(:space)}.to change(target.spaces, :count).by(+1) }
+  end
+
+  it ".roles"
+
   describe ".search" do
+    it "returns an empty array if name is blank"
+
     before(:each) do
       FactoryGirl.create(:institution, :name => 'Black Sabbath', :acronym => 'BS')
       FactoryGirl.create(:institution, :name => 'National Acrobats Association', :acronym => 'NAA')
@@ -35,23 +51,32 @@ describe Institution do
     it { Institution.search('BS').count.should be(2) }
   end
 
-  describe ".spaces" do
-    let (:target) do
-        target = FactoryGirl.create(:institution)
-        target.spaces << FactoryGirl.create(:space)
-        target.spaces << FactoryGirl.create(:space)
-        target
+  describe ".correct_duplicate" do
+    let(:original) { FactoryGirl.create(:institution, :name => 'National Snooping Agency', :acronym => 'NSA') }
+    let(:copy) { FactoryGirl.create(:institution, :name => 'NSA', :acronym => 'NSA') }
+    let(:admin){ FactoryGirl.create(:user, :username => 'thecopyadmin')}
+    before :each do
+      original.add_member!(FactoryGirl.create(:user))
+      copy.add_member!(FactoryGirl.create(:user))
+      copy.add_member!(admin, 'Admin')
     end
+    subject { Institution.correct_duplicate(original, copy) }
 
-    it { target.spaces.size.should be(2) }
-    it { expect {target.spaces << FactoryGirl.create(:space)}.to change(target.spaces, :count).by(+1) }
+    it { expect {subject}.to change(Institution, :count).by(-1) }
+    it { expect {subject}.to change(original.users, :count).by(+2) }
+    it { expect {subject}.to change(copy.users, :count).by(-2) }
+    it { original.admins.include? admin }
   end
+
+  it ".find_or_create_by_name_or_acronym"
+
+  it "#admins"
 
   describe ".add_member!" do
 
     context "when user has no previous institution" do
-      let (:user) { FactoryGirl.create(:user) }
-      let (:target) { FactoryGirl.create(:institution) }
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
 
       it { expect { target.add_member!(user) }.to change(target.users, :count).by(+1) }
     end
@@ -67,22 +92,9 @@ describe Institution do
     end
   end
 
-  describe ".correct_duplicate" do
-    let (:original) { FactoryGirl.create(:institution, :name => 'National Snooping Agency', :acronym => 'NSA') }
-    let (:copy) { FactoryGirl.create(:institution, :name => 'NSA', :acronym => 'NSA') }
-    let (:admin){ FactoryGirl.create(:user, :username => 'thecopyadmin')}
-    before :each do
-      original.add_member!(FactoryGirl.create(:user))
-      copy.add_member!(FactoryGirl.create(:user))
-      copy.add_member!(admin, 'Admin')
-    end
-    subject { Institution.correct_duplicate(original, copy) }
+  it "#unapproved_users"
 
-    it { expect {subject}.to change(Institution, :count).by(-1) }
-    it { expect {subject}.to change(original.users, :count).by(+2) }
-    it { expect {subject}.to change(copy.users, :count).by(-2) }
-    it { original.admins.include? admin }
-  end
+  it "#to_json"
 
   describe "abilities" do
     subject { ability }
@@ -97,21 +109,18 @@ describe Institution do
     context "when is a registered user" do
       let(:user) { FactoryGirl.create(:user) }
 
-      context "that's a member of the institution" do
-        before do
-          target.add_member!(user, Role.default_role.name)
-        end
-
-        it { should_not be_able_to_do_anything_to(target).except(:read) }
-      end
-
       context "that's not a member of the institution" do
         it { should_not be_able_to_do_anything_to(target).except(:read) }
       end
 
-      context "that's an institutional admin of the institution" do
+      context "that's a member of the institution" do
+        before { target.add_member!(user, Role.default_role.name) }
+        it { should_not be_able_to_do_anything_to(target).except(:read) }
+      end
+
+      context "that's an admin of the institution" do
         before { target.add_member!(user, 'Admin') }
-        it { should_not be_able_to_do_anything_to(target).except([:read, :update]) }
+        it { should_not be_able_to_do_anything_to(target).except([:read, :update, :edit]) }
       end
     end
 

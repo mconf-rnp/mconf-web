@@ -10,15 +10,6 @@ describe InstitutionsController do
 
   render_views
 
-  describe "#index" do
-  end
-
-  it "#select.json"
-
-  describe "#show.json" do
-    it "responds with the correct json"
-  end
-
   describe "#new" do
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
@@ -81,6 +72,8 @@ describe InstitutionsController do
     end
   end
 
+  it "#update"
+
   describe "#edit" do
     let(:institution) { FactoryGirl.create(:institution) }
     let(:user) { FactoryGirl.create(:superuser) }
@@ -97,10 +90,10 @@ describe InstitutionsController do
     end
   end
 
-  it "#update"
   it "#destroy"
-  it "#select"
   it "#correct_duplicate"
+  it "#user_permissions"
+  it "#select"
 
   describe "abilities", :abilities => true do
     render_views(false)

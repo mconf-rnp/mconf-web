@@ -21,21 +21,20 @@ class mconf.SignupForm
     $fullname.on "input keyup", () ->
       $username.attr "value", stringToSlug($fullname.val())
 
-# Dynamic search for institutions
-id = '#user_institution_name'
-url = '/institutions/select.json'
-
-$(id).select2
-  minimumInputLength: 1
-  width: 'resolve'
-  multiple: false
-  ajax:
-    url: url
-    dataType: "json"
-    data: (term, page) ->
-      q: term # search term
-    results: (data, page) -> # parse the results into the format expected by Select2.
-      results: data
+    # Dynamic search for institutions
+    idInstitution = '#user_institution_name'
+    urlInstitutions = '/institutions/select.json'
+    $(idInstitution).select2
+      minimumInputLength: 1
+      width: 'resolve'
+      multiple: false
+      ajax:
+        url: urlInstitutions
+        dataType: "json"
+        data: (term, page) ->
+          q: term # search term
+        results: (data, page) -> # parse the results into the format expected by Select2.
+          results: data
 
 # Uncommenting this makes it possible to add a new institution by suggesting a new name
 #  createSearchChoice: (term, data) ->

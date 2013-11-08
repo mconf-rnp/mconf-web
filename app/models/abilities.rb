@@ -45,31 +45,12 @@ module Abilities
   class MemberAbility < BaseAbility
     def register_abilities(user)
       abilities_for_bigbluebutton_rails(user)
+      abilities_for_institution_admins(user)
 
       # Users
       # Disabled users are only visible to superusers
       can [:read, :fellows, :current, :select], User, :disabled => false
       can [:edit, :update, :destroy], User, :id => user.id, :disabled => false
-
-      # Institutional admins can edit their institution user's
-      can [:edit, :update, :destroy], User do |u|
-        u.institution.admins.include?(user)
-      end
-
-      # Institutional admins can approve users in their institution
-      can :approve, User do |user_object|
-        user_object.institution == user.institution &&
-        user.institution.admins.include?(user)
-      end
-
-      # The ManageController permissions
-      can :users, :manage do
-        user.institution.admins.include?(user)
-      end
-
-      can :spaces, :manage do
-        user.institution.admins.include?(user)
-      end
 
       # User profiles
       # Visible according to options selected by the user, editable by their owners
@@ -88,11 +69,6 @@ module Abilities
         end
       end
       can [:read, :edit, :update], Profile, :user_id => user.id
-
-      # Institutional admins can edit their institution user's
-      can [:read, :edit, :update], Profile do |p|
-        p.user.institution.admins.include?(user)
-      end
 
       # Private messages
       can :create, PrivateMessage
@@ -185,8 +161,8 @@ module Abilities
 
       # Institutions
       can [:read, :select], Institution
-      can [:edit, :update, :user_permissions], Institution do |i|
-        i.admins.include?(user)
+      can [:edit, :update, :user_permissions], Institution do |institution|
+        institution.admins.include?(user)
       end
 
       # Permissions
@@ -207,6 +183,32 @@ module Abilities
     end
 
     private
+
+    # Users that are admins of their institutions have some privileged permissions in objects
+    # related to their institution.
+    def abilities_for_institution_admins(user)
+      # Institutional admins can edit their institution's users
+      can [:edit, :update, :destroy], User do |u|
+        !u.institution.nil? && u.institution.admins.include?(user)
+      end
+
+      # Institutional admins can approve users in their institution
+      can :approve, User do |user_object|
+        user_object.institution == user.institution &&
+          !user.institution.nil? &&
+          user.institution.admins.include?(user)
+      end
+
+      # Institutional admins can access the manage lists of spaces and users in their institution
+      can [:users, :spaces], :manage do
+        !user.institution.nil? && user.institution.admins.include?(user)
+      end
+
+      # Institutional admins can edit their institution user's
+      can [:read, :edit, :update], Profile do |profile|
+        !profile.user.institution.nil? && profile.user.institution.admins.include?(user)
+      end
+    end
 
     # Abilities for the resources from BigbluebuttonRails.
     # Not everything is done here, some authorization steps are done by the gem
