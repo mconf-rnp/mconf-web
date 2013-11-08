@@ -3,11 +3,13 @@
   = raw link_logo_image(user, :size => '32', :title => user.name, :url => user_path(user), :class => 'logo logo-user')
 
   %ul.group_links
+    - unless user.approved?
+      = link_to approve_user_path(user), :confirm => t('.approve_confirm') do
+        = icon_approve(:alt => t('.approve'), :title => t('.approve'))
     = link_to (edit_user_path(user)) do
       = icon_edit(:alt => t('edit'), :title => t('edit'))
     = link_to user_path(user), :confirm => t('are_you_sure'), :method => :delete do
       = icon_delete(:alt => t('disable'), :title => t('user.disable'))
-    = link_to t('user.approve'), approve_user_path(user), :confirm => t('user.approve_confirm') if !user.approved?
 
   .user_data
     %ul

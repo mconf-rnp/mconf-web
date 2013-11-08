@@ -904,6 +904,9 @@ pt-br:
       preview: "Pré-visualização"
   logout: Sair
   manage:
+    enabled_user:
+      approve: "Aprovar"
+      approve_confirm: "Você deseja permitir que este usuário acesse o site?"
     menu:
       general: "Geral"
       spaces: "Comunidades"
@@ -1562,9 +1565,7 @@ pt-br:
     add_more: "Adicionar usuários >>"
     admin: Administrador
     administrators: Administradores
-    approve: Aprovar
     approved: "%{username} foi aprovado para usar o website."
-    approve_confirm: Este usuário será aprovado para usar o website.
     assist: Participantes
     by_email: "Por e-mail"
     by_private_message: "Por mensagem privada"
