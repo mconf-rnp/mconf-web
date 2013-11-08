@@ -1,7 +1,9 @@
 = render :partial => 'menu'
 
 = content_for :sidebar do
-  = render :partial => 'institutions/form', :locals => { :@institution => Institution.new }
+  %h3
+    = t('institutions.form.new')
+  = render :partial => 'institutions/form', :locals => { :@institution => Institution.new, :button_name => t('institutions.new.button') }
 
 #manage
   #institutions

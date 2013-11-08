@@ -3,20 +3,20 @@ class InstitutionsController < ApplicationController
   load_and_authorize_resource :find_by => :permalink
   skip_load_resource :only => :index
 
-  def new
-    @institution = Institution.new
-  end
+  respond_to :js, :only => [:select]
+  respond_to :html, :only => [:index, :new, :edit, :user_permissions]
 
   def create
     @institution = Institution.new(params[:institution])
 
-    respond_to do |format|
-      if @institution.save
-        flash[:success] = t('institution.created')
+    if @institution.save
+      flash[:success] = t('institution.created')
+      respond_to do |format|
         format.html { redirect_to manage_institutions_path }
-      else
-        flash[:error] = t('institution.error.create')
-        format.html { redirect_to new_institution_path }
+      end
+    else
+      respond_with @institution do |format|
+        format.html { render :new }
       end
     end
 
@@ -33,7 +33,9 @@ class InstitutionsController < ApplicationController
 
     else
       flash[:error] = t('error.change')
-      redirect_to edit_institution_path(@institution)
+      respond_with @institution do |format|
+        format.html { render :edit }
+      end
     end
   end
 

@@ -770,6 +770,12 @@ pt-br:
   institutions:
     form:
       new: Nova instituição
+    edit:
+      title: Editar instituição
+      button: Atualizar dados
+    new:
+      title: Criar instituição
+      button: Criar
   invitation:
     accept: "Aceitar o convite"
     access_space: "Você agora é um membro da comunidade %{spacename} e pode acessá-la em <a href=\"%{space_url}\"> %{space_url} </a>"
