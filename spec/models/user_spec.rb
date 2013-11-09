@@ -26,8 +26,8 @@ describe User do
   it { should validate_presence_of(:username) }
 
   [ :email, :password, :password_confirmation,
-    :remember_me, :login, :username, :receive_digest,
-    :institution_name, :approved ].each do |attribute|
+    :remember_me, :login, :username, :receive_digest, :approved,
+    :institution_name ].each do |attribute|
     it { should allow_mass_assignment_of(attribute) }
   end
 
@@ -83,7 +83,6 @@ describe User do
   end
 
   describe "on update" do
-
     context "updates the webconf room" do
       let(:user) { FactoryGirl.create(:user, :username => "old-user-name") }
       before(:each) { user.update_attributes(:username => "new-user-name") }
@@ -119,7 +118,28 @@ describe User do
     #   it { user.institution.should be(institution) }
     #   it { should change(Institution, :count).by(1) }
     # end
+  end
 
+  describe "on create" do
+    describe "#automatically_approve_if_needed" do
+      context "if #require_registration_approval is not set in the current site" do
+        before { Site.current.update_attributes(:require_registration_approval => false) }
+
+        context "automatically approves the user" do
+          before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
+          it { @user.approved?.should be_true }
+        end
+      end
+
+      context "if #require_registration_approval is set in the current site" do
+        before { Site.current.update_attributes(:require_registration_approval => true) }
+
+        context "doesn't approve the user" do
+          before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
+          it { @user.approved?.should be_false }
+        end
+      end
+    end
   end
 
   describe "#accessible_rooms" do
@@ -326,11 +346,70 @@ describe User do
     it "sends a message to the institution admins"
   end
 
-  it "#approve!"
+  describe "#approve!" do
+    let(:user) { FactoryGirl.create(:user, :approved => false) }
+    let(:params) {
+      { :username => "any", :email => "any@jaloo.com", :approved => false, :password => "123456" }
+    }
 
-  it "#active_for_authentication?"
+    context "sets the user as approved" do
+      before { user.approve! }
+      it { user.approved.should be_true }
+    end
 
-  it "#inactive_message"
+    context "throws an exception if fails to update the user" do
+      it {
+        user.should_receive(:update_attributes) { throw Exception.new }
+        expect { user.approve! }.to raise_error
+      }
+    end
+  end
+
+  describe "#active_for_authentication?" do
+    context "if #require_registration_approval is set in the current site" do
+      before { Site.current.update_attributes(:require_registration_approval => true) }
+
+      context "true if the user was approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => true) }
+        it { user.active_for_authentication?.should be_true }
+      end
+
+      context "false if the user was not approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => false) }
+        it { user.active_for_authentication?.should be_false }
+      end
+    end
+
+    context "if #require_registration_approval is not set in the current site" do
+      context "true even if the user was not approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => false) }
+        it { user.active_for_authentication?.should be_true }
+      end
+    end
+  end
+
+  describe "#inactive_message" do
+    context "if #require_registration_approval is set in the current site" do
+      before { Site.current.update_attributes(:require_registration_approval => true) }
+
+      context "if the user was approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => true) }
+        it { user.inactive_message.should be(:inactive) }
+      end
+
+      context "if the user was not approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => false) }
+        it { user.inactive_message.should be(:not_approved) }
+      end
+    end
+
+    context "if #require_registration_approval is not set in the current site" do
+      context "ignores the fact that the user was not approved" do
+        let(:user) { FactoryGirl.create(:user, :approved => false) }
+        it { user.inactive_message.should be(:inactive) }
+      end
+    end
+  end
 
   describe "abilities", :abilities => true do
     set_custom_ability_actions([:fellows, :current, :select, :approve])

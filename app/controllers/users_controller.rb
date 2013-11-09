@@ -146,10 +146,14 @@ class UsersController < ApplicationController
   end
 
   def approve
-    @user.approve!
-
-    flash[:notice] = t('user.approved', :username => @user.username)
+    if Site.current.require_registration_approval?
+      @user.approve!
+      @user.skip_confirmation_notification!
+      @user.confirm!
+      flash[:notice] = t('users.approve.approved', :username => @user.username)
+    else
+      flash[:error] = t('users.approve.not_enabled')
+    end
     redirect_to manage_users_path
   end
-
 end
