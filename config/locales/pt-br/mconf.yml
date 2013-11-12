@@ -1598,6 +1598,9 @@ pt-br:
       enabled: "Usuário %{name} já está habilitado"
     filter: "Convidar por nome de usuário"
     group_invite_email: "Convidar por e-mail"
+    hint:
+      institution: Escolha uma ou digite para buscar.
+    id: "ID do Usuário"
     include_registered: "Incluir usuários registrados"
     index:
       user_list:

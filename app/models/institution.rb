@@ -22,7 +22,8 @@ class Institution < ActiveRecord::Base
 
   # Search by both name and acronym
   def self.search name
-    return [] if name.blank?
+    # Return some institutions on blank search
+    return Institution.first(3) if name.blank?
     where "name LIKE :name OR acronym LIKE :name", :name => "%#{name}%"
   end
 

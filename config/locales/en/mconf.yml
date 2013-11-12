@@ -1641,6 +1641,9 @@ en:
       enabled: "User %{name} is already enabled"
     filter: "Invite by user name"
     group_invite_email: "Invite by e-mail"
+    hint:
+      institution: Choose one or type to search.
+    id: "User ID"
     include_registered: "Include registered users"
     institution: Institution
     index:

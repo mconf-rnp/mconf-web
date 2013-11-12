@@ -25,7 +25,8 @@ class mconf.SignupForm
     idInstitution = '#user_institution_name'
     urlInstitutions = '/institutions/select.json'
     $(idInstitution).select2
-      minimumInputLength: 1
+      minimumInputLength: 0
+      placeholder: I18n.t('user.hint.institution')
       width: 'resolve'
       multiple: false
       ajax:
