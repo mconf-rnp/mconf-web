@@ -1664,6 +1664,7 @@ pt-br:
     detailed_user:
       from: "De:"
     edit:
+      change_institution: Mudar instituição do usuário
       federated:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"

@@ -1697,6 +1697,7 @@ en:
     detailed_user:
       from: "From:"
     edit:
+      change_institution: Change user institution
       federated:
         see_your_data: "Click here to see your data that the federation shared with this website"
         title: "You are signed in using a federation!"
