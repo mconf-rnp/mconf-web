@@ -52,7 +52,7 @@ class Institution < ActiveRecord::Base
   end
 
   def full?
-    !user_limit.nil? && approved_users.count < user_limit
+    !user_limit.nil? && approved_users.count >= user_limit
   end
 
   def admins

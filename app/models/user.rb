@@ -183,8 +183,12 @@ class User < ActiveRecord::Base
     i.add_member!(self, Role.default_role.name)
   end
 
-  before_update do |user|
-    user.institution && !user.institution.full?
+  def institution_is_full?
+    if institution.nil?
+      false # if user has no institution, it's ok :)
+    else
+      institution.full?
+    end
   end
 
   after_commit do |user|
@@ -331,7 +335,11 @@ class User < ActiveRecord::Base
 
   # Sets the user as approved
   def approve!
-    self.update_attributes(:approved => true)
+    if institution_is_full?
+      false
+    else
+      self.update_attributes(:approved => true)
+    end
   end
 
   # Overrides a method from devise, see:
