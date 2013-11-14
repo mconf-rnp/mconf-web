@@ -22,4 +22,3 @@
         = user_category_name(user)
       %li.main_text.institution-name
         = link_to user.institution.name, user_permissions_institution_path(user.institution) if user.institution
-      = link_to t('user.approve'), approve_user_path(user), :confirm => t('user.approve_confirm'), :class => 'btn btn-primary' if !user.approved?

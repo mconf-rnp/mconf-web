@@ -1607,6 +1607,7 @@ pt-br:
     enabled: "Usuário habilitado com sucesso. O usuário atualmente não pertence a nenhuma comunidade, e terá que aderir às comunidades novamente."
     error:
       enabled: "Usuário %{name} já está habilitado"
+      institution_full: Usuário não foi aprovado porque %{name} tem um limite de %{limit} membros
     filter: "Convidar por nome de usuário"
     group_invite_email: "Convidar por e-mail"
     hint:
@@ -1669,6 +1670,9 @@ pt-br:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"
         your_idp: "O seu provedor de identidade é: %{idp}"
+    registrations:
+      signup_form:
+        institution_hint: Escolha uma ou digite para buscar.
   username: "Nome de usuário"
   vCard:
     corrupt: "O vCard que você enviou está corrompido ou é uma versão não suportada"
