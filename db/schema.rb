@@ -185,6 +185,7 @@ ActiveRecord::Schema.define(:version => 20131109180956) do
     t.string   "permalink"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "user_limit"
   end
 
   create_table "join_requests", :force => true do |t|

@@ -68,6 +68,8 @@ class User < ActiveRecord::Base
 
   validates :email, :presence => true, :email => true
 
+  validates :institution_name, :presence => true, :on => :create
+
   acts_as_resource :param => :username
 
   has_and_belongs_to_many :spaces, :join_table => :permissions,
@@ -179,6 +181,14 @@ class User < ActiveRecord::Base
   def set_institution name
     i = Institution.find_or_create_by_name_or_acronym(name)
     i.add_member!(self, Role.default_role.name)
+  end
+
+  def institution_is_full?
+    if institution.nil?
+      false # if user has no institution, it's ok :)
+    else
+      institution.full?
+    end
   end
 
   after_commit do |user|
@@ -325,7 +335,11 @@ class User < ActiveRecord::Base
 
   # Sets the user as approved
   def approve!
-    self.update_attributes(:approved => true)
+    if institution_is_full?
+      false
+    else
+      self.update_attributes(:approved => true)
+    end
   end
 
   # Overrides a method from devise, see:

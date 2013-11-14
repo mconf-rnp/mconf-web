@@ -1,7 +1,9 @@
 class Institution < ActiveRecord::Base
-  attr_accessible :acronym, :name
+  attr_accessible :acronym, :name, :user_limit
 
   validates :name, :presence => true, :uniqueness => true
+
+  validates :user_limit, :numericality => true, :allow_blank => true
 
   has_many :permissions, :foreign_key => "subject_id",
            :conditions => { :permissions => {:subject_type => 'Institution'} },
@@ -22,7 +24,8 @@ class Institution < ActiveRecord::Base
 
   # Search by both name and acronym
   def self.search name
-    return [] if name.blank?
+    # Return some institutions on blank search
+    return Institution.first(3) if name.blank?
     where "name LIKE :name OR acronym LIKE :name", :name => "%#{name}%"
   end
 
@@ -42,6 +45,14 @@ class Institution < ActiveRecord::Base
 
     # Create the institution if it doesn't exist and add the user to it
     i ||= create(:name => name)
+  end
+
+  def approved_users
+    users.where :approved => true
+  end
+
+  def full?
+    !user_limit.nil? && approved_users.count >= user_limit
   end
 
   def admins

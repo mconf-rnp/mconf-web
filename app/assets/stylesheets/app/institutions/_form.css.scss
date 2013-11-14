@@ -1,0 +1,18 @@
+@import "definitions";
+@import "compass/css3";
+
+body.institutions {
+
+    width: 98%;
+
+    input[type=text], textarea {
+      width: 98%;
+    }
+
+    textarea {
+      resize: vertical;
+      max-height: none;
+      height: 150px;
+    }
+
+}
