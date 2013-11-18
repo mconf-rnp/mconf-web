@@ -18,6 +18,8 @@
         = sanitize institution.name
 
       %p
-        = link_to t('institution.user', :count => institution.users.count).capitalize, user_permissions_institution_path(institution)
+        = link_to t('institution.user', :count => institution.approved_users.count).capitalize, user_permissions_institution_path(institution)
+        - if institution.user_limit
+          = t('institution.user_limit', :limit => institution.user_limit)
       %p
         = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institutions_path(institution)

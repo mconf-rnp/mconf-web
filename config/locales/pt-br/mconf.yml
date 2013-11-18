@@ -88,6 +88,7 @@ pt-br:
       institution:
         name: Nome
         acronym: Sigla
+        user_limit: Número Máximo de membros
       site:
         analytics_code: "Código do Google Analytics"
         chat_enabled: "Habilitar Chat"
@@ -747,10 +748,14 @@ pt-br:
     ppal: Internet
   institution:
     created: Instituição criada com sucesso.
+    updated: Atualizada com sucesso
+    error:
+      update: As informações não puderam ser atualizadas
     user:
       zero: nenhum membro
       one: um membro
       other: %{count} membros
+    user_limit: de no máximo %{limit}
     space:
       zero: nenhuma comunidade
       one: uma comunidade
@@ -765,6 +770,12 @@ pt-br:
   institutions:
     form:
       new: Nova instituição
+    edit:
+      title: Editar instituição
+      button: Atualizar dados
+    new:
+      title: Criar instituição
+      button: Criar
   invitation:
     accept: "Aceitar o convite"
     access_space: "Você agora é um membro da comunidade %{spacename} e pode acessá-la em <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -1596,8 +1607,12 @@ pt-br:
     enabled: "Usuário habilitado com sucesso. O usuário atualmente não pertence a nenhuma comunidade, e terá que aderir às comunidades novamente."
     error:
       enabled: "Usuário %{name} já está habilitado"
+      institution_full: Usuário não foi aprovado porque %{name} tem um limite de %{limit} membros
     filter: "Convidar por nome de usuário"
     group_invite_email: "Convidar por e-mail"
+    hint:
+      institution: Escolha uma ou digite para buscar.
+    id: "ID do Usuário"
     include_registered: "Incluir usuários registrados"
     index:
       user_list:
@@ -1650,10 +1665,14 @@ pt-br:
     detailed_user:
       from: "De:"
     edit:
+      change_institution: Mudar instituição do usuário
       federated:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"
         your_idp: "O seu provedor de identidade é: %{idp}"
+    registrations:
+      signup_form:
+        institution_hint: Escolha uma ou digite para buscar.
   username: "Nome de usuário"
   vCard:
     corrupt: "O vCard que você enviou está corrompido ou é uma versão não suportada"

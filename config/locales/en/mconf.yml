@@ -756,6 +756,7 @@ en:
       zero: no spaces
       one: one space
       other: %{count} spaces
+    user_limit: of a maximum of %{limit}
     users: Users in this institution
     destroy: Delete institution
     duplicate: This institution is a duplicate...
@@ -1639,8 +1640,10 @@ en:
     enabled: "User successfully enabled. The user currently belongs to no space, and will have to join spaces again."
     error: 
       enabled: "User %{name} is already enabled"
+      institution_full: User can't be approved because %{name} has a user limit of %{limit}
     filter: "Invite by user name"
     group_invite_email: "Invite by e-mail"
+    id: "User ID"
     include_registered: "Include registered users"
     institution: Institution
     index:
@@ -1694,10 +1697,14 @@ en:
     detailed_user:
       from: "From:"
     edit:
+      change_institution: Change user institution
       federated:
         see_your_data: "Click here to see your data that the federation shared with this website"
         title: "You are signed in using a federation!"
         your_idp: "Your identity provider is: %{idp}"
+    registrations:
+      signup_form:
+        institution_hint: Choose one or type to search.
   username: Username
   vCard: 
     corrupt: "The vCard you sent is corrupted or is a non-supported version"

@@ -3,20 +3,20 @@ class InstitutionsController < ApplicationController
   load_and_authorize_resource :find_by => :permalink
   skip_load_resource :only => :index
 
-  def new
-    @institution = Institution.new
-  end
+  respond_to :js, :only => [:select]
+  respond_to :html, :only => [:index, :new, :edit, :user_permissions]
 
   def create
     @institution = Institution.new(params[:institution])
 
-    respond_to do |format|
-      if @institution.save
-        flash[:success] = t('institution.created')
+    if @institution.save
+      flash[:success] = t('institution.created')
+      respond_to do |format|
         format.html { redirect_to manage_institutions_path }
-      else
-        flash[:error] = t('institution.error.create')
-        format.html { redirect_to new_institution_path }
+      end
+    else
+      respond_with @institution do |format|
+        format.html { render :new }
       end
     end
 
@@ -32,14 +32,16 @@ class InstitutionsController < ApplicationController
       end
 
     else
-      flash[:error] = t('institution.error.update')
-      redirect_to manage_institutions_path
+      flash[:error] = t('error.change')
+      respond_with @institution do |format|
+        format.html { render :edit }
+      end
     end
   end
 
   def edit
     respond_to do |format|
-      format.html
+      format.html { render :layout => !request.xhr? }
     end
   end
 

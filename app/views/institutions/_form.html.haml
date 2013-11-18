@@ -1,10 +1,8 @@
-#institution-sidebar
-  %h3
-    = t('.new')
+#institution-form
 
   = simple_form_for(@institution) do |f|
-    = f.input :name
-    = f.hint icon_help(t('simple_form.hints.institution.acronym'))
-    = f.label :acronym
-    = f.text_field :acronym
-    = f.button :wrapped, :value => t("_other.create")
+    #institution-basic-info
+      = f.input :name
+      = f.input :acronym
+      = f.input :user_limit
+    = f.button :wrapped, :value => button_name
