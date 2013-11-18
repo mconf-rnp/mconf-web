@@ -1607,7 +1607,6 @@ pt-br:
     enabled: "Usuário habilitado com sucesso. O usuário atualmente não pertence a nenhuma comunidade, e terá que aderir às comunidades novamente."
     error:
       enabled: "Usuário %{name} já está habilitado"
-      institution_full: Usuário não foi aprovado porque %{name} tem um limite de %{limit} membros
     filter: "Convidar por nome de usuário"
     group_invite_email: "Convidar por e-mail"
     hint:
@@ -1661,6 +1660,7 @@ pt-br:
   users:
     approve:
       approved: "O usuário %{username} foi aprovado para acessar este site!"
+      institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
       not_enabled: "A aprovação de registros não está habilitada neste site"
     detailed_user:
       from: "De:"

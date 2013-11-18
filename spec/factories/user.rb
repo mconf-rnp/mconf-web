@@ -5,7 +5,12 @@
 # 3 or later. See the LICENSE file.
 
 FactoryGirl.define do
-  factory :user, :class => User do |u|
+
+  # TODO: Not really unconfirmed as it should, but can't do it right now:
+  #   It's triggering an error related to delayed_job (undefined method `tag=').
+  #   Uncomment this when delayed_job is removed, see #811.
+  #   Search for this same comment in other files as well.
+  factory :user_unconfirmed, :class => User do |u|
     u.username
     u.email
     u.sequence(:_full_name) { |n| Forgery::Name.unique_full_name(n) }
@@ -17,9 +22,9 @@ FactoryGirl.define do
     u.approved true
     u.superuser false
     u.receive_digest { User::RECEIVE_DIGEST_NEVER }
+    u.confirmed_at { Time.now }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
-    u.confirmed_at { Time.now }
     u.sequence(:institution_name) { |n| Forgery::Name.unique_full_name(n) }
     after(:create) do |u2|
       u2.confirm!
@@ -27,10 +32,10 @@ FactoryGirl.define do
     end
   end
 
-  # factory :user, :parent => :user_unconfirmed do |u|
-  #   u.confirmed_at { Time.now }
-  #   after(:create) { |u2| u2.confirm! }
-  # end
+  factory :user, :parent => :user_unconfirmed do |u|
+    # u.confirmed_at { Time.now }
+    # after(:create) { |u2| u2.confirm! }
+  end
 
   factory :superuser, :class => User, :parent => :user do |u|
     u.superuser true

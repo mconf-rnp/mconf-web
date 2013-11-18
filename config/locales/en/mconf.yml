@@ -1640,7 +1640,6 @@ en:
     enabled: "User successfully enabled. The user currently belongs to no space, and will have to join spaces again."
     error: 
       enabled: "User %{name} is already enabled"
-      institution_full: User can't be approved because %{name} has a user limit of %{limit}
     filter: "Invite by user name"
     group_invite_email: "Invite by e-mail"
     id: "User ID"
@@ -1693,6 +1692,7 @@ en:
   users:
     approve:
       approved: "The user %{username} was approved to access the website!"
+      institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
       not_enabled: "Approval of registrations is not enabled in this website"
     detailed_user:
       from: "From:"
