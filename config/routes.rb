@@ -30,7 +30,6 @@ Mconf::Application.routes.draw do
     get "logout", :to => "sessions#destroy"
     get "register", :to => "registrations#new"
   end
-  get '/users/:id/approve' => 'users#approve', :as => :approve_user
 
   # bigbluebutton_rails default routes
   bigbluebutton_routes :default, :controllers => {
@@ -138,12 +137,6 @@ Mconf::Application.routes.draw do
     end
 
     resource :profile, :except => [:new, :create]
-
-    resource :avatar do
-      member do
-        post :precrop
-      end
-    end
   end
 
   # Routes specific for the current user
@@ -169,6 +162,8 @@ Mconf::Application.routes.draw do
       get :webconf
     end
   end
+
+  resources :tags
 
   # The unique Site is created in db/seeds and can only be edited
   resource :site, :only => [:show, :edit, :update]
