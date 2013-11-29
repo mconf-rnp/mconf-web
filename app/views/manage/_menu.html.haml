@@ -16,7 +16,7 @@
         = link_to t('.users'), manage_users_path
 
     - if can?(:institutions, :manage)
-      %li{ :class => "#{'selected' if params[:controller] == 'manage' && params[:action] == 'institutions'}" }
+      %li{ :class => "#{'selected' if (params[:controller] == 'manage' && params[:action] == 'institutions') or (params[:controller] == 'institutions')}" }
         = link_to t('.institutions'), manage_institutions_path
 
     - if can?(:spam, :manage)

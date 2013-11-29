@@ -11,3 +11,7 @@
   .space-text
     = link_to space_path(space), :class => 'space-name' do
       = highlight(sanitize(space.name), params[:q])
+
+    - if space.institution
+      %span.institution-name
+        = link_to space.institution.full_name, spaces_institution_path(space.institution)

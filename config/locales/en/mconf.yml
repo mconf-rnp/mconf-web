@@ -768,6 +768,12 @@ en:
   institutions:
     form:
       new: New institution
+    edit:
+      title: Edit institution
+      button: Update data
+    new:
+      title: Create institution
+      button: Create
   invitation:
     accept: "Accept invitation"
     access_space: "You are now a member of %{spacename} and now you can access it on <a href=\"%{space_url}\"> %{space_url} </a>"

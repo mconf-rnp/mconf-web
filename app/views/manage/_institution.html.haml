@@ -22,4 +22,4 @@
         - if institution.user_limit
           = t('institution.user_limit', :limit => institution.user_limit)
       %p
-        = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institutions_path(institution)
+        = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)

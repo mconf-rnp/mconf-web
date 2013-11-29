@@ -60,7 +60,7 @@ class Institution < ActiveRecord::Base
   end
 
   def add_member! u, role = 'User'
-    # Adds the user to the institution and sets his role as admin
+    # Adds the user to the institution and sets his role as `role`
     p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
     p ||= Permission.new :user => u
     p.subject = self
@@ -68,12 +68,26 @@ class Institution < ActiveRecord::Base
     p.save!
   end
 
+  def remove_member! u, role = 'User'
+    p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
+    p.destroy unless p.nil?
+  end
+
   def unapproved_users
     users.where :approved => [nil, false]
   end
 
   def to_json
-    { :text => "#{name} (#{acronym})", :id => name}
+    { :text => full_name, :id => name}
+  end
+
+  def full_name
+    "#{name} (#{acronym})"
+  end
+
+  def user_role user
+    p = Permission.where(:user_id => user.id, :subject_type => 'Institution').first
+    p.role.name unless p.nil? or p.role.nil?
   end
 
 end

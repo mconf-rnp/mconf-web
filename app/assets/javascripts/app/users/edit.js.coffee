@@ -5,8 +5,6 @@ $ ->
     urlInstitutions = '/institutions/select.json'
     $(idInstitution).select2
       minimumInputLength: 0
-      placeholder: I18n.t('user.hint.institution')
-      width: 'resolve'
       multiple: false
       ajax:
         url: urlInstitutions

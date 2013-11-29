@@ -102,9 +102,6 @@ class User < ActiveRecord::Base
   attr_accessor :_full_name
   attr_accessible :_full_name
 
-  attr_accessor :institution_name
-  attr_accessible :institution_name
-
   # BigbluebuttonRoom requires an identifier with 3 chars generated from :name
   # So we'll require :_full_name and :username to have length >= 3
   # TODO: review, see issue #737
@@ -174,24 +171,6 @@ class User < ActiveRecord::Base
     else
       ""
     end
-  end
-
-  def set_institution name
-    i = Institution.find_or_create_by_name_or_acronym(name)
-    i.add_member!(self, Role.default_role.name)
-  end
-
-  def institution_is_full?
-    if institution.nil?
-      false # if user has no institution, it's ok :)
-    else
-      institution.full?
-    end
-  end
-
-  after_commit do |user|
-    # Try to set institution information
-    user.set_institution(user.institution_name) if user.institution_name
   end
 
   after_create do |user|
@@ -275,11 +254,6 @@ class User < ActiveRecord::Base
     self.update_attribute(:disabled,false)
   end
 
-  def institution
-    p = Permission.where(:user_id => id, :subject_type => 'Institution').first
-    p ? p.subject : nil
-  end
-
   def fellows(name=nil, limit=nil)
     limit = limit || 5            # default to 5
     limit = 50 if limit.to_i > 50 # no more than 50
@@ -356,4 +330,44 @@ class User < ActiveRecord::Base
       super # Use whatever other message
     end
   end
+
+
+  #
+  # Association with an institution
+  #
+
+  attr_accessor :institution_name
+  attr_accessible :institution_name
+  attr_accessible :institution
+
+  def set_institution name
+    i = Institution.find_or_create_by_name_or_acronym(name)
+    i.add_member!(self, Role.default_role.name)
+  end
+
+  def institution_is_full?
+    if institution.nil?
+      false # if user has no institution, it's ok :)
+    else
+      institution.full?
+    end
+  end
+
+  def institution
+    p = Permission.where(:user_id => id, :subject_type => 'Institution').first
+    p ? p.subject : nil
+  end
+
+  # Remove the user from his institution (if any) and add him to the institution
+  # `new_institution` (if any, otherwise the user will be without an institution set).
+  def institution=(new_institution)
+    institution.remove_member!(self) unless institution.nil?
+    new_institution.add_member!(self, Role.default_role.name) unless new_institution.nil?
+  end
+
+  after_commit do |user|
+    # Try to set institution information
+    user.set_institution(user.institution_name) if user.institution_name
+  end
+
 end

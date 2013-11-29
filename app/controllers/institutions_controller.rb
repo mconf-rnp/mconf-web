@@ -68,6 +68,13 @@ class InstitutionsController < ApplicationController
       x.user.name <=> y.user.name
     end
     @roles = Institution.roles
+
+    render :layout => 'no_sidebar'
+  end
+
+  def spaces
+    @spaces = @institution.spaces
+    render :layout => 'no_sidebar'
   end
 
   def select

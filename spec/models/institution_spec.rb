@@ -72,7 +72,7 @@ describe Institution do
 
   it "#admins"
 
-  describe ".add_member!" do
+  describe "#add_member!" do
 
     context "when user has no previous institution" do
       let(:user) { FactoryGirl.create(:user) }
@@ -82,9 +82,9 @@ describe Institution do
     end
 
     context "when user has a previous institution" do
-      let (:user) { FactoryGirl.create(:user) }
-      let (:target) { FactoryGirl.create(:institution) }
-      let (:previous) { FactoryGirl.create(:institution) }
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+      let(:previous) { FactoryGirl.create(:institution) }
       before(:each) { previous.add_member!(user) }
 
       it { expect { target.add_member!(user) }.to change(target.users, :count).by(+1) }
@@ -92,9 +92,51 @@ describe Institution do
     end
   end
 
+  describe "#remove_member!" do
+    context "when user is not in the institution" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+      it { expect { target.remove_member!(user) }.not_to change(target.users, :count) }
+    end
+
+    context "when user is in the institution" do
+      let(:target) { FactoryGirl.create(:institution) }
+      let(:user) { FactoryGirl.create(:user, :institution => target) }
+      it {
+        user # force the user to be created before the call below
+        expect { target.remove_member!(user) }.to change(target.users, :count).by(-1)
+      }
+    end
+  end
+
   it "#unapproved_users"
 
   it "#to_json"
+
+  describe "#full_name" do
+    context "returns the name and the acronym" do
+      let(:target) { FactoryGirl.create(:institution, :name => "Any Name", :acronym => "YAAC") }
+      subject { target.full_name }
+      it { should eql("Any Name (YAAC)") }
+    end
+  end
+
+  describe "#user_role" do
+    context "returns the name of the role for the target user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+
+      context "if a normal user" do
+        before { target.add_member!(user, "User") }
+        it { target.user_role(user).should eql("User") }
+      end
+
+      context "if an admin" do
+        before { target.add_member!(user, "Admin") }
+        it { target.user_role(user).should eql("Admin") }
+      end
+    end
+  end
 
   describe "abilities" do
     subject { ability }

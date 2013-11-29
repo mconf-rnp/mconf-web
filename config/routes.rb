@@ -54,11 +54,11 @@ Mconf::Application.routes.draw do
   resources :institutions, :except => [:index, :show] do
     member do
       get :user_permissions
+      get :spaces
     end
     collection do
       get :select
       get :correct_duplicate
-      get :spaces
     end
   end
 

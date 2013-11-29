@@ -93,6 +93,7 @@ describe InstitutionsController do
   it "#destroy"
   it "#correct_duplicate"
   it "#user_permissions"
+  it "#spaces"
   it "#select"
 
   describe "abilities", :abilities => true do

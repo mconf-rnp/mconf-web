@@ -142,7 +142,7 @@ describe ManageController do
 
     describe "if the current user is an institution admin" do
       let(:institution) { FactoryGirl.create(:institution) }
-      let(:user) { FactoryGirl.create(:user, :institution_name => institution.name) }
+      let(:user) { FactoryGirl.create(:user, :institution => institution) }
       before { institution.add_member!(user, 'Admin') }
       before(:each) { sign_in(user) }
 
@@ -154,10 +154,10 @@ describe ManageController do
       context "sets @users to a list of all users, excluding disabled users and users from other institutions" do
         before {
           @u1 = user
-          @u2 = FactoryGirl.create(:user, :institution_name => institution.name, :disabled => false)
-          @u3 = FactoryGirl.create(:user, :institution_name => institution.name, :disabled => false)
-          @u4 = FactoryGirl.create(:user, :institution_name => institution.name, :disabled => true)
-          @u5 = FactoryGirl.create(:user, :institution_name => FactoryGirl.create(:institution).name, :disabled => true)
+          @u2 = FactoryGirl.create(:user, :institution => institution, :disabled => false)
+          @u3 = FactoryGirl.create(:user, :institution => institution, :disabled => false)
+          @u4 = FactoryGirl.create(:user, :institution => institution, :disabled => true)
+          @u5 = FactoryGirl.create(:user, :institution => FactoryGirl.create(:institution), :disabled => true)
         }
         before(:each) { get :users }
         it { assigns(:users).count.should be(3) } # our 2 plus the standard seeded user
@@ -177,10 +177,9 @@ describe ManageController do
       context "orders @users by the user's full name" do
         before {
           @u1 = user
-          @u1.update_attributes(:institution_name => institution.name)
           @u1.profile.update_attributes(:full_name => 'Ce user')
-          @u2 = FactoryGirl.create(:user, :_full_name => 'A user', :institution_name => institution.name)
-          @u3 = FactoryGirl.create(:user, :_full_name => 'Be user', :institution_name => institution.name)
+          @u2 = FactoryGirl.create(:user, :_full_name => 'A user', :institution => institution)
+          @u3 = FactoryGirl.create(:user, :_full_name => 'Be user', :institution => institution)
         }
         before(:each) { get :users }
         it { assigns(:users).count.should be(3) }
@@ -191,7 +190,7 @@ describe ManageController do
 
       context "paginates the list of users" do
         before {
-          45.times { FactoryGirl.create(:user, :institution_name => institution.name) }
+          45.times { FactoryGirl.create(:user, :institution => institution) }
           User.first.destroy # it's not from the same institution, remove to prevent errors
         }
 
@@ -219,10 +218,9 @@ describe ManageController do
         context "by full name" do
           before {
             @u1 = user
-            @u1.update_attributes(:institution_name => institution.name)
             @u1.profile.update_attributes(:full_name => 'First')
-            @u2 = FactoryGirl.create(:user, :institution_name => institution.name, :_full_name => 'Second')
-            @u3 = FactoryGirl.create(:user, :institution_name => institution.name, :_full_name => 'Secondary')
+            @u2 = FactoryGirl.create(:user, :institution => institution, :_full_name => 'Second')
+            @u3 = FactoryGirl.create(:user, :institution => institution, :_full_name => 'Secondary')
           }
           before(:each) { get :users, :q => 'sec' }
           it { assigns(:users).count.should be(2) }
@@ -233,10 +231,9 @@ describe ManageController do
         context "by username" do
           before {
             @u1 = user
-            @u1.update_attributes(:institution_name => institution.name)
             @u1.update_attributes(:username => 'First')
-            @u2 = FactoryGirl.create(:user, :institution_name => institution.name, :username => 'Second')
-            @u3 = FactoryGirl.create(:user, :institution_name => institution.name, :username => 'Secondary')
+            @u2 = FactoryGirl.create(:user, :institution => institution, :username => 'Second')
+            @u3 = FactoryGirl.create(:user, :institution => institution, :username => 'Secondary')
           }
           before(:each) { get :users, :q => 'sec' }
           it { assigns(:users).count.should be(2) }
@@ -250,8 +247,8 @@ describe ManageController do
         #   before {
         #     @u1 = user
         #     @u1.update_attributes(:email => 'first@here.com')
-        #     @u2 = FactoryGirl.create(:user, :institution_name => institution.name, :email => 'second@there.com')
-        #     @u3 = FactoryGirl.create(:user, :institution_name => institution.name, :email => 'my@secondary.org')
+        #     @u2 = FactoryGirl.create(:user, :institution => institution, :email => 'second@there.com')
+        #     @u3 = FactoryGirl.create(:user, :institution => institution, :email => 'my@secondary.org')
         #   }
         #   before(:each) { get :users, :q => 'sec' }
         #   it { assigns(:users).count.should be(2) }
@@ -376,7 +373,7 @@ describe ManageController do
 
     describe "if the current user is an institution admin" do
       let(:institution) { FactoryGirl.create(:institution) }
-      let(:user) { FactoryGirl.create(:user, :institution_name => institution.name) }
+      let(:user) { FactoryGirl.create(:user, :institution => institution) }
       before { institution.add_member!(user, 'Admin') }
       before(:each) { sign_in(user) }
 

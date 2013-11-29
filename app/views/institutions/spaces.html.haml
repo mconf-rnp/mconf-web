@@ -1,0 +1,5 @@
+= render :partial => 'manage/menu'
+
+#institution-spaces
+  - for space in @spaces
+    = render :partial => 'spaces/unified_space', :locals => { :space => space, :is_member => false }

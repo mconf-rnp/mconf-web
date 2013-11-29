@@ -51,6 +51,12 @@ body.users.edit, body.users.update {
     h3 {
       margin: 5px 0 10px 0;
     }
+
+    .user_institution_name {
+      #user_institution_name, .select2-container {
+        width: 50%;
+      }
+    }
   }
 
   #cancel-account {

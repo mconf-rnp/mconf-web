@@ -20,9 +20,9 @@
       = highlight(sanitize(user.full_name), params[:q])
       = "(#{highlight(user.username, params[:q])}, #{highlight(user.email, params[:q])})".html_safe
 
-    %span.user-category
-      = user_category_name(user)
-
     - if user.institution
       %span.institution-name
-        = link_to user.institution.name, user_permissions_institution_path(user.institution)
+        = link_to user.institution.full_name, user_permissions_institution_path(user.institution)
+
+    %span.user-category
+      = user_category_name(user)

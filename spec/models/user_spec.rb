@@ -26,8 +26,7 @@ describe User do
   it { should validate_presence_of(:username) }
 
   [ :email, :password, :password_confirmation,
-    :remember_me, :login, :username, :receive_digest, :approved,
-    :institution_name ].each do |attribute|
+    :remember_me, :login, :username, :receive_digest, :approved ].each do |attribute|
     it { should allow_mass_assignment_of(attribute) }
   end
 
@@ -37,15 +36,6 @@ describe User do
     it "is created when the user is created" do
       user.profile.should_not be_nil
       user.profile.should be_an_instance_of(Profile)
-    end
-  end
-
-  describe "#institution" do
-    let(:user) { FactoryGirl.create(:user) }
-
-    it "user has one after being created" do
-      user.institution.should_not be_nil
-      user.institution.should be_an_instance_of(Institution)
     end
   end
 
@@ -351,16 +341,6 @@ describe User do
     end
   end
 
-  it "#set_institution"
-
-  describe "on commit" do
-    it "sets the institution from #institution_name"
-  end
-
-  describe "on create" do
-    it "sends a message to the institution admins"
-  end
-
   describe "#approve!" do
     let(:user) { FactoryGirl.create(:user, :approved => false) }
     let(:params) {
@@ -513,6 +493,58 @@ describe User do
         it { should_not be_able_to_do_anything_to(target) }
       end
     end
+  end
+
+
+  #
+  # Tests for the association with institutions
+  #
+
+  [ :institution_name, :institution ].each do |attribute|
+    it { should allow_mass_assignment_of(attribute) }
+  end
+
+  describe "#institution" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    it "is set when the user is created" do
+      user.institution.should_not be_nil
+      user.institution.should be_an_instance_of(Institution)
+    end
+
+    context "is set to the correct value" do
+      let(:institution) { FactoryGirl.create(:institution) }
+      before { institution.add_member!(user) }
+      it { user.institution.should eql(institution) }
+    end
+  end
+
+  describe "#institution=" do
+    let(:institution) { FactoryGirl.create(:institution) }
+    let(:user) { FactoryGirl.create(:user, :institution => institution) }
+    let(:new_institution) { FactoryGirl.create(:institution) }
+
+    it "removes the user from the previous institution" do
+      user # force the user to be created and associated with the institution
+      expect { user.institution = new_institution }.to change(institution.users, :count).by(-1)
+      institution.users.should_not include(user)
+    end
+
+    it "adds the user to the new institution with the default role" do
+      expect { user.institution = new_institution }.to change(new_institution.users, :count).by(1)
+      new_institution.users.should include(user)
+      new_institution.user_role(user).should eql('User')
+    end
+  end
+
+  it "#set_institution"
+
+  describe "on commit" do
+    it "sets the institution from #institution_name"
+  end
+
+  describe "on create" do
+    it "sends a message to the institution admins"
   end
 
 end
