@@ -250,6 +250,10 @@ class User < ActiveRecord::Base
     self.with_exclusive_scope { find(*args) }
   end
 
+  def self.with_disabled
+    where(:disabled => [true, false])
+  end
+
   def <=>(user)
     self.username <=> user.username
   end
@@ -330,6 +334,11 @@ class User < ActiveRecord::Base
     else
       self.update_attributes(:approved => true)
     end
+  end
+
+  # Sets the user as not approved
+  def disapprove!
+    self.update_attributes(:approved => false)
   end
 
   # Overrides a method from devise, see:

@@ -924,9 +924,26 @@ en:
       preview: "Preview"
   logout: Logout
   manage:
+    disabled_space:
+      enable: "Enable space"
+      enable_confirm: "Are you sure you want to enable this space?"
+    disabled_user:
+      enable: "Enable user"
+      enable_confirm: "Are you sure you want to enable this user?"
+    enabled_space:
+      disable: "Disable space"
+      disable_confirm: "Are you sure you want to disable this space?"
+      edit: "Edit space"
     enabled_user:
-      approve: "Approve"
+      administrator: "Global administrator"
+      approve: "Approve: allow this user to access the website"
       approve_confirm: "Are you sure you want to allow this user to access the website?"
+      disable: "Disable user"
+      disable_confirm: "Are you sure you want to disable this user?"
+      disapprove: "Disapprove: block user from accessing the website"
+      disapprove_confirm: "Are you sure you want to block this user from accessing the website?"
+      edit: "Edit user"
+      normal_user: "Normal user"
     menu:
       general: "General"
       spaces: "Spaces"
@@ -935,6 +952,9 @@ en:
       users: "Users"
       webconf: "Web Conference"
       institutions: Institutions
+    spaces:
+      filter_name: "Name"
+      filter_results: "Filter the results:"
     spam:
       event:
         delete_confirmation: "Remove this event permanently?"
@@ -949,6 +969,11 @@ en:
         not_spam_confirmation: "Confirm that this post is not a spam?"
         not_spam_tooltip: "This post is not a spam"
         title: "Posts marked as spam"
+    users:
+      filter_name_or_username: "Name, username or email"
+      filter_results: "Filter the results:"
+    users_list:
+      no_user_found: "No user found"
   mandatory_field: "Mandatory field"
   message: 
     created: "Message sent successfully"
@@ -1615,7 +1640,6 @@ en:
     add_more: "Add users >>"
     admin: Admin
     administrators: Administrators
-    approved: "%{username} was approved to use the website"
     assist: Attending
     by_email: "By email"
     by_private_message: "By private message"
@@ -1630,7 +1654,6 @@ en:
       change_password: "Change your password"
       click_to_edit_profile: "Click here to edit your profile"
       did_not_find_info: "Didn't find the information you were looking for?"
-      other_options: "Other options"
       password:
         hint: "Leave it blank if you don't want to change it"
       yes_cancel_account: "Yes, cancel my account"
@@ -1642,7 +1665,6 @@ en:
       enabled: "User %{name} is already enabled"
     filter: "Invite by user name"
     group_invite_email: "Invite by e-mail"
-    id: "User ID"
     include_registered: "Include registered users"
     institution: Institution
     index:
@@ -1696,12 +1718,20 @@ en:
       not_enabled: "Approval of registrations is not enabled in this website"
     detailed_user:
       from: "From:"
+    disapprove:
+      disapproved: "The user %{username} was blocked from accessing the website!"
+      not_enabled: "Approval of registrations is not enabled in this website"
     edit:
+      approve: "Approve: allow user to access the website"
+      approve_confirm: "Are you sure you want to allow this user to access the website?"
       change_institution: Change user institution
+      disable: "Disable this user's account"
+      disable_confirm: "Are you sure you want to disable this user's account?"
       federated:
         see_your_data: "Click here to see your data that the federation shared with this website"
         title: "You are signed in using a federation!"
         your_idp: "Your identity provider is: %{idp}"
+      management_options: "Management options"
     registrations:
       signup_form:
         institution_hint: Choose one or type to search.

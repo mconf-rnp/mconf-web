@@ -9,26 +9,51 @@ class ManageController < ApplicationController
   authorize_resource :class => false
 
   def users
-    @users =
-      if current_user.superuser?
-        User.find_by_id_with_disabled(:all,:order => "username")
-      else
-        current_user.institution.users.find(:all, :order => "username")
-      end
+    name = params[:q]
+    partial = params.delete(:partial) # otherwise the pagination links in the view will include this param
 
-    @users = @users.paginate(:page => params[:page], :per_page => 20)
+    if current_user.superuser?
+      query = User.with_disabled
+    else
+      query = current_user.institution.users
+    end
+    query = query.joins(:profile).includes(:profile).order("profiles.full_name")
+    if name.blank?
+      query = query.all
+    else
+      query = query.where("profiles.full_name like ? OR users.username like ? OR users.email like ?", "%#{name}%", "%#{name}%", "%#{name}%")
+    end
+    @users = query.paginate(:page => params[:page], :per_page => 20)
 
-    render :layout => 'no_sidebar'
+    if partial
+      render :partial => 'users_list', :layout => false
+    else
+      render :layout => 'no_sidebar'
+    end
   end
 
   def spaces
-    @spaces =
-      if current_user.superuser?
-        Space.find_with_disabled(:all,:order => "name")
-      else
-        current_user.institution.spaces.find(:all, :order => "name")
-      end
-    @spaces = @spaces.paginate(:page => params[:page], :per_page => 20)
+    name = params[:q]
+    partial = params.delete(:partial) # otherwise the pagination links in the view will include this param
+
+    if current_user.superuser?
+      query = Space.with_disabled
+    else
+      query = current_user.institution.spaces
+    end
+    query = query.order("name")
+    if name.blank?
+      query = query.all
+    else
+      query = query.where("name like ?", "%#{name}%")
+    end
+    @spaces = query.paginate(:page => params[:page], :per_page => 20)
+
+    if partial
+      render :partial => 'spaces_list', :layout => false
+    else
+      render :layout => 'no_sidebar'
+    end
   end
 
   def institutions

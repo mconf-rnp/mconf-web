@@ -77,7 +77,6 @@ describe UsersController do
     context "attributes that the user can't update" do
 
       context "trying to update username" do
-
         before(:each) do
           @user = FactoryGirl.create(:user)
           sign_in @user
@@ -156,8 +155,58 @@ describe UsersController do
 
   end
 
-  it "#destroy"
-  it "#enable"
+  describe "#destroy" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    context "an admin removing a user" do
+      before(:each) { sign_in(FactoryGirl.create(:superuser)) }
+      before(:each) { delete :destroy, :id => user.to_param }
+      it { should respond_with(:redirect) }
+      it { should set_the_flash.to(I18n.t('user.disabled', :username => user.username)) }
+      it { should redirect_to(manage_users_path) }
+      it("disables the user") { user.reload.disabled.should be_true }
+    end
+
+    context "the user removing himself" do
+      before(:each) { sign_in(user) }
+      before(:each) { delete :destroy, :id => user.to_param }
+      it { should respond_with(:redirect) }
+      it { should set_the_flash.to(I18n.t('devise.registrations.destroyed')) }
+      it { should redirect_to(root_path) }
+      it("disables the user") { user.reload.disabled.should be_true }
+    end
+  end
+
+  describe "#enable" do
+    before(:each) { login_as(FactoryGirl.create(:superuser)) }
+
+    context "loads the user by username" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) { post :enable, :id => user.to_param }
+      it { assigns(:user).should eql(user) }
+    end
+
+    context "loads also users that are disabled" do
+      let(:user) { FactoryGirl.create(:user, :disabled => true) }
+      before(:each) { post :enable, :id => user.to_param }
+      it { assigns(:user).should eql(user) }
+    end
+
+    context "if the user is already enabled" do
+      let(:user) { FactoryGirl.create(:user, :disabled => false) }
+      before(:each) { post :enable, :id => user.to_param }
+      it { should redirect_to(manage_users_path) }
+      it { should set_the_flash.to(I18n.t('user.error.enabled', :name => user.username)) }
+    end
+
+    context "if the user is disabled" do
+      let(:user) { FactoryGirl.create(:user, :disabled => true) }
+      before(:each) { post :enable, :id => user.to_param }
+      it { should redirect_to(manage_users_path) }
+      it { should set_the_flash.to(I18n.t('user.enabled')) }
+      it { user.reload.disabled.should be_false }
+    end
+  end
 
   describe "#select" do
     context ".json" do
@@ -348,10 +397,13 @@ describe UsersController do
 
   describe "#approve" do
     let(:user) { FactoryGirl.create(:user_unconfirmed, :approved => false) }
-    before { login_as(FactoryGirl.create(:superuser)) }
+    before {
+      request.env["HTTP_REFERER"] = "/any"
+      login_as(FactoryGirl.create(:superuser))
+    }
 
     context "if #require_registration_approval is set in the current site" do
-      before {
+      before(:each) {
         Site.current.update_attributes(:require_registration_approval => true)
       }
 
@@ -361,15 +413,12 @@ describe UsersController do
         }
         it { should respond_with(:redirect) }
         it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
-        it { should redirect_to(manage_users_path) }
+        it { should redirect_to('/any') }
         it("approves the user") { user.reload.approved?.should be_true }
         it("confirms the user") { user.reload.confirmed?.should be_true }
-        it { user.reload.approved?.should be_true }
 
-        # TODO: Not working yet:
-        #   It's triggering an error related to delayed_job (undefined method `tag=').
-        #   Uncomment this when delayed_job is removed, see #811.
-        #   Search for this same comment in other files as well.
+        # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
+        #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
         # context "skips the confirmation email" do
         #   before(:each) {
         #     Site.current.update_attributes(:require_registration_approval => true)
@@ -394,7 +443,7 @@ describe UsersController do
         }
         it { should respond_with(:redirect) }
         it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
-        it { should redirect_to(manage_users_path) }
+        it { should redirect_to('/any') }
         it("doesn't approve the user") { user.reload.approved?.should be_false }
 
         # TODO: Not working yet:
@@ -406,22 +455,91 @@ describe UsersController do
     end
 
     context "if #require_registration_approval is not set in the current site" do
-      before {
-        Site.current.update_attributes(:require_registration_approval => false)
-      }
       before(:each) {
+        Site.current.update_attributes(:require_registration_approval => false)
         post :approve, :id => user.to_param
       }
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('users.approve.not_enabled')) }
-      it { should redirect_to(manage_users_path) }
+      it { should redirect_to('/any') }
       it { user.reload.approved?.should be_true } # auto approved
     end
   end
 
+  describe "#disapprove" do
+    let(:user) { FactoryGirl.create(:user, :approved => true) }
+    before {
+      request.env["HTTP_REFERER"] = "/any"
+      login_as(FactoryGirl.create(:superuser))
+    }
+
+    context "if #require_registration_approval is set in the current site" do
+      before(:each) {
+        Site.current.update_attributes(:require_registration_approval => true)
+        post :disapprove, :id => user.to_param
+      }
+      it { should respond_with(:redirect) }
+      it { should set_the_flash.to(I18n.t('users.disapprove.disapproved', :username => user.username)) }
+      it { should redirect_to('/any') }
+      it("disapproves the user") { user.reload.approved?.should be_false }
+    end
+
+    context "if #require_registration_approval is not set in the current site" do
+      before(:each) {
+        Site.current.update_attributes(:require_registration_approval => false)
+        post :disapprove, :id => user.to_param
+      }
+      it { should respond_with(:redirect) }
+      it { should set_the_flash.to(I18n.t('users.disapprove.not_enabled')) }
+      it { should redirect_to('/any') }
+      it("user is still (auto) approved") { user.reload.approved?.should be_true } # auto approved on registration
+    end
+  end
+
+  # TODO: refactor to use the same style used to test SpacesController, with the matcher allow_access_to
   describe "abilities", :abilities => true do
 
-    context "for a normal user:" do
+    context "for a superuser", :user => "superuser" do
+      let(:another_user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:superuser) }
+      before(:each) { login_as(user) }
+
+      context "can access #index" do
+        let(:space) { FactoryGirl.create(:space) }
+        let(:do_action) { get :index, :space_id => space }
+        it_should_behave_like "it can access an action"
+      end
+
+      [:show, :edit].each do |action|
+        describe "can access ##{action}" do
+          let(:do_action) { get action, :id => user }
+          it_should_behave_like "it can access an action"
+        end
+      end
+
+      [:show, :edit].each do |action|
+        describe "can access ##{action} for other users" do
+          let(:do_action) { get action, :id => another_user }
+          it_should_behave_like "it can access an action"
+        end
+      end
+
+      [:update, :destroy, :enable].each do |action|
+        describe "can access ##{action}" do
+          let(:do_action) { post action, :id => user.to_param, :user => {} }
+          it_should_behave_like "it can access an action"
+        end
+      end
+
+      [:update, :destroy, :enable].each do |action|
+        describe "can access ##{action} for other users" do
+          let(:do_action) { post action, :id => another_user.to_param, :user => {} }
+          it_should_behave_like "it can access an action"
+        end
+      end
+    end
+
+    context "for a normal user", :user => "normal" do
       let(:another_user) { FactoryGirl.create(:user) }
       let(:user) { FactoryGirl.create(:user) }
       before(:each) { login_as(user) }
@@ -495,7 +613,7 @@ describe UsersController do
 
     end
 
-    context "for an anonymous user:" do
+    context "for an anonymous user", :user => "anonymous" do
       let(:user) { FactoryGirl.create(:user) }
 
       describe "can access #index" do
@@ -520,46 +638,6 @@ describe UsersController do
         describe "cannot access ##{action}" do
           let(:do_action) { post action, :id => user }
           it_should_behave_like "it cannot access an action"
-        end
-      end
-    end
-
-    context "for a superuser:" do
-      let(:another_user) { FactoryGirl.create(:user) }
-      let(:user) { FactoryGirl.create(:superuser) }
-      before(:each) { login_as(user) }
-
-      context "can access #index" do
-        let(:space) { FactoryGirl.create(:space) }
-        let(:do_action) { get :index, :space_id => space }
-        it_should_behave_like "it can access an action"
-      end
-
-      [:show, :edit].each do |action|
-        describe "can access ##{action}" do
-          let(:do_action) { get action, :id => user }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:show, :edit].each do |action|
-        describe "can access ##{action} for other users" do
-          let(:do_action) { get action, :id => another_user }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:update, :destroy, :enable].each do |action|
-        describe "can access ##{action}" do
-          let(:do_action) { post action, :id => user.to_param, :user => {} }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:update, :destroy, :enable].each do |action|
-        describe "can access ##{action} for other users" do
-          let(:do_action) { post action, :id => another_user.to_param, :user => {} }
-          it_should_behave_like "it can access an action"
         end
       end
     end

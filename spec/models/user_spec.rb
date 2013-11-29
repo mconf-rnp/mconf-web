@@ -336,6 +336,21 @@ describe User do
     end
   end
 
+  describe ".with_disabled" do
+    let(:user1) { FactoryGirl.create(:user, :disabled => true) }
+    let(:user2) { FactoryGirl.create(:user, :disabled => false) }
+
+    context "finds users even if disabled" do
+      subject { User.with_disabled.all }
+      it { should include(user1) }
+      it { should include(user2) }
+    end
+
+    context "returns a Relation object" do
+      it { User.with_disabled.should be_an_instance_of(ActiveRecord::Relation) }
+    end
+  end
+
   it "#set_institution"
 
   describe "on commit" do
@@ -355,6 +370,25 @@ describe User do
     context "sets the user as approved" do
       before { user.approve! }
       it { user.approved.should be_true }
+    end
+
+    context "throws an exception if fails to update the user" do
+      it {
+        user.should_receive(:update_attributes) { throw Exception.new }
+        expect { user.approve! }.to raise_error
+      }
+    end
+  end
+
+  describe "#disapprove!" do
+    let(:user) { FactoryGirl.create(:user, :approved => true) }
+    let(:params) {
+      { :username => "any", :email => "any@jaloo.com", :approved => false, :password => "123456" }
+    }
+
+    context "sets the user as disapproved" do
+      before { user.disapprove! }
+      it { user.approved.should be_false }
     end
 
     context "throws an exception if fails to update the user" do

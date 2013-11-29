@@ -927,9 +927,26 @@ pt-br:
       preview: "Pré-visualização"
   logout: Sair
   manage:
+    disabled_space:
+      enable: "Habilitar comunidade"
+      enable_confirm: "Tem certeza que deseja habilitar esta comunidade?"
+    disabled_user:
+      enable: "Habilitar usuário"
+      enable_confirm: "Tem certeza que deseja habilitar este usuário?"
+    enabled_space:
+      disable: "Desabilitar comundiade"
+      disable_confirm: "Tem certeza que deseja desabiltar esta comunidade?"
+      edit: "Editar comunidade"
     enabled_user:
-      approve: "Aprovar"
+      administrator: "Administrador global"
+      approve: "Aprovar: permitir que este usuário acesse o site"
       approve_confirm: "Tem certeza que deseja permitir que este usuário acesse o site?"
+      disable: "Desabilitar usuário"
+      disable_confirm: "Tem certeza que deseja desabilitar este usuário?"
+      disapprove: "Desaprovar: bloquear o acesso deste usuário ao site"
+      disapprove_confirm: "Tem certeza que deseja bloquear o acesso deste usuário ao site?"
+      edit: "Editar usuário"
+      normal_user: "Usuário normal"
     menu:
       general: "Geral"
       spaces: "Comunidades"
@@ -938,6 +955,9 @@ pt-br:
       users: "Usuários"
       webconf: "Webconferência"
       institutions: Instituições
+    spaces:
+      filter_name: "Nome"
+      filter_results: "Filtrar os resultados:"
     spam:
       event:
         delete_confirmation: "Remover este evento permanentemente?"
@@ -952,6 +972,11 @@ pt-br:
         not_spam_confirmation: "Esta mensagem realmente não é um spam?"
         not_spam_tooltip: "Esta mensagem não é um spam"
         title: "Mensagens denunciadas como spam"
+    users:
+      filter_name_or_username: "Nome, identificador ou e-mail"
+      filter_results: "Filtrar os resultados:"
+    users_list:
+      no_user_found: "Nenhum usuário encontrado"
   mandatory_field: "Campo obrigatório"
   mconf: Mconf
   members:
@@ -1364,7 +1389,9 @@ pt-br:
       clarify_registered: "Por favor, digite a senha para participar desta comunidade."
       clarify_unregistered: "Por favor, digite o seu nome completo e uma senha para se registrar no Mconf e participar desta comunidade."
     join_pending: "Pedido de adesão sendo processado"
-    leave: "Sair desta comunidade"
+    leave:
+      leave_this_space: Deixar esta comunidade
+      success: Você deixou a comunidade %{space_name}
     logo: "Logo da comunidade"
     logo_selected:
       default_message: "Logo da comunidade"
@@ -1611,7 +1638,6 @@ pt-br:
     group_invite_email: "Convidar por e-mail"
     hint:
       institution: Escolha uma ou digite para buscar.
-    id: "ID do Usuário"
     include_registered: "Incluir usuários registrados"
     index:
       user_list:
@@ -1664,12 +1690,20 @@ pt-br:
       not_enabled: "A aprovação de registros não está habilitada neste site"
     detailed_user:
       from: "De:"
+    disapprove:
+      disapproved: "O usuário %{username} foi bloqueado de acessar este site!"
+      not_enabled: "A aprovação de registros não está habilitada neste site"
     edit:
+      approve: "Aprovar: permitir que este usuário acesse o site"
+      approve_confirm: "Tem certeza que deseja permitir que este usuário acesse o site?"
       change_institution: Mudar instituição do usuário
+      disapprove: "Desaprovar: bloquear o acesso deste usuário ao site"
+      disapprove_confirm: "Tem certeza que deseja bloquear o acesso deste usuário ao site?"
       federated:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"
         your_idp: "O seu provedor de identidade é: %{idp}"
+      management_options: "Management options"
     registrations:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.

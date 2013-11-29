@@ -8,7 +8,8 @@
 require "digest/sha1"
 class UsersController < ApplicationController
 
-  load_and_authorize_resource :find_by => :username
+  load_and_authorize_resource :find_by => :username, :except => [:enable]
+  before_filter :load_and_authorize_with_disabled, :only => [:enable]
 
   # Rescue username not found rendering a 404
   rescue_from ActiveRecord::RecordNotFound, :with => :render_404
@@ -29,7 +30,6 @@ class UsersController < ApplicationController
     elsif institution
       @users = institution.users.sort {|x,y| x.name <=> y.name }
     end
-
   end
 
   def show
@@ -79,24 +79,25 @@ class UsersController < ApplicationController
   def destroy
     @user.disable
 
-    flash[:notice] = t('user.disabled', :username => @user.username)
+    if current_user == @user
+      # the same message devise users when removing a registration
+      flash[:notice] = t('devise.registrations.destroyed')
+    else
+      flash[:notice] = t('user.disabled', :username => @user.username)
+    end
 
     respond_to do |format|
       format.html {
-        if !@space && current_user.superuser?
+        if current_user.superuser?
           redirect_to manage_users_path
-        elsif !@space
-          redirect_to root_path
         else
-          redirect_to(space_users_path(@space))
+          redirect_to root_path
         end
       }
     end
   end
 
   def enable
-    @user = User.find_with_disabled(params[:id])
-
     unless @user.disabled?
       flash[:notice] = t('user.error.enabled', :name => @user.username)
     else
@@ -157,6 +158,24 @@ class UsersController < ApplicationController
     else
       flash[:error] = t('users.approve.not_enabled')
     end
-    redirect_to manage_users_path
+    redirect_to :back
   end
+
+  def disapprove
+    if Site.current.require_registration_approval?
+      @user.disapprove!
+      flash[:notice] = t('users.disapprove.disapproved', :username => @user.username)
+    else
+      flash[:error] = t('users.disapprove.not_enabled')
+    end
+    redirect_to :back
+  end
+
+  private
+
+  def load_and_authorize_with_disabled
+    @user = User.with_disabled.find_by_username(params[:id])
+    authorize! :enable, @user
+  end
+
 end
