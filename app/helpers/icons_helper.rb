@@ -48,6 +48,10 @@ module IconsHelper
     icon_constructor nil, "icon-awesome icon-cogs icon-mconf-superuser", options
   end
 
+  def icon_admin_institution(options={})
+    icon_constructor nil, "icon-awesome icon-user icon-mconf-admin-institution", options
+  end
+
   # Conference "in progress" icon.
   def icon_in_progress(options={})
     icon_constructor nil, "icon-awesome icon-refresh icon-mconf-in-progress icon-spin", options
