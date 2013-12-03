@@ -40,6 +40,10 @@ class Space < ActiveRecord::Base
 
   belongs_to :institution
 
+  attr_accessor :institution_name
+  attr_accessible :institution_name
+  before_update :set_institution
+
   # for the associated BigbluebuttonRoom
   attr_accessible :bigbluebutton_room_attributes
   accepts_nested_attributes_for :bigbluebutton_room
@@ -162,6 +166,14 @@ class Space < ActiveRecord::Base
   end
 
   private
+
+  def set_institution
+    # Try to set institution information
+    if institution_name.present?
+      i = Institution.find_or_create_by_name_or_acronym(institution_name)
+      self.institution_id = i.id
+    end
+  end
 
   # Creates the webconf room after the space is created
   def create_webconf_room
