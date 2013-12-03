@@ -7,4 +7,17 @@ body.manage.institutions {
     display: none;
   }
 
+  .management-links {
+    float: right;
+    padding-top: 8px;
+  }
+
+  .institution-users {
+    display: block;
+  }
+
+  .institution-spaces {
+    display: block;
+  }
+
 }
