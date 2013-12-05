@@ -758,7 +758,12 @@ pt-br:
       zero: nenhum membro
       one: um membro
       other: %{count} membros
+    can_record_user:
+      zero: nenhum membro pode gravar
+      one: um membro pode gravar
+      other: %{count} membros podem gravar
     user_limit: de no máximo %{limit}
+    can_record_limit: de no máximo %{limit}
     space:
       zero: nenhuma comunidade
       one: uma comunidade
