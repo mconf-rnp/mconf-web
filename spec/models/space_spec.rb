@@ -209,6 +209,16 @@ describe Space do
     end
   end
 
+  describe "#set_institution" do
+    context "updates the institution of a space" do
+      let(:space) { FactoryGirl.create(:space_with_institution) }
+      let(:institution) { FactoryGirl.create(:institution) }
+      before(:each) { space.update_attributes(:institution_name => institution.name) }
+
+      it { space.institution.should eq(institution) }
+    end
+  end
+
   it "#check_permalink"
 
   describe "#admins" do
