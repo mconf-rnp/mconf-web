@@ -165,6 +165,10 @@ class Space < ActiveRecord::Base
     pending_join_requests.where(:candidate_id => user).size > 0
   end
 
+  def institution=(new_institution)
+    self.institution_id = new_institution.id
+  end
+
   private
 
   def set_institution

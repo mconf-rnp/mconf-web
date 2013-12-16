@@ -210,12 +210,21 @@ describe Space do
   end
 
   describe "#set_institution" do
+    let(:old_institution) { FactoryGirl.create(:institution) }
+    let(:space) { FactoryGirl.create(:space, :institution => old_institution) }
+
+    before do
+      space
+    end
+    it { old_institution.spaces.size.should be(1) }
+
     context "updates the institution of a space" do
-      let(:space) { FactoryGirl.create(:space_with_institution) }
       let(:institution) { FactoryGirl.create(:institution) }
       before(:each) { space.update_attributes(:institution_name => institution.name) }
 
+      it { old_institution.spaces.size.should be(0) }
       it { space.institution.should eq(institution) }
+      it { institution.spaces.size.should be(1) }
     end
   end
 
