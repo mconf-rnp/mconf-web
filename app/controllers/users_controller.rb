@@ -54,6 +54,11 @@ class UsersController < ApplicationController
       params[:user].delete(:username)
       params[:user].delete(:email)
     end
+
+    unless current_user.superuser? and params[:user][:institution].nil?
+      params[:user].delete(:can_record) if [:user][:institution].can_record_full?
+    end
+
     password_changed =
       !params[:user].nil? && params[:user].has_key?(:password) &&
       !params[:user][:password].empty?

@@ -195,6 +195,19 @@ module Abilities
           user.institution.admins.include?(user)
       end
 
+      # Institutional admins can set the ability of record meetings to users in their institution
+      can :can_record, User do |user_object|
+        user_object.institution == user.institution &&
+          !user.institution.nil? &&
+          user.institution.admins.include?(user)
+      end
+
+      can :manage_admin_options, User do |user_object|
+        user_object.institution == user.institution &&
+          !user.institution.nil? &&
+          user.institution.admins.include?(user)
+      end
+
       # Institutional admins can access the manage lists of spaces and users in their institution
       can [:users, :spaces], :manage do
         !user.institution.nil? && user.institution.admins.include?(user)
