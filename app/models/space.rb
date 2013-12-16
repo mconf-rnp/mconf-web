@@ -166,7 +166,7 @@ class Space < ActiveRecord::Base
   end
 
   def institution=(new_institution)
-    self.institution_id = new_institution.id
+    self.institution_id = new_institution.id unless new_institution.nil?
   end
 
   private
