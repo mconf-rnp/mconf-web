@@ -56,7 +56,9 @@ class UsersController < ApplicationController
     end
 
     unless (current_user.superuser? or @user.institution.nil?)
-      params[:user].delete(:can_record) if @user.institution.can_record_full?
+      if (@user.institution.can_record_full? and !@user.can_record) or !(@user.institution.admins.include? current_user)
+        params[:user].delete(:can_record)
+      end
     end
 
     password_changed =
