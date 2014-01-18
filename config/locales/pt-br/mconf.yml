@@ -137,6 +137,7 @@ pt-br:
         description: "Descrição"
         moderator_password: "Senha de moderador"
         name: "Nome"
+        permalink: "Identificador"
         public: "Pública"
         repository: "Repositório de documentos"
       user:

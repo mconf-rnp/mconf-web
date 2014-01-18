@@ -34,10 +34,17 @@ class User < ActiveRecord::Base
   # TODO: block :username from being modified after registration
   # attr_accessible :username, :as => :create
 
+  # TODO: improve the format matcher, check specs for some values that are allowed today
+  #   but are not really recommended (e.g. '-')
   validates :username, :uniqueness => { :case_sensitive => false },
                        :presence => true,
                        :format => /^[A-Za-z0-9\-_]*$/,
                        :length => { :minimum => 1 }
+
+  # The username has to be unique not only for user, but across other
+  # models as well
+  validate :username_uniqueness
+
   extend FriendlyId
   friendly_id :username
 
@@ -368,6 +375,14 @@ class User < ActiveRecord::Base
   after_commit do |user|
     # Try to set institution information
     user.set_institution(user.institution_name) if user.institution_name
+  end
+
+  private
+
+  def username_uniqueness
+    unless Space.find_by_permalink(self.username).blank?
+      errors.add(:username, "has already been taken")
+    end
   end
 
 end
