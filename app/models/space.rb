@@ -40,6 +40,10 @@ class Space < ActiveRecord::Base
 
   belongs_to :institution
 
+  attr_accessor :institution_name
+  attr_accessible :institution_name
+  before_update :set_institution
+
   # for the associated BigbluebuttonRoom
   attr_accessible :bigbluebutton_room_attributes
   accepts_nested_attributes_for :bigbluebutton_room
@@ -174,7 +178,19 @@ class Space < ActiveRecord::Base
     pending_join_requests.where(:candidate_id => user).size > 0
   end
 
+  def institution=(new_institution)
+    self.institution_id = new_institution.id unless new_institution.nil?
+  end
+
   private
+
+  def set_institution
+    # Try to set institution information
+    if institution_name.present?
+      i = Institution.find_or_create_by_name_or_acronym(institution_name)
+      self.institution_id = i.id
+    end
+  end
 
   def permalink_uniqueness
     unless User.find_by_username(self.permalink).blank?

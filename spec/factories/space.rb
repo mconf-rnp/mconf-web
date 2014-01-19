@@ -23,4 +23,8 @@ FactoryGirl.define do
   factory :private_space, :parent => :space do |s|
     s.public false
   end
+
+  factory :space_with_institution, :parent => :space do |s|
+    s.association :institution, :factory => :institution
+  end
 end
