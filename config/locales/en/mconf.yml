@@ -756,11 +756,16 @@ en:
       zero: no members
       one: one member
       other: %{count} members
+    can_record_user:
+      zero: no members can record
+      one: one member can record
+      other: %{count} members can record
     space:
       zero: no spaces
       one: one space
       other: %{count} spaces
     user_limit: of a maximum of %{limit}
+    can_record_limit: of a maximum of %{limit}
     users: Users in this institution
     destroy: Delete institution
     duplicate: This institution is a duplicate...

@@ -11,5 +11,9 @@
       = link_to t('institution.user', :count => institution.approved_users.count).capitalize, user_permissions_institution_path(institution)
       - if institution.user_limit
         = t('institution.user_limit', :limit => institution.user_limit)
+    .institution-can-record-users
+      = link_to t('institution.can_record_user', :count => institution.can_record_users.count).capitalize, user_permissions_institution_path(institution)
+      - if institution.can_record_limit
+        = t('institution.can_record_limit', :limit => institution.can_record_limit)
     .institution-spaces
       = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)
