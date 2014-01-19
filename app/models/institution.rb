@@ -1,9 +1,10 @@
 class Institution < ActiveRecord::Base
-  attr_accessible :acronym, :name, :user_limit
+  attr_accessible :acronym, :name, :user_limit, :can_record_limit
 
   validates :name, :presence => true, :uniqueness => true
 
   validates :user_limit, :numericality => true, :allow_blank => true
+  validates :can_record_limit, :numericality => true, :allow_blank => true
 
   has_many :permissions, :foreign_key => "subject_id",
            :conditions => { :permissions => {:subject_type => 'Institution'} },
@@ -52,7 +53,15 @@ class Institution < ActiveRecord::Base
   end
 
   def full?
-    !user_limit.nil? && approved_users.count >= user_limit
+    !user_limit.nil? && (approved_users.count >= user_limit)
+  end
+
+  def can_record_users
+    users.where :can_record => true
+  end
+
+  def can_record_full?
+    !can_record_limit.nil? && (can_record_users.count >= can_record_limit)
   end
 
   def admins

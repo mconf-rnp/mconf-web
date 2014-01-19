@@ -496,6 +496,92 @@ describe UsersController do
     end
   end
 
+  describe "#can_record" do
+    before(:each) { @target = FactoryGirl.create(:institution, :can_record_limit => 1) }
+
+    context "a superuser" do
+      before(:each) { sign_in FactoryGirl.create(:superuser) }
+
+      context "can set the record meetings ability to a user in an institution with free slots" do
+        before(:each) do
+          @user = FactoryGirl.create(:user, :can_record => false)
+          @target.add_member!(@user, "User")
+
+          put :update, :id => @user.to_param, :user => { :can_record => true }
+        end
+
+        it { response.should redirect_to edit_user_path(@user) }
+        it { @user.reload.can_record.should_not be(false) }
+        it { @user.reload.can_record.should be(true) }
+      end
+
+      context "can set the record meetings ability to a user in an institution without free slots" do
+        before(:each) do
+          @user_can_record = FactoryGirl.create(:user, :institution => @target, :can_record => true)
+          @user = FactoryGirl.create(:user, :can_record => false)
+          @target.add_member!(@user, "User")
+
+          put :update, :id => @user.to_param, :user => { :can_record => true }
+        end
+
+        it { response.should redirect_to edit_user_path(@user) }
+        it { @user.reload.can_record.should_not be(false) }
+        it { @user.reload.can_record.should be(true) }
+      end
+    end
+
+    context "an institutional admin" do
+      before(:each) do
+        @admin = FactoryGirl.create(:user)
+        @target.add_member!(@admin, "Admin")
+
+        sign_in @admin
+      end
+
+      context "can set the record meetings ability to a user if the institution has free slots" do
+        before(:each) do
+          @user = FactoryGirl.create(:user, :can_record => false)
+          @target.add_member!(@user, "User")
+
+          put :update, :id => @user.to_param, :user => { :can_record => true }
+        end
+
+        it { response.should redirect_to edit_user_path(@user) }
+        it { @user.reload.can_record.should_not be(false) }
+        it { @user.reload.can_record.should be(true) }
+      end
+
+      context "cannot set the record meetings ability to a user if the institution hasn't free slots" do
+        before(:each) do
+          @user_can_record = FactoryGirl.create(:user, :institution => @target, :can_record => true)
+          @user = FactoryGirl.create(:user, :can_record => false)
+          @target.add_member!(@user, "User")
+
+          put :update, :id => @user.to_param, :user => { :can_record => true }
+        end
+
+        it { response.should redirect_to edit_user_path(@user) }
+        it { @user.reload.can_record.should_not be(true) }
+        it { @user.reload.can_record.should be(false) }
+      end
+    end
+
+    context "a normal user" do
+      context "cannot set the record meetings ability to himself" do
+        before(:each) do
+          @user = FactoryGirl.create(:user, :institution => @target, :can_record => false)
+          sign_in @user
+
+          put :update, :id => @user.to_param, :user => { :can_record => true }
+        end
+
+        it { response.should redirect_to edit_user_path(@user) }
+        it { @user.reload.can_record.should_not be(true) }
+        it { @user.reload.can_record.should be(false) }
+      end
+    end
+  end
+
   # TODO: refactor to use the same style used to test SpacesController, with the matcher allow_access_to
   describe "abilities", :abilities => true do
 
