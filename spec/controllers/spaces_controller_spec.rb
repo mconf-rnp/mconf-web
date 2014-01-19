@@ -201,6 +201,14 @@ describe SpacesController do
         it { user.institution.spaces.should include(Space.last) }
       end
 
+      describe "doesn't set an institution in the space if the user has no institution" do
+        before(:each) {
+          user.update_attributes(:institution => nil)
+          post :create, :space => space.attributes
+        }
+        it { Space.last.institution.should be(nil) }
+      end
+
       it "creates a new activity for the space created"
     end
 

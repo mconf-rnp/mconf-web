@@ -561,14 +561,14 @@ describe User do
   end
 
   describe "#institution=" do
-    let(:institution) { FactoryGirl.create(:institution) }
-    let(:user) { FactoryGirl.create(:user, :institution => institution) }
+    let(:old_institution) { FactoryGirl.create(:institution) }
+    let(:user) { FactoryGirl.create(:user, :institution => old_institution) }
     let(:new_institution) { FactoryGirl.create(:institution) }
 
     it "removes the user from the previous institution" do
-      user # force the user to be created and associated with the institution
-      expect { user.institution = new_institution }.to change(institution.users, :count).by(-1)
-      institution.users.should_not include(user)
+      user # force the user to be created and associated with the old institution
+      expect { user.institution = new_institution }.to change(old_institution.users, :count).by(-1)
+      old_institution.users.should_not include(user)
     end
 
     it "adds the user to the new institution with the default role" do
@@ -576,9 +576,18 @@ describe User do
       new_institution.users.should include(user)
       new_institution.user_role(user).should eql('User')
     end
+
+    it "allows setting the institution to nil" do
+      user # force the user to be created and associated with the old institution
+      expect { user.institution = nil }.to change(old_institution.users, :count).by(-1)
+      old_institution.users.should_not include(user)
+      user.institution.should be(nil)
+    end
   end
 
-  it "#set_institution"
+  describe "#set_institution" do
+    it "is called on before_update"
+  end
 
   describe "on commit" do
     it "sets the institution from #institution_name"

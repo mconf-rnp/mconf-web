@@ -247,22 +247,36 @@ describe Space do
     end
   end
 
-  describe "#set_institution" do
+  describe "#institution=" do
     let(:old_institution) { FactoryGirl.create(:institution) }
     let(:space) { FactoryGirl.create(:space, :institution => old_institution) }
+    let(:new_institution) { FactoryGirl.create(:institution) }
 
-    before do
-      space
+    it "removes the space from the previous institution" do
+      space # force the space to be created and associated with the old institution
+      expect {
+        space.institution = new_institution
+        space.save!
+      }.to change(old_institution.spaces, :count).by(-1)
+      old_institution.spaces.should_not include(space)
     end
-    it { old_institution.spaces.size.should be(1) }
 
-    context "updates the institution of a space" do
-      let(:institution) { FactoryGirl.create(:institution) }
-      before(:each) { space.update_attributes(:institution_name => institution.name) }
+    it "adds the space to the new institution" do
+      expect {
+        space.institution = new_institution
+        space.save!
+      }.to change(new_institution.spaces, :count).by(1)
+      new_institution.spaces.should include(space)
+    end
 
-      it { old_institution.spaces.size.should be(0) }
-      it { space.institution.should eq(institution) }
-      it { institution.spaces.size.should be(1) }
+    it "allows setting the institution to nil" do
+      space # force the space to be created and associated with the old institution
+      expect {
+        space.institution = nil
+        space.save!
+      }.to change(old_institution.spaces, :count).by(-1)
+      old_institution.spaces.should_not include(space)
+      space.institution.should be(nil)
     end
   end
 

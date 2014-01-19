@@ -20,16 +20,14 @@
       = f.input :description, :as => :text, :input_html => { :rows => 5 }
       = f.input :repository
       = f.input :public, :label => t('.public')
+      - if current_user.superuser
+        - current_institution = @space.institution.name if @space.institution
+        = f.input :institution_name, :required => false, :placeholder => current_institution
+
       %h3= t('.webconf_options')
       = f.simple_fields_for :bigbluebutton_room do |bbb_room|
         = bbb_room.input :attendee_password, :as => :showable_password
         = bbb_room.input :moderator_password, :as => :showable_password
-
-    - if user_signed_in? && current_user.superuser
-      #management-options.alert.alert-gray
-        %h3= t('.management_options')
-        - current_institution = @space.institution.name if @space.institution
-        = f.input :institution_name, :required => false, :placeholder => current_institution
 
     = f.button :wrapped, :value => t("_other.update")
 

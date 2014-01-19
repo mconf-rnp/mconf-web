@@ -179,13 +179,16 @@ class Space < ActiveRecord::Base
   end
 
   def institution=(new_institution)
-    self.institution_id = new_institution.id unless new_institution.nil?
+    unless new_institution.nil?
+      write_attribute(:institution_id, new_institution.id)
+    else
+      write_attribute(:institution_id, nil)
+    end
   end
 
   private
 
   def set_institution
-    # Try to set institution information
     if institution_name.present?
       i = Institution.find_or_create_by_name_or_acronym(institution_name)
       self.institution_id = i.id

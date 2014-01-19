@@ -41,17 +41,9 @@ body.spaces.edit {
     }
   }
 
-  #management-options {
-    clear: both;
-    padding: 5px 10px;
-    h3 {
-      margin: 5px 0 10px 0;
-    }
-
-    .space_institution_name {
-      #space_institution_name, .select2-container {
-        width: 50%;
-      }
+  .space_institution_name {
+    #space_institution_name, .select2-container {
+      width: 100%;
     }
   }
 
