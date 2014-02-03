@@ -24,11 +24,6 @@
         - current_institution = @space.institution.name if @space.institution
         = f.input :institution_name, :required => false, :placeholder => current_institution
 
-      %h3= t('.webconf_options')
-      = f.simple_fields_for :bigbluebutton_room do |bbb_room|
-        = bbb_room.input :attendee_password, :as => :showable_password
-        = bbb_room.input :moderator_password, :as => :showable_password
-
     = f.button :wrapped, :value => t("_other.update")
 
   #edit-space-other-options
