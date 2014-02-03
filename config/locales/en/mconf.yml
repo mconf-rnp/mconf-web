@@ -1471,6 +1471,7 @@ en:
     edit:
       change_logo: "Change picture"
       delete_space: "Remove this space?"
+      institution_placeholder: "Select an institution"
       other_options: "Other options"
       public: "Make this a public space"
       yes_delete: "Yes, remove it!"
@@ -1756,6 +1757,7 @@ en:
         see_your_data: "Click here to see your data that the federation shared with this website"
         title: "You are signed in using a federation!"
         your_idp: "Your identity provider is: %{idp}"
+      institution_placeholder: "Select an institution"
       management_options: "Management options"
     registrations:
       signup_form:

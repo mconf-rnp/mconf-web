@@ -22,7 +22,7 @@
       = f.input :public, :label => t('.public')
       - if current_user.superuser
         - current_institution = @space.institution.name if @space.institution
-        = f.input :institution_name, :required => false, :placeholder => current_institution
+        = f.input :institution_name, :required => false, :input_html => { :value => current_institution }
 
     = f.button :wrapped, :value => t("_other.update")
 

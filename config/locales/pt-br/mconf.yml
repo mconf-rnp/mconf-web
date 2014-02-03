@@ -1452,6 +1452,7 @@ pt-br:
     edit:
       change_logo: "Mudar imagem"
       delete_space: "Remover esta comunidade?"
+      institution_placeholder: "Selecione uma instituição"
       other_options: "Outras opções"
       public: "Tornar esta comunidade pública"
       yes_delete: "Sim, remova!"
@@ -1718,6 +1719,7 @@ pt-br:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"
         your_idp: "O seu provedor de identidade é: %{idp}"
+      institution_placeholder: "Selecione uma instituição"
       management_options: "Management options"
     registrations:
       signup_form:

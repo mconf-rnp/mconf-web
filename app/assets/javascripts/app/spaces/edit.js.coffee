@@ -9,6 +9,11 @@ $ ->
     $(idInstitution).select2
       minimumInputLength: 0
       multiple: false
+      allowClear: true
+      placeholder: I18n.t("spaces.edit.institution_placeholder")
+      initSelection: (element, callback) ->
+        data = { id: element.val(), text: element.val() }
+        callback(data)
       ajax:
         url: urlInstitutions
         dataType: "json"
