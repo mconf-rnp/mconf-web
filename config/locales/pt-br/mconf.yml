@@ -89,9 +89,10 @@ pt-br:
         name: "Nome"
         start_date: "Data e horário de início"
       institution:
-        name: Nome
         acronym: Sigla
-        user_limit: Número Máximo de membros
+        can_record_limit: Usuários que podem gravar
+        name: Nome
+        user_limit: Máximo de membros
       site:
         analytics_code: "Código do Google Analytics"
         chat_enabled: "Habilitar Chat"
@@ -1716,6 +1717,9 @@ pt-br:
     registrations:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.
+    update:
+      can_record_reached_limit: "A isntituição deste usuário chegou no limite de usuários que podem gravar reuniões"
+      error:  "Houve um erro atualizando o usuário"
   username: "Nome de usuário"
   vCard:
     corrupt: "O vCard que você enviou está corrompido ou é uma versão não suportada"

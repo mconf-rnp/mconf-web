@@ -88,6 +88,11 @@ en:
         location: "Location"
         name: "Name"
         start_date: "Date and time when it starts"
+      institution:
+        acronym: Acronym
+        can_record_limit: Users that can record
+        name: Name
+        user_limit: Maximum of members
       site:
         analytics_code: "Analytics Code"
         chat_enabled: "Enable Chat"
@@ -757,7 +762,7 @@ en:
       one: one member
       other: %{count} members
     can_record_user:
-      zero: no members can record
+      zero: no member can record
       one: one member can record
       other: %{count} members can record
     space:
@@ -1750,6 +1755,9 @@ en:
     registrations:
       signup_form:
         institution_hint: Choose one or type to search.
+    update:
+      can_record_reached_limit: "This user's institution has reached its limit of users that can record meetings"
+      error:  "There was an error updating the user"
   username: Username
   vCard: 
     corrupt: "The vCard you sent is corrupted or is a non-supported version"

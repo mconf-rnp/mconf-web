@@ -467,7 +467,8 @@ describe User do
   end
 
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([:fellows, :current, :select, :approve])
+    set_custom_ability_actions([ :fellows, :current, :select, :approve, :manage_user,
+                                 :manage_can_record, :manage_approved ])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -515,7 +516,8 @@ describe User do
       before { target.institution.add_member!(user, 'Admin') }
 
       it {
-        allowed = [:read, :edit, :update, :destroy, :fellows, :current, :select, :approve]
+        allowed = [:read, :edit, :update, :destroy, :fellows, :current, :select,
+                   :approve, :manage_user, :manage_can_record, :manage_approved]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }
 

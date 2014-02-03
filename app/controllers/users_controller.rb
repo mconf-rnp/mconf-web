@@ -55,9 +55,21 @@ class UsersController < ApplicationController
       params[:user].delete(:email)
     end
 
-    unless (current_user.superuser? or @user.institution.nil?)
-      if (@user.institution.can_record_full? and !@user.can_record) or !(@user.institution.admins.include? current_user)
-        params[:user].delete(:can_record)
+    # check if the institution has reached its limit for users that can record
+    # but do it only if the record flag is being set, otherwise ignore it
+    # also, superusers can always set the flag, even if the limit is reached
+    set_can_record =
+      !params[:user].nil? && params[:user].has_key?(:can_record) &&
+      params[:user][:can_record] && !@user.can_record
+    if set_can_record
+      unless (current_user.superuser? or @user.institution.nil?)
+        if (@user.institution.can_record_full? and !@user.can_record) or
+            !(@user.institution.admins.include? current_user)
+          @user.errors.add(:can_record, t('users.update.can_record_reached_limit'))
+          flash[:error] = t('users.update.error')
+          render "edit", :layout => 'no_sidebar'
+          return
+        end
       end
     end
 

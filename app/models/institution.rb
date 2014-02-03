@@ -56,12 +56,12 @@ class Institution < ActiveRecord::Base
     !user_limit.nil? && (approved_users.count >= user_limit)
   end
 
-  def can_record_users
-    users.where :can_record => true
+  def users_that_can_record
+    approved_users.where :can_record => true
   end
 
   def can_record_full?
-    !can_record_limit.nil? && (can_record_users.count >= can_record_limit)
+    !can_record_limit.nil? && (users_that_can_record.count >= can_record_limit)
   end
 
   def admins

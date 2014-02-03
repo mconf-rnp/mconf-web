@@ -83,7 +83,7 @@ module Shoulda
         def description
           desc = "be able to do anything to the object"
           unless @exceptions.empty?
-            desc += " except #{@exceptions}"
+            desc += " except #{@exceptions.sort}"
           end
           desc
         end
@@ -95,9 +95,9 @@ module Shoulda
         def negative_failure_message
           m = "Expected #{@subject.class.name} not to be able to do anything with '#{@target}'"
           unless @exceptions.empty?
-            m += " except #{@exceptions},"
+            m += " except #{@exceptions.sort},"
           end
-          m += " but it can #{@can}"
+          m += " but it can #{@can.sort}"
           m
         end
 

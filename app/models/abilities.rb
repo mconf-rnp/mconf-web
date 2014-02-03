@@ -183,29 +183,16 @@ module Abilities
     # Users that are admins of their institutions have some privileged permissions in objects
     # related to their institution.
     def abilities_for_institution_admins(user)
-      # Institutional admins can edit their institution's users
-      can [:edit, :update, :destroy], User do |u|
+
+      # Things an institutional admin can make in the users from his institution
+      # * Use the :edit, :update, and :destroy actions
+      # * Approve users
+      # * Manage users (generic, doesn't specify yet which attributes)
+      # * Change their attribute `:can_record`
+      # * Change their attribute `:approved`
+      can [:edit, :update, :destroy, :approve, :manage_user,
+           :manage_can_record, :manage_approved], User do |u|
         !u.institution.nil? && u.institution.admins.include?(user)
-      end
-
-      # Institutional admins can approve users in their institution
-      can :approve, User do |user_object|
-        user_object.institution == user.institution &&
-          !user.institution.nil? &&
-          user.institution.admins.include?(user)
-      end
-
-      # Institutional admins can set the ability of record meetings to users in their institution
-      can :can_record, User do |user_object|
-        user_object.institution == user.institution &&
-          !user.institution.nil? &&
-          user.institution.admins.include?(user)
-      end
-
-      can :manage_admin_options, User do |user_object|
-        user_object.institution == user.institution &&
-          !user.institution.nil? &&
-          user.institution.admins.include?(user)
       end
 
       # Institutional admins can access the manage lists of spaces and users in their institution

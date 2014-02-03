@@ -47,18 +47,18 @@
         - collection.push([User::RECEIVE_DIGEST_WEEKLY, t('user.receive_digest.weekly')])
         = f.collection_radio_buttons :receive_digest, collection, :first, :last
 
-  - if user_signed_in? and can?(:manage_admin_options, @user)
+  - if user_signed_in? and can?(:manage_user, @user)
     #management-options.alert.alert-gray
       %h3= t('.management_options')
-      - if can?(:institution_name, @user)
+      - if can?(:manage_institution_name, @user)
         - current_institution = @user.institution.name if @user.institution
         = f.input :institution_name, :required => false, :placeholder => current_institution
-      = f.input :can_record, :required => false if can?(:can_record, @user)
+      = f.input :can_record, :required => false if can?(:manage_can_record, @user)
       -# prevent admins from mistakenly removing themselves from being admins
       - unless @user.id == current_user.id
-        = f.input :approved, :required => false if can?(:approve, @user)
-        = f.input :superuser, :required => false if can?(:superuser, @user)
-      - if can?(:disable, @user)
+        = f.input :approved, :required => false if can?(:manage_approved, @user)
+        = f.input :superuser, :required => false if can?(:manage_superuser, @user)
+      - if can?(:manage_disable, @user)
         .input
           = link_to user_path(@user), :confirm => t('.disable_confirm'), :method => :delete do
             = icon_delete(:alt => t('.disable'), :title => t('.disable'))

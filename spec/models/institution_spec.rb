@@ -70,6 +70,10 @@ describe Institution do
 
   it ".find_or_create_by_name_or_acronym"
 
+  it "#approved_users"
+  it "#full?"
+  it "#users_that_can_record"
+  it "#can_record_full?"
   it "#admins"
 
   describe "#add_member!" do
