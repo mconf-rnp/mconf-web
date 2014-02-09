@@ -16,16 +16,16 @@
         = link_to t('.users'), manage_users_path
 
     - if can?(:institutions, :manage)
-      %li{ :class => "#{'selected' if (params[:controller] == 'manage' && params[:action] == 'institutions') or (params[:controller] == 'institutions')}" }
+      %li{ :class => "#{'selected' if (params[:controller] == 'manage' && params[:action] == 'institutions')}" }
         = link_to t('.institutions'), manage_institutions_path
+
+    - if can?(:users, Institution) && current_user.institution
+      %li{ :class => "#{'selected' if params[:controller] == 'institutions'}" }
+        = link_to t('.my_institution'), institution_path(current_user.institution)
 
     - if can?(:spam, :manage)
       %li{ :class => "#{'selected' if params[:controller] == 'manage' && params[:action] == 'spam'}" }
         = link_to t('.spam'), manage_spam_path
-
-    - if can?(:user_permissions, Institution) && current_user.institution
-      %li{ :class => "#{'selected' if params[:controller] == 'institution' && params[:action] == 'user_permissions'}" }
-        = link_to t('institution.user_permissions'), user_permissions_institution_path(current_user.institution)
 
     - if can?(:manage, BigbluebuttonServer) && can?(:manage, BigbluebuttonRoom)
       - webconf_controllers = ['custom_bigbluebutton_servers', 'custom_bigbluebutton_rooms', 'custom_bigbluebutton_recordings']

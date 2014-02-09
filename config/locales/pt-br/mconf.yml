@@ -753,39 +753,23 @@ pt-br:
     ppal: Internet
   institution:
     created: Instituição criada com sucesso.
-    updated: Atualizada com sucesso
-    error:
-      update: As informações não puderam ser atualizadas
-    user:
-      zero: nenhum membro
-      one: um membro
-      other: %{count} membros
-    can_record_user:
-      zero: nenhum membro pode gravar
-      one: um membro pode gravar
-      other: %{count} membros podem gravar
-    user_limit: de no máximo %{limit}
-    can_record_limit: de no máximo %{limit}
-    space:
-      zero: nenhuma comunidade
-      one: uma comunidade
-      other: %{count} comunidades
-    destroy: Apagar instituição
-    duplicate: Esta instituição é duplicata
-    select-duplicate: ... desta aqui
-    user_permissions: Permissões de membros
+    duplicate: Esta instituição é uma duplicata
     user_registered:
       title: "Eu me registrei em sua instituição"
       body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
+    updated: "Instituição atualizada com sucesso"
   institutions:
     form:
       new: Nova instituição
     edit:
       title: Editar instituição
-      button: Atualizar dados
     new:
       title: Criar instituição
       button: Criar
+    spaces:
+      title: "Comunidades na instituição %{name}"
+    users:
+      title: "Usuários na instituição %{name}"
   invitation:
     accept: "Aceitar o convite"
     access_space: "Você agora é um membro da comunidade %{spacename} e pode acessá-la em <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -955,14 +939,34 @@ pt-br:
       disapprove: "Desaprovar: bloquear o acesso deste usuário ao site"
       disapprove_confirm: "Tem certeza que deseja bloquear o acesso deste usuário ao site?"
       edit: "Editar usuário"
+    institution:
+      can_record_users:
+        zero: 0 membros podem gravar
+        one: 1 membro pode gravar
+        other: %{count} membros podem gravar
+      can_record_limit: "máximo: %{limit}"
+      destroy: "Remover instituição"
+      no_user_limit: "sem limite"
+      users:
+        zero: 0 membros
+        one: 1 membro
+        other: %{count} membros
+      user_limit: "máximo: %{limit}"
+      spaces:
+        zero: 0 comunidades
+        one: 1 comunidade
+        other: %{count} comunidades
+    institutions:
+      create: "Criar uma nova instituição"
     menu:
+      institutions: Instituições
       general: "Geral"
+      my_institution: "Minha instituição"
       spaces: "Comunidades"
       spam: "Spam"
       title: "Gerenciamento do Site"
       users: "Usuários"
       webconf: "Webconferência"
-      institutions: Instituições
     spaces:
       filter_name: "Nome"
       filter_results: "Filtrar os resultados:"

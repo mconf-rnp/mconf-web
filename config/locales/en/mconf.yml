@@ -757,37 +757,23 @@ en:
     ppal: Internet
   institution:
     created: Institution created successfully.
-    user:
-      zero: no members
-      one: one member
-      other: %{count} members
-    can_record_user:
-      zero: no member can record
-      one: one member can record
-      other: %{count} members can record
-    space:
-      zero: no spaces
-      one: one space
-      other: %{count} spaces
-    user_limit: of a maximum of %{limit}
-    can_record_limit: of a maximum of %{limit}
-    users: Users in this institution
-    destroy: Delete institution
-    duplicate: This institution is a duplicate...
-    select-duplicate: ... of this one
-    user_permissions: User Permissions
+    duplicate: This institution is a duplicate
     user_registered:
       title: "I have registered for your institution"
       body_html: "Your <a href=\"%{url}\">approval</a> is needed for '%{name}' to be able to log in. You can do this in the management interface."
+    updated: "Instituição atualizada com sucesso"
   institutions:
     form:
       new: New institution
     edit:
       title: Edit institution
-      button: Update data
     new:
       title: Create institution
       button: Create
+    spaces:
+      title: "Spaces in the institution %{name}"
+    users:
+      title: "Users in the institution %{name}"
   invitation:
     accept: "Accept invitation"
     access_space: "You are now a member of %{spacename} and now you can access it on <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -962,14 +948,34 @@ en:
       disapprove: "Disapprove: block user from accessing the website"
       disapprove_confirm: "Are you sure you want to block this user from accessing the website?"
       edit: "Edit user"
+    institution:
+      can_record_users:
+        zero: 0 members can record
+        one: 1 member can record
+        other: %{count} members can record
+      can_record_limit: "maximum: %{limit}"
+      destroy: "Remove institution"
+      no_user_limit: "no maximum"
+      users:
+        zero: 0 members
+        one: 1 member
+        other: %{count} members
+      user_limit: "maximum: %{limit}"
+      spaces:
+        zero: 0 spaces
+        one: 1 space
+        other: %{count} spaces
+    institutions:
+      create: "Create a new institution"
     menu:
+      institutions: Institutions
       general: "General"
+      my_institution: "My Institution"
       spaces: "Spaces"
       spam: "Spam"
       title: "Site Management"
       users: "Users"
       webconf: "Web Conference"
-      institutions: Institutions
     spaces:
       filter_name: "Name"
       filter_results: "Filter the results:"

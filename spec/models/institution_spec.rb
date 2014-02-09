@@ -143,30 +143,32 @@ describe Institution do
   end
 
   describe "abilities" do
+    set_custom_ability_actions([:users, :spaces])
+
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
     let(:target) { FactoryGirl.create(:institution) }
 
     context "when is an anonymous user" do
       let(:user) { User.new }
-      it { should_not be_able_to_do_anything_to(target).except(:read) }
+      it { should_not be_able_to_do_anything_to(target) }
     end
 
     context "when is a registered user" do
       let(:user) { FactoryGirl.create(:user) }
 
       context "that's not a member of the institution" do
-        it { should_not be_able_to_do_anything_to(target).except(:read) }
+        it { should_not be_able_to_do_anything_to(target) }
       end
 
-      context "that's a member of the institution" do
+      context "that's a normal member of the institution" do
         before { target.add_member!(user, Role.default_role.name) }
-        it { should_not be_able_to_do_anything_to(target).except(:read) }
+        it { should_not be_able_to_do_anything_to(target) }
       end
 
       context "that's an admin of the institution" do
         before { target.add_member!(user, 'Admin') }
-        it { should_not be_able_to_do_anything_to(target).except([:read, :update, :edit]) }
+        it { should_not be_able_to_do_anything_to(target).except([:read, :users, :spaces]) }
       end
     end
 

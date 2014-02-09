@@ -1,5 +1,7 @@
 = render :partial => 'manage/menu'
 
-#institution-permission
+#institution-users
+  %h3= t('.title', :name => @institution.name)
+
   - for permission in @permissions
     = render :partial => 'edit_user_permission', :locals => {:permission => permission, :user => permission.user}

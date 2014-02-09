@@ -58,6 +58,7 @@ class ManageController < ApplicationController
 
   def institutions
     @institutions = Institution.find(:all, :order => "name").paginate(:page => params[:page], :per_page => 20)
+    render :layout => 'no_sidebar'
   end
 
   def spam

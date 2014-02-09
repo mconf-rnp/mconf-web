@@ -1,19 +1,24 @@
-.thread.thread-no-hover{:class => "#{cycle("thread-even" , "thread-odd")}"}
-  .management-links
-    = link_to icon_edit(:alt => t('edit'), :title => t('edit')), edit_institution_path(institution), :class => 'open-modal'
-    = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
-      = icon_delete(:alt => t('disable'), :title => t('institution.destroy'))
+.thread.thread-no-hover.thread-no-logo{:class => "#{cycle("thread-even" , "thread-odd")}"}
+  %ul.management-links
+    - if can?(:edit, institution)
+      = link_to icon_edit(:alt => t('_other.edit'), :title => t('_other.edit')), edit_institution_path(institution), :class => 'open-modal'
+    - if can?(:destroy, institution)
+      = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
+        = icon_delete(:alt => t('disable'), :title => t('.destroy'))
 
-  .institution-data
-    %h3
+  .thread-content
+    .thread-title
       = institution.full_name
-    .institution-users
-      = link_to t('institution.user', :count => institution.approved_users.count).capitalize, user_permissions_institution_path(institution)
-      - if institution.user_limit
-        = t('institution.user_limit', :limit => institution.user_limit)
-    .institution-can-record-users
-      = link_to t('institution.can_record_user', :count => institution.users_that_can_record.count).capitalize, user_permissions_institution_path(institution)
-      - if institution.can_record_limit
-        = t('institution.can_record_limit', :limit => institution.can_record_limit)
-    .institution-spaces
-      = link_to t('institution.space', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)
+    .institution-details
+      .institution-users
+        = link_to t('.users', :count => institution.approved_users.count).capitalize, users_institution_path(institution)
+        - if institution.user_limit
+          = '(' + t('.user_limit', :limit => institution.user_limit) + ')'
+        - else
+          = '(' + t('.no_user_limit') + ')'
+        = ' - '
+        = t('.can_record_users', :count => institution.users_that_can_record.count).capitalize
+        - if institution.can_record_limit
+          = '(' + t('.can_record_limit', :limit => institution.can_record_limit) + ')'
+      .institution-spaces
+        = link_to t('.spaces', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)

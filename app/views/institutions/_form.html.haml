@@ -1,9 +1,11 @@
-#institution-form
+= simple_form_for @institution, :html => { :class => 'single-column' } do |f|
 
-  = simple_form_for(@institution) do |f|
+  .modal-body
     #institution-basic-info
       = f.input :name
       = f.input :acronym
       = f.input :user_limit
       = f.input :can_record_limit
-    = f.button :wrapped, :value => button_name
+
+  .modal-footer
+    = f.button :submit, :value => button_name, :class => "btn btn-primary"

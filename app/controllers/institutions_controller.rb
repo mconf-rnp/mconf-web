@@ -4,7 +4,17 @@ class InstitutionsController < ApplicationController
   skip_load_resource :only => :index
 
   respond_to :js, :only => [:select]
-  respond_to :html, :only => [:index, :new, :edit, :user_permissions]
+  respond_to :html, :only => [:index, :new, :edit, :users]
+
+  def new
+    respond_to do |format|
+      format.html { render :layout => !request.xhr? }
+    end
+  end
+
+  def show
+    render :layout => 'no_sidebar'
+  end
 
   def create
     @institution = Institution.new(params[:institution])
@@ -57,7 +67,7 @@ class InstitutionsController < ApplicationController
   def correct_duplicate
   end
 
-  def user_permissions
+  def users
     @users = @institution.users.where(:approved => true)
 
     @permissions = @users.map do |u|

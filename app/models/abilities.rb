@@ -45,7 +45,6 @@ module Abilities
   class MemberAbility < BaseAbility
     def register_abilities(user)
       abilities_for_bigbluebutton_rails(user)
-      abilities_for_institution_admins(user)
 
       # Users
       # Disabled users are only visible to superusers
@@ -156,10 +155,8 @@ module Abilities
       can :read, Attachment, :space => { :public => true, :repository => true }
 
       # Institutions
-      can [:read, :select], Institution
-      can [:edit, :update, :user_permissions], Institution do |institution|
-        institution.admins.include?(user)
-      end
+      can [:select], Institution
+      abilities_for_institution_admins(user)
 
       # Permissions
       # Only space admins can update user roles/permissions
@@ -197,6 +194,11 @@ module Abilities
 
       # Institutional admins can access the manage lists of spaces and users in their institution
       can [:users, :spaces], :manage do
+        !user.institution.nil? && user.institution.admins.include?(user)
+      end
+
+      # Institutional admins can access these actions in their institution
+      can [:read, :users, :spaces], Institution do
         !user.institution.nil? && user.institution.admins.include?(user)
       end
 
@@ -354,7 +356,7 @@ module Abilities
       can :show, News, :space => { :public => true }
       can :read, Event, :space => { :public => true }
       can :read, Attachment, :space => { :public => true, :repository => true }
-      can [:read, :select], Institution
+      can [:select], Institution
     end
 
     private

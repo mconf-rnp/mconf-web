@@ -1,3 +1,5 @@
-= render_page_title t('.title')
-
-= render 'form', :button_name => t('.button')
+#institution-edit
+  .modal-header
+    = modal_close_button
+    %h3= t('.title')
+  = render 'form', :button_name => t('_other.update')

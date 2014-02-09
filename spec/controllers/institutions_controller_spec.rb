@@ -10,18 +10,41 @@ describe InstitutionsController do
 
   render_views
 
+  describe "#show" do
+    let(:institution) { FactoryGirl.create(:institution) }
+    let(:user) { FactoryGirl.create(:superuser) }
+    before(:each) { sign_in(user) }
+
+    before(:each) { get :show, :id => institution.to_param }
+
+    context "template and view" do
+      it { should render_with_layout("no_sidebar") }
+      it { should render_template("institutions/show") }
+    end
+
+    it "assigns @institution" do
+      should assign_to(:institution).with(instance_of(Institution))
+    end
+  end
+
   describe "#new" do
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
 
-    before(:each) { get :new }
-
     context "template and view" do
+      before(:each) { get :new }
       it { should render_with_layout("application") }
       it { should render_template("institutions/new") }
     end
 
+    context "template and view via xhr" do
+      before(:each) { xhr :get, :new }
+      it { should_not render_with_layout() }
+      it { should render_template("institutions/new") }
+    end
+
     it "assigns @institution" do
+      get :new
       should assign_to(:institution).with(instance_of(Institution))
     end
   end
@@ -92,11 +115,12 @@ describe InstitutionsController do
 
   it "#destroy"
   it "#correct_duplicate"
-  it "#user_permissions"
+  it "#users"
   it "#spaces"
   it "#select"
 
   describe "abilities", :abilities => true do
+    set_custom_ability_actions([:users, :spaces])
     render_views(false)
 
     let(:hash) { { :id => target.to_param } }
@@ -114,8 +138,9 @@ describe InstitutionsController do
       context "in an institution" do
         let(:target) { FactoryGirl.create(:institution) }
 
+        it { should allow_access_to(:show, hash) }
         it { should allow_access_to(:edit, hash) }
-        it { should allow_access_to(:user_permissions, hash) }
+        it { should allow_access_to(:users, hash) }
         it { should allow_access_to(:update, hash_with_attrs).via(:post) }
         it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
       end
@@ -125,7 +150,6 @@ describe InstitutionsController do
       let(:user) { FactoryGirl.create(:user) }
       before(:each) { login_as(user) }
 
-      it { should allow_access_to(:select) }
       it { should_not allow_access_to(:new) }
       it { should_not allow_access_to(:create).via(:post) }
 
@@ -133,8 +157,9 @@ describe InstitutionsController do
         let(:target) { FactoryGirl.create(:institution) }
 
         context "he is not a member of" do
+          it { should_not allow_access_to(:show, hash) }
           it { should_not allow_access_to(:edit, hash) }
-          it { should_not allow_access_to(:user_permissions, hash) }
+          it { should_not allow_access_to(:users, hash) }
           it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
         end
@@ -143,17 +168,20 @@ describe InstitutionsController do
           context "with the role 'Admin'" do
             before(:each) { target.add_member!(user, "Admin") }
 
-            it { should allow_access_to(:edit, hash) }
-            it { should allow_access_to(:user_permissions, hash) }
-            it { should allow_access_to(:update, hash_with_attrs).via(:post) }
+            it { should allow_access_to(:show, hash) }
+            it { should_not allow_access_to(:edit, hash) }
+            it { should allow_access_to(:users, hash) }
+            it { should allow_access_to(:spaces, hash) }
+            it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
             it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
           end
 
           context "with the role 'User'" do
             before(:each) { target.add_member!(user, "User") }
 
+            it { should_not allow_access_to(:show, hash) }
             it { should_not allow_access_to(:edit, hash) }
-            it { should_not allow_access_to(:user_permissions, hash) }
+            it { should_not allow_access_to(:users, hash) }
             it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
             it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
           end
@@ -168,8 +196,9 @@ describe InstitutionsController do
 
       context "in an institution" do
         let(:target) { FactoryGirl.create(:institution) }
+        it { should_not allow_access_to(:show, hash) }
         it { should_not allow_access_to(:edit, hash) }
-        it { should_not allow_access_to(:user_permissions, hash) }
+        it { should_not allow_access_to(:users, hash) }
         it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
         it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
       end

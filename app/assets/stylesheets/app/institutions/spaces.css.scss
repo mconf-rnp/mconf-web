@@ -1,19 +1,15 @@
 @import "definitions";
 @import "compass/css3";
 
-body.manage.institutions {
+body.institutions.spaces {
 
   .management-links {
     float: right;
     padding-top: 8px;
   }
 
-  .thread-title {
-    font-weight: bold;
-  }
-
-  .page-tabs-full {
-    .btn { float: right; }
+  .institution-name {
+    display: block;
   }
 
 }

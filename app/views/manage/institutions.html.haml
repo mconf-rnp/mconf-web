@@ -1,11 +1,10 @@
 = render :partial => 'menu'
 
-= content_for :sidebar do
-  %h3
-    = t('institutions.form.new')
-  = render :partial => 'institutions/form', :locals => { :@institution => Institution.new, :button_name => t('institutions.new.button') }
-
 #manage
+
+  .page-tabs.page-tabs-full
+    = link_to t('.create'), new_institution_path, :class => 'open-modal btn btn-info'
+
   #institutions
     - for institution in @institutions
       = render :partial => 'institution', :locals => { :institution => institution }

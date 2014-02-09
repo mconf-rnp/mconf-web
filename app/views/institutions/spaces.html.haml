@@ -1,5 +1,10 @@
 = render :partial => 'manage/menu'
 
 #institution-spaces
+  %h3= t('.title', :name => @institution.name)
+
   - for space in @spaces
-    = render :partial => 'spaces/unified_space', :locals => { :space => space, :is_member => false }
+    - if space.disabled?
+      = render :partial => 'manage/disabled_space', :locals => { :space => space }
+    - else
+      = render :partial => 'manage/enabled_space', :locals => { :space => space }
