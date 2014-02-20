@@ -65,6 +65,7 @@ pt-br:
     user:
       administrator: "Administrador global"
       normal_user: "Usuário normal"
+      removed: "<usuário removido>"
     yes_: "Sim"
     webconference:
       not_allowed_to_create: "Você não tem permissão para criar reuniões nesta sala"
@@ -145,10 +146,14 @@ pt-br:
         _full_name: "Nome completo"
         can_record: "Permitir ao usuário gravar reuniões"
         email: "E-mail"
+        expanded_post: "Mostrar mensagens no mural com a visão expandida por padrão"
         institution_name: "Instituição"
+        notification: "Como você deseja receber as notificações?"
         password: "Senha"
         password_confirmation: "Confirmação de senha"
+        receive_digest: "O quão frequentemente você gostaria de receber emails com um resumo das atividades que aconteceram nas comunidades as quais você pertence?"
         superuser: "Administrador global"
+        timezone: "Fuso horário"
         username: "ID"
     errors:
       models:
@@ -506,8 +511,12 @@ pt-br:
         resend_confirmation_email: "Reenviar e-mail de confirmação"
     strategies:
       ldap_authenticatable:
+        create_failed: "Não foi possĩvel criar as estruturas internas para sua conta do LDAP, por favor contate um administrador" 
         invalid_bind: "Não foi possível conectar ao servidor LDAP, verifique a configuração do LDAP na página de administração"
         ldap_not_enabled: "LDAP não esta habilitado neste site"
+        missing_username: "Não foi possível encontrar o nome de usuário do LDAP, por favor contate um administrador"
+        missing_name: "Não foi possível encontrar o nome do usuário do LDAP, por favor contate um administrador"
+        missing_email: "Não foi possível encontrar o email do usuário do LDAP, por favor contate um administrador"
   disable: Desabilitar
   disabled: Desabilitado
   document:
@@ -842,7 +851,7 @@ pt-br:
   join: Entrar
   join_cam: Participar
   join_requests:
-    join_request_space:
+    index:
       not_pending:
         other: "Não existem solicitações de adesão pendentes"
       pending:
@@ -1027,12 +1036,13 @@ pt-br:
       events:
         other: "Outros"
         today: "Hoje"
+      not_confirmed: "Sua conta ainda não foi confirmada. Por favor verifique o seu e-mail para ativá-la. (Não recebeu um e-mail? <a href=\"%{url}\">Clique aqui</a>.)"
       view_all_activity: "Ver todas suas atividades"
       view_all_spaces: "Ver todas comunidades"
     edit_recording:
       title: "Editar sua gravação"
     edit_room:
-      layout_empty_option: "<deixar a aplicação escolher>"
+      layout_empty_option: "<padrão>"
     recordings:
       title: "Gravações da minha sala de webconferência"
       update_recordings:
@@ -1043,13 +1053,13 @@ pt-br:
       end: "Parar a reunião"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
       fast_start: "Início rápido usando as opções já configuradas"
-      invite: "Convidar outras pessoas..."
+      invite: "Convidar outras pessoas"
       join: "Entrar na reunião!"
-      join_mobile_full: "Entrar a partir de um dispositivo móvel..."
+      join_mobile_full: "Entrar a partir de um dispositivo móvel"
       not_running: "Nenhuma reunião em andamento."
       options: "Opções"
-      preferences: "Preferências..."
-      recordings: "Ver gravações disponíveis"
+      preferences: "Preferências"
+      recordings: "Ver gravações"
       running_with:
         no_participants: "Existe uma reunião em andamento sem usuários."
         participants:
@@ -1149,6 +1159,9 @@ pt-br:
     title: "Mensagens (%{count})"
     updated: "Mensagem atualizada!"
     wall: Mural
+  posts:
+    post_with_children:
+      by: "de"
   prav: PRAV
   preferences: Preferências
   previous: Anterior
@@ -1170,6 +1183,8 @@ pt-br:
       sent: Enviadas
     new: 
       title: "Mensagens Privadas"
+    reply_private_message:
+      user_not_registered: "Este usuário não está mais registrado, você não poderá responder esta mensagem."
     show: 
       title: "Mensagens Privadas"
     show_received: 
@@ -1203,9 +1218,13 @@ pt-br:
     visibility_public_fellows: "Apenas os seus colegas em um espaço público podem ver o seu perfil privado."
   profiles:
     edit:
-      change_pic: "Mudar sua foto"
-      edit_your_profile: "Editar o seu perfil"
-      view_your_profile: "Visualizar o seu perfil"
+      change_pic: "Mudar foto"
+      title: "Editar perfil"
+      view_your_profile: "Visualizar perfil"
+      vcard:
+        export: "Exportar vCard"
+        tooltip: "vCard é um formato de arquivo padrão para cartões eletrônicos"
+        use: "Usar um vCard"
     form:
       no_organization: "<nenhuma organização atribuída>"
   province: Estado
@@ -1459,7 +1478,7 @@ pt-br:
       institution_placeholder: "Selecione uma instituição"
       other_options: "Outras opções"
       public: "Tornar esta comunidade pública"
-      yes_delete: "Sim, remova!"
+      yes_delete: "Sim, quero excluir esta comunidade"
     edit_recording:
       title: "Editar sua gravação"
     index: 
@@ -1500,18 +1519,21 @@ pt-br:
       end: "Finalizar"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
       fast_start: "Início rápido usando as opções já configuradas"
-      invite: "Convidar outras pessoas..."
+      invite: "Convidar outras pessoas"
       join: "Entrar!"
       join_mobile: "Entrar/móvel"
-      join_mobile_full: "Entrar a partir de um dispositivo móvel..."
+      join_mobile_full: "Entrar a partir de um dispositivo móvel"
       options: "Opções"
-      preferences: "Preferências..."
+      preferences: "Preferências"
       start: "Iniciar"
     space_thumbnail:
       private: "Privada"
       public: "Pública"
     unified_space: 
+      private: "comunidade privada"
+      public: "comunidade pública"
       user_is_member: "Você é membro desta comunidade"
+      with_members: "com %{count} membros"
     users: "Usuários nesta comunidade"
     webconference:
       invite: "Convidar outras pessoas"
@@ -1529,7 +1551,7 @@ pt-br:
           header: Compartilhar
           url: "Endereço da sala"
     webconference_options:
-      layout_empty_option: "<deixar a aplicação escolher>"
+      layout_empty_option: "<padrão>"
       options: "Opções da sala de webconferência"
     webconference_tabs:
       access: "Acesso à webconferência"
@@ -1612,10 +1634,8 @@ pt-br:
     share: "Esta é a url para compartilhar este vídeo com os seus colegas"
     tag: "Tags são palavras-chave ou termos associados com o conteúdo que são utilizadas para localizar e filtrar as informações. Pressione enter para confirmar cada tag."
     tag_by: "Tags são palavras que descrevem os documentos. Use este link para ordená-las por popularidade ou por ordem alfabética. Em seguida, clique nelas para ver os documentos relacionados."
-    timezone: "Ao selecionar o seu fuso horário não haverá equívoco ao criar eventos com pessoas de outros países"
     upcoming: "Esta seção mostra os próximos eventos nesta comunidade"
     update_logo: "Você pode enviar o seu próprio logotipo, criar um logotipo de texto ou selecionar uma imagem da galeria"
-    vcard: "vCard é um formato de arquivo padrão para cartões eletrônicos"
     vclass: "O tipo Classe Virtual é a maneira perfeita para organizar aulas, conferências e seminários, onde o professor assume um papel de destaque."
     vcongress: "O tipo Congresso Virtual é muito parecido com o tipo Reunião Virtual, mas voltado para eventos maiores, tanto em tamanho quanto em complexidade. Normalmente, este tipo requer o apoio de um operador local."
     vmeeting: "O tipo Reunião Virtual é adequado para reuniões online ou encontros presenciais com fortes características virtuais, ou seja, onde os participantes locais e remoto terão a oportunidade de se comunicar de forma interativa."
@@ -1638,17 +1658,11 @@ pt-br:
     admin: Administrador
     administrators: Administradores
     assist: Participantes
-    by_email: "Por e-mail"
-    by_private_message: "Por mensagem privada"
     category: Categoria
     confirm_password: "Confirmar senha"
     delete_from_space: "Excluir usuário da comunidade"
     disable: "Desabilitar usuário"
     disabled: "Usuário %{username} desabilitado"
-    edit:
-      click_to_edit_profile: "Clique aqui para editar o seu perfil"
-      did_not_find_info: "Não encontrou a informação que estava procurando?"
-    edit_account: "Editar sua conta"
     email_used_to_create_account: "Digite o endereço de e-mail que você usou para criar a sua conta"
     enable: "Habilitar usuário"
     enabled: "Usuário habilitado com sucesso. O usuário atualmente não pertence a nenhuma comunidade, e terá que aderir às comunidades novamente."
@@ -1674,18 +1688,11 @@ pt-br:
     new_password_tip: "Preencha este campo apenas se você deseja mudar a sua senha."
     noactivity: "%{user} não tem atividade recente"
     normal_user: "Usuário comum"
-    not_activated: "Sua conta não está ativada, verifique o seu e-mail. (Não recebeu o e-mail? <a href=\"%{url}\">Clique aqui</a>.)"
     not_assist: "Não participarão"
     not_confirmed: "Não confirmados"
-    notifications: "Como você deseja receber as notificações?"
     one: Usuário
     other: Usuários
     private_message: "Enviar Mensagem"
-    receive_digest:
-      daily: Diariamente
-      description: "O quão frequentemente você gostaria de receber emails com um resumo das atividades que aconteceram nas comunidades as quais você pertence?"
-      never: Nunca
-      weekly: Semanalmente
     recent_join: "Usuários recentemente inscritos"
     registered: "Obrigado por se registar! Acabamos de enviar instruções sobre como ativar a sua conta de usuário"
     request_confirmation: "Solicitar e-mail de confirmação"
@@ -1699,10 +1706,8 @@ pt-br:
       one: "Pessoas, %{users_size} resultado"
       other: "Pessoas, %{users_size} resultados"
     results_found: "Usuários encontrados"
-    timezone: "Fuso horário"
     updated: "Usuário atualizado com sucesso"
     vcc_email: "E-mail do usuário Mconf %{dir}"
-    view_expanded_posts: "Mostrar mensagens no mural com a visão expandida por padrão"
   users:
     approve:
       approved: "O usuário %{username} foi aprovado para acessar este site!"
@@ -1714,17 +1719,39 @@ pt-br:
       disapproved: "O usuário %{username} foi bloqueado de acessar este site!"
       not_enabled: "A aprovação de registros não está habilitada neste site"
     edit:
+      account_info: "Informações da conta"
       approve: "Aprovar: permitir que este usuário acesse o site"
       approve_confirm: "Tem certeza que deseja permitir que este usuário acesse o site?"
+      cancel_account: "Cancelar conta?"
       change_institution: Mudar instituição do usuário
+      change_password: "Mudar senha"
+      click_to_edit_profile: "Clique aqui para editar o seu perfil"
+      did_not_find_info: "Não encontrou a informação que estava procurando?"
       disapprove: "Desaprovar: bloquear o acesso deste usuário ao site"
       disapprove_confirm: "Tem certeza que deseja bloquear o acesso deste usuário ao site?"
       federated:
         see_your_data: "Clique para ver os seus dados que foram compartilhados com este site pela federação"
         title: "Você acessou este site através de uma federação!"
         your_idp: "O seu provedor de identidade é: %{idp}"
+      ldap:
+        title: "Você acessou este site através do LDAP!"
       institution_placeholder: "Selecione uma instituição"
       management_options: "Management options"
+      not_confirmed: "Sua conta ainda não foi confirmada. Por favor verifique o seu e-mail para ativá-la. (Não recebeu um e-mail? <a href=\"%{url}\">Clique aqui</a>.)"
+      notification:
+        by_email: "Por e-mail"
+        by_private_message: "Por mensagem privada"
+      other_user:
+        click_to_edit_profile: "Clique aqui para editar o perfil deste usuário"
+        not_confirmed: "Este usuário ainda não confirmou sua conta."
+        title: "Editar conta de usuário"
+      preferences: "Preferências"
+      receive_digest:
+        daily: "Diariamente"
+        never: "Nunca"
+        weekly: "Semanalmente"
+      title: "Editar sua conta"
+      yes_cancel_account: "Sim, cancelar minha conta"
     registrations:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.
@@ -1734,10 +1761,8 @@ pt-br:
   username: "Nome de usuário"
   vCard:
     corrupt: "O vCard que você enviou está corrompido ou é uma versão não suportada"
-    export: "Exportar seu vCard"
     message: "Use seu vCard para preencher automaticamente seu perfil"
     upload: "Envie o seu vCard"
-    use: "Use seu vCard"
   vcc: Mconf
   vcc_mail_label: "[Mconf]"
   version:

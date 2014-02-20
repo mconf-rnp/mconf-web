@@ -88,6 +88,13 @@ describe ApplicationHelper do
     end
   end
 
+  describe "#webconf_path_prefix" do
+    context "returns the path prefix for web conference urls" do
+      before { Site.current.update_attributes(:domain => 'test.com', :ssl => true) }
+      it { webconf_path_prefix.should eq('/webconf/') }
+    end
+  end
+
   describe "#options_for_tooltip" do
     context "returns a hash with the default attributes for tooltips" do
       subject { options_for_tooltip('my-title') }
@@ -133,6 +140,29 @@ describe ApplicationHelper do
         Mconf::Shibboleth.any_instance.should_receive(:signed_in?).and_return(false)
       }
       it { user_signed_in_via_federation?.should be_false }
+    end
+  end
+
+  describe "#user_signed_in_via_ldap?" do
+    context "if signed in in devise and Mconf::LDAP" do
+      before {
+        should_receive(:user_signed_in?).and_return(true)
+        Mconf::LDAP.any_instance.should_receive(:signed_in?).and_return(true)
+      }
+      it { user_signed_in_via_ldap?.should be_true }
+    end
+
+    context "if there's no user signed in" do
+      before { should_receive(:user_signed_in?).and_return(false) }
+      it { user_signed_in_via_ldap?.should be_false }
+    end
+
+    context "if there's a user signed in but not via LDAP" do
+      before {
+        should_receive(:user_signed_in?).and_return(true)
+        Mconf::LDAP.any_instance.should_receive(:signed_in?).and_return(false)
+      }
+      it { user_signed_in_via_ldap?.should be_false }
     end
   end
 

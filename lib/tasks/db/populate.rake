@@ -5,6 +5,7 @@ namespace :db do
 
   desc "Populate the DB with random test data. Options: SINCE, CLEAR"
   task :populate => :environment do
+    reserved_usernames = ['lfzawacki', 'daronco', 'fbottin']
 
     if ENV['SINCE']
       @created_at_start = DateTime.parse(ENV['SINCE']).to_time
@@ -24,6 +25,7 @@ namespace :db do
       Statistic.destroy_all
       Permission.destroy_all
       Space.destroy_all
+      Event.destroy_all
       RecentActivity.destroy_all
       BigbluebuttonRecording.destroy_all
       users_without_admin = User.find_by_id_with_disabled(:all)
@@ -35,14 +37,24 @@ namespace :db do
     end
 
     puts "* Create users (15)"
+
     User.populate 15 do |user|
-      user.username = "#{Populator.words(1)}-#{username_offset += 1}"
+
+      if username_offset < reserved_usernames.size # Use some fixed usernames and always approve them
+        user.username = reserved_usernames[username_offset]
+        user.approved = true
+        puts "* Create users: default user '#{user.username}'"
+      else # Create user as normal
+        user.username = "#{Populator.words(1)}-#{username_offset}"
+        user.approved = rand(0) < 0.8 # ~20% marked as not approved
+      end
+      username_offset += 1
+
       user.email = Faker::Internet.email
       user.confirmed_at = @created_at_start..Time.now
       user.disabled = false
       user.notification = User::NOTIFICATION_VIA_EMAIL
       user.encrypted_password = "123"
-      user.approved = rand(0) < 0.8 # ~20% marked as not approved
 
       Profile.populate 1 do |profile|
         profile.user_id = user.id
@@ -328,5 +340,19 @@ namespace :db do
 
     end
 
+    # done after all the rest to simulate what really happens: users are created enabled
+    # and disabled later on
+    puts "* Disabling a few users and spaces"
+    ids = Space.all.map(&:id)
+    ids = ids.sample(Space.count/5) # 1/5th disabled
+    Space.where(:id => ids).each do |space|
+      space.disable
+    end
+    users_without_admin = User.where(["(superuser IS NULL OR superuser = ?) AND username NOT IN (?)", false, reserved_usernames])
+    ids = users_without_admin.map(&:id)
+    ids = ids.sample(User.count/5) # 1/5th disabled
+    User.where(:id => ids).each do |user|
+      user.disable
+    end
   end
 end

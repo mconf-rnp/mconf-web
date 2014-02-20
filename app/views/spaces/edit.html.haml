@@ -5,8 +5,6 @@
 = render :partial => 'admin_tabs'
 
 #edit-space
-  %h1= t('space.configuration')
-
   .right-column
     #edit-space-current-logo
       = logo_image(@space, :size => '168x128', :class => 'logo')
@@ -24,7 +22,7 @@
         - current_institution = @space.institution.name if @space.institution
         = f.input :institution_name, :required => false, :input_html => { :value => current_institution }
 
-    = f.button :wrapped, :value => t("_other.update")
+    = f.button :wrapped, :value => t("_other.save")
 
   #edit-space-other-options
     %h3= t('.other_options')

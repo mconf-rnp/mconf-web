@@ -5,8 +5,6 @@
 = render :partial => 'admin_tabs'
 
 #webconference-options
-  %h1= t('.options')
-
   = simple_form_for @space, :html => { :method => :put, :class => 'single-column' } do |f|
     .left-column
       = f.simple_fields_for :bigbluebutton_room do |bbb_room|
@@ -15,4 +13,4 @@
         = bbb_room.input :default_layout do
           = bbb_room.select :default_layout, @space.bigbluebutton_room.get_available_layouts, :include_blank => t('.layout_empty_option')
 
-    = f.button :wrapped, :value => t("_other.update")
+    = f.button :wrapped, :value => t("_other.save")

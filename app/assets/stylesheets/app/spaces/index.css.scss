@@ -48,7 +48,7 @@ body.spaces.index {
   .select2-results, .select2-container {
     i {
       float: right;
-      font-size: 11px;
+      @include font-size($font-small);
       margin: 6px 0 0 0;
     }
   }
@@ -91,14 +91,16 @@ body.spaces.index {
 
     .space-item.space-list {
       .thread {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        padding-right: 5px;
+        // bigger pading than the usual
+        padding-right: 8px;
+        padding-left: 8px;
       }
 
       &.selected .thread {
-        border-right: 5px solid #aaa;
-        padding-right: 0;
+        background: $light-gray;
+        .logo-in-thread img {
+          border-color: $bright-blue;
+        }
       }
     }
 

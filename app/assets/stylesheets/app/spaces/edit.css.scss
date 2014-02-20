@@ -1,6 +1,8 @@
 @import "definitions";
 @import "compass/css3";
 
+@import "app/spaces/admin_tabs";
+
 body.spaces.edit {
 
   #edit-space {
@@ -41,10 +43,14 @@ body.spaces.edit {
     }
   }
 
+  #edit-space-other-options {
+    text-align: center;
+    .btn { margin-left: 5px; }
+  }
+
   .space_institution_name {
     #space_institution_name, .select2-container {
       width: 100%;
     }
   }
-
 }
