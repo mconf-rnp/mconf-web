@@ -190,7 +190,6 @@ describe ManageController do
       context "paginates the list of users" do
         before {
           45.times { FactoryGirl.create(:user, :institution => institution) }
-          User.first.destroy # it's not from the same institution, remove to prevent errors
         }
 
         context "if no page is passed in params" do

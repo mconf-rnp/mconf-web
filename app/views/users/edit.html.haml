@@ -67,7 +67,7 @@
         - collection.push([User::RECEIVE_DIGEST_WEEKLY, t('.receive_digest.weekly')])
         = f.collection_radio_buttons :receive_digest, collection, :first, :last
 
-  - if user_signed_in? && and can?(:manage_user, @user)
+  - if user_signed_in? && can?(:manage_user, @user)
     #management-options.alert.alert-gray
       %h3= t('.management_options')
       - if can?(:manage_institution_name, @user)
