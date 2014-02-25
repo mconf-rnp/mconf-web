@@ -265,7 +265,7 @@ describe Space do
       expect {
         space.institution = new_institution
         space.save!
-      }.to change(new_institution.spaces, :count).by(1)
+      }.to change(new_institution.spaces, :count).by(+1)
       new_institution.spaces.should include(space)
     end
 
@@ -297,7 +297,8 @@ describe Space do
   end
 
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([:leave, :enable, :webconference, :select])
+    set_custom_ability_actions([:leave, :enable, :webconference, :select,
+                                :user_permissions, :webconference_options, :recordings])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -353,19 +354,32 @@ describe Space do
         let(:target) { FactoryGirl.create(:public_space) }
 
         context "he is not a member of" do
-          it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :create, :select]) }
+          it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select]) }
         end
 
         context "he is a member of" do
           context "with the role 'Admin'" do
             before { target.add_member!(user, "Admin") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :create, :select, :leave, :edit, :update, :destroy]) }
+            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave,
+                                                                      :edit, :update, :destroy, :user_permissions, :webconference_options]) }
           end
 
           context "with the role 'User'" do
             before { target.add_member!(user, "User") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :create, :select, :leave]) }
+            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave]) }
           end
+        end
+
+        context "when is an admin of the spaces's institution" do
+          before {
+            target.institution.add_member!(user, 'Admin')
+          }
+
+          it {
+            allowed = [:create, :select, :read, :destroy, :edit, :update, :user_permissions,
+                       :webconference_options, :webconference, :recordings]
+            should_not be_able_to_do_anything_to(target).except(allowed)
+          }
         end
       end
 
@@ -379,13 +393,26 @@ describe Space do
         context "he is a member of" do
           context "with the role 'Admin'" do
             before { target.add_member!(user, "Admin") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :create, :select, :leave, :edit, :update, :destroy]) }
+            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave, :edit,
+                                                                      :update, :destroy, :user_permissions, :webconference_options]) }
           end
 
           context "with the role 'User'" do
             before { target.add_member!(user, "User") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :create, :select, :leave]) }
+            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave]) }
           end
+        end
+
+        context "when is an admin of the spaces's institution" do
+          before {
+            target.institution.add_member!(user, 'Admin')
+          }
+
+          it {
+            allowed = [:create, :select, :read, :destroy, :edit, :update, :user_permissions,
+                       :webconference_options, :webconference, :recordings]
+            should_not be_able_to_do_anything_to(target).except(allowed)
+          }
         end
       end
     end
@@ -395,7 +422,7 @@ describe Space do
 
       context "in a public space" do
         let(:target) { FactoryGirl.create(:public_space) }
-        it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :select]) }
+        it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :select]) }
       end
 
       context "in a private space" do

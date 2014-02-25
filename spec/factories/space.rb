@@ -14,6 +14,7 @@ FactoryGirl.define do
     s.deleted false
     s.repository false
     s.disabled false
+    s.association :institution, :factory => :institution
   end
 
   factory :public_space, :parent => :space do |s|

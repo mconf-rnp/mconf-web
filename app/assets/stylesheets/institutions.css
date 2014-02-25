@@ -3,4 +3,5 @@
  *= require ./app/institutions/new
  *= require ./app/institutions/edit
  *= require ./app/institutions/show
+ *= require ./app/institutions/users
  */

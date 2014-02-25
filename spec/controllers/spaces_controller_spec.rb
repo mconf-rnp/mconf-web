@@ -204,7 +204,9 @@ describe SpacesController do
       describe "doesn't set an institution in the space if the user has no institution" do
         before(:each) {
           user.update_attributes(:institution => nil)
-          post :create, :space => space.attributes
+          attrs = space.attributes
+          attrs.delete('institution_id')
+          post :create, :space => attrs
         }
         it { Space.last.institution.should be(nil) }
       end

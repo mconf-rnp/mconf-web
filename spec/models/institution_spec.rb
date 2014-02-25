@@ -19,15 +19,18 @@ describe Institution do
   it { should allow_mass_assignment_of(:acronym) }
 
   describe ".spaces" do
-    let(:target) do
-      target = FactoryGirl.create(:institution)
-      target.spaces << FactoryGirl.create(:space)
-      target.spaces << FactoryGirl.create(:space)
-      target
-    end
+    let(:target) { FactoryGirl.create(:institution) }
+    before {
+      FactoryGirl.create(:space, :institution => target)
+      FactoryGirl.create(:space, :institution => target)
+    }
 
     it { target.spaces.size.should be(2) }
-    it { expect {target.spaces << FactoryGirl.create(:space)}.to change(target.spaces, :count).by(+1) }
+    it {
+      expect {
+        FactoryGirl.create(:space, :institution => target)
+      }.to change(target.spaces, :count).by(+1)
+    }
   end
 
   it ".roles"

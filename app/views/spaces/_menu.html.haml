@@ -1,6 +1,5 @@
 - if @space && @space.id != nil
-  - member_or_superuser = (current_user && (@space.users.include?(current_user) || current_user.superuser?))
-  - if @space.public? || member_or_superuser
+  - if can?(:read, @space)
     = content_for :page_menu do
       %ul
         %li{ spaces_menu_select_if(:home) }
@@ -17,6 +16,6 @@
           %li{ spaces_menu_select_if(:repository) }
             = link_to t('repository.one').capitalize, space_attachments_path(@space)
         - if user_signed_in?
-          - if @space.role_for?(current_user, :name => 'Admin') || current_user.superuser?
+          - if can?(:edit, @space)
             %li{ spaces_menu_select_if(:admin) }
               = link_to t('admin.one').capitalize, edit_space_path(@space), :class => "admin danger-text"

@@ -186,14 +186,14 @@ class Space < ActiveRecord::Base
     end
   end
 
-  private
-
   def set_institution
     if institution_name.present?
       i = Institution.find_or_create_by_name_or_acronym(institution_name)
       self.institution_id = i.id
     end
   end
+
+  private
 
   def permalink_uniqueness
     unless User.find_by_username(self.permalink).blank?

@@ -1,0 +1,20 @@
+@import "definitions";
+@import "compass/css3";
+
+body.institutions.users {
+
+  select {
+    width: auto;
+  }
+
+  form {
+    select, input {
+      vertical-align: baseline;
+    }
+  }
+
+  .thread .thread-text {
+    float: right;
+  }
+
+}
