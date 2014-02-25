@@ -99,7 +99,7 @@ module Abilities
       can :create, JoinRequest do |jr|
         group = jr.group
         if !group.nil? and group.is_a?(Space)
-          !group.users.include?(user)
+          !user.nil?
         else
           false
         end
@@ -115,7 +115,7 @@ module Abilities
         end
       end
       # space admins can work with all join requests in the space
-      can [:index, :show, :update, :destroy], JoinRequest do |jr|
+      can [:index, :show, :update, :destroy, :invite], JoinRequest do |jr|
         group = jr.group
         if !group.nil? and group.is_a?(Space)
           group.admins.include?(user)
