@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ManageController do
 
   describe "#users" do
-    before { User.destroy_all }
+    before { User.destroy_all } # exclude seeded user(s)
 
     describe "if the current user is a superuser" do
       let(:user) { FactoryGirl.create(:superuser) }
