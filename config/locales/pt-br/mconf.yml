@@ -98,11 +98,6 @@ pt-br:
   actions: Ações
   activerecord:
     attributes:
-      institution:
-        acronym: Sigla
-        can_record_limit: Usuários que podem gravar
-        name: Nome
-        user_limit: Máximo de membros
       site:
         analytics_code: "Código do Google Analytics"
         chat_enabled: "Habilitar Chat"
@@ -157,7 +152,6 @@ pt-br:
         can_record: "Permitir ao usuário gravar reuniões"
         email: "E-mail"
         expanded_post: "Mostrar mensagens no mural com a visão expandida por padrão"
-        institution_name: "Instituição"
         notification: "Como você deseja receber as notificações?"
         password: "Senha"
         password_confirmation: "Confirmação de senha"
@@ -178,7 +172,6 @@ pt-br:
       join_request: "Pedido de Adesão"
       news: "Notícia"
       space: "Comunidade"
-      institution: Instituição
   address: Endereço
   admin:
     one: Administrador
@@ -664,25 +657,6 @@ pt-br:
   internet:
     on_the: "Na Internet"
     ppal: Internet
-  institution:
-    created: Instituição criada com sucesso.
-    duplicate: Esta instituição é uma duplicata
-    user_registered:
-      title: "Eu me registrei em sua instituição"
-      body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
-    updated: "Instituição atualizada com sucesso"
-  institutions:
-    form:
-      new: Nova instituição
-    edit:
-      title: Editar instituição
-    new:
-      title: Criar instituição
-      button: Criar
-    spaces:
-      title: "Comunidades na instituição %{name}"
-    users:
-      title: "Usuários na instituição %{name}"
   invitation:
     accept: "Aceitar o convite"
     access_space: "Você agora é um membro da comunidade %{spacename} e pode acessá-la em <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -848,29 +822,8 @@ pt-br:
       disapprove: "Desaprovar: bloquear o acesso deste usuário ao site"
       disapprove_confirm: "Tem certeza que deseja bloquear o acesso deste usuário ao site?"
       edit: "Editar usuário"
-    institution:
-      can_record_users:
-        zero: 0 membros podem gravar
-        one: 1 membro pode gravar
-        other: %{count} membros podem gravar
-      can_record_limit: "máximo: %{limit}"
-      destroy: "Remover instituição"
-      no_user_limit: "sem limite"
-      users:
-        zero: 0 membros
-        one: 1 membro
-        other: %{count} membros
-      user_limit: "máximo: %{limit}"
-      spaces:
-        zero: 0 comunidades
-        one: 1 comunidade
-        other: %{count} comunidades
-    institutions:
-      create: "Criar uma nova instituição"
     menu:
-      institutions: Instituições
       general: "Geral"
-      my_institution: "Minha instituição"
       spaces: "Comunidades"
       spam: "Spam"
       title: "Gerenciamento do Site"
@@ -1126,8 +1079,6 @@ pt-br:
         export: "Exportar vCard"
         tooltip: "vCard é um formato de arquivo padrão para cartões eletrônicos"
         use: "Usar um vCard"
-    form:
-      no_organization: "<nenhuma organização atribuída>"
     show:
       vcard:
         export: "Exportar vCard"
@@ -1415,7 +1366,6 @@ pt-br:
     edit:
       change_logo: "Mudar imagem"
       delete_space: "Remover esta comunidade?"
-      institution_placeholder: "Selecione uma instituição"
       other_options: "Outras opções"
       public: "Tornar esta comunidade pública"
       yes_delete: "Sim, quero excluir esta comunidade"
@@ -1627,14 +1577,7 @@ pt-br:
       enabled: "Usuário %{name} já está habilitado"
     filter: "Convidar por nome de usuário"
     group_invite_email: "Convidar por e-mail"
-    hint:
-      institution: Escolha uma ou digite para buscar.
     include_registered: "Incluir usuários registrados"
-    index:
-      user_list:
-        header_spaces: "Usuários nesta comunidade: %{count}"
-        header_institutions: "Usuários nesta instituição: %{count}"
-    institutional_admin: Administrador de instituição
     invite: "Convidar pessoas"
     invite_email: "Convide pessoas por e-mail"
     invited: "Usuários já convidados"
@@ -1668,7 +1611,6 @@ pt-br:
   users:
     approve:
       approved: "O usuário %{username} foi aprovado para acessar este site!"
-      institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
       not_enabled: "A aprovação de registros não está habilitada neste site"
     detailed_user:
       from: "De:"
@@ -1680,7 +1622,6 @@ pt-br:
       approve: "Aprovar: permitir que este usuário acesse o site"
       approve_confirm: "Tem certeza que deseja permitir que este usuário acesse o site?"
       cancel_account: "Cancelar conta?"
-      change_institution: Mudar instituição do usuário
       change_password: "Mudar senha"
       click_to_edit_profile: "Clique aqui para editar o seu perfil"
       did_not_find_info: "Não encontrou a informação que estava procurando?"
@@ -1692,7 +1633,6 @@ pt-br:
         your_idp: "O seu provedor de identidade é: %{idp}"
       ldap:
         title: "Você acessou este site através do LDAP!"
-      institution_placeholder: "Selecione uma instituição"
       management_options: "Management options"
       not_confirmed: "Sua conta ainda não foi confirmada. Por favor verifique o seu e-mail para ativá-la. (Não recebeu um e-mail? <a href=\"%{url}\">Clique aqui</a>.)"
       notification:
@@ -1709,12 +1649,6 @@ pt-br:
         weekly: "Semanalmente"
       title: "Editar sua conta"
       yes_cancel_account: "Sim, cancelar minha conta"
-    registrations:
-      signup_form:
-        institution_hint: Escolha uma ou digite para buscar.
-    update:
-      can_record_reached_limit: "A isntituição deste usuário chegou no limite de usuários que podem gravar reuniões"
-      error:  "Houve um erro atualizando o usuário"
   username: "Nome de usuário"
   vCard:
     corrupt: "O vCard que você enviou está corrompido ou é uma versão não suportada"

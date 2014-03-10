@@ -108,11 +108,6 @@ en:
         users: "Users"
       join_request:
         comment: "Message"
-      institution:
-        acronym: Acronym
-        can_record_limit: Users that can record
-        name: Name
-        user_limit: Maximum of members
       news:
         text: "Text"
         title: "Title"
@@ -170,8 +165,6 @@ en:
         can_record: "Allow this user to record meetings"
         email: "Email"
         expanded_post: "Show messages in wall with the expanded view by default"
-        institution_name: "Institution"
-        password: "Password"
         notification: "How do you want to receive your notifications?"
         password: "Password"
         password_confirmation: "Password confirmation"
@@ -682,25 +675,6 @@ en:
   internet: 
     on_the: "On the Internet"
     ppal: Internet
-  institution:
-    created: Institution created successfully.
-    duplicate: This institution is a duplicate
-    user_registered:
-      title: "I have registered for your institution"
-      body_html: "Your <a href=\"%{url}\">approval</a> is needed for '%{name}' to be able to log in. You can do this in the management interface."
-    updated: "Instituição atualizada com sucesso"
-  institutions:
-    form:
-      new: New institution
-    edit:
-      title: Edit institution
-    new:
-      title: Create institution
-      button: Create
-    spaces:
-      title: "Spaces in the institution %{name}"
-    users:
-      title: "Users in the institution %{name}"
   invitation:
     accept: "Accept invitation"
     access_space: "You are now a member of %{spacename} and now you can access it on <a href=\"%{space_url}\"> %{space_url} </a>"
@@ -866,29 +840,8 @@ en:
       disapprove: "Disapprove: block user from accessing the website"
       disapprove_confirm: "Are you sure you want to block this user from accessing the website?"
       edit: "Edit user"
-    institution:
-      can_record_users:
-        zero: 0 members can record
-        one: 1 member can record
-        other: %{count} members can record
-      can_record_limit: "maximum: %{limit}"
-      destroy: "Remove institution"
-      no_user_limit: "no maximum"
-      users:
-        zero: 0 members
-        one: 1 member
-        other: %{count} members
-      user_limit: "maximum: %{limit}"
-      spaces:
-        zero: 0 spaces
-        one: 1 space
-        other: %{count} spaces
-    institutions:
-      create: "Create a new institution"
     menu:
-      institutions: Institutions
       general: "General"
-      my_institution: "My Institution"
       spaces: "Spaces"
       spam: "Spam"
       title: "Site Management"
@@ -1149,8 +1102,6 @@ en:
         export: "Export vCard"
         tooltip: "vCard is a file format standard for electronic business cards"
         use: "Use a vCard"
-    form:
-      no_organization: "<no organization set>"
     show:
       vcard:
         export: "Export vCard"
@@ -1445,7 +1396,6 @@ en:
     edit:
       change_logo: "Change picture"
       delete_space: "Remove this space?"
-      institution_placeholder: "Select an institution"
       other_options: "Other options"
       public: "Make this a public space"
       yes_delete: "Yes, I want to remove this space"
@@ -1670,12 +1620,9 @@ en:
     filter: "Invite by user name"
     group_invite_email: "Invite by e-mail"
     include_registered: "Include registered users"
-    institution: Institution
     index: 
       user_list: 
-        header_spaces: "Users in this space: %{count}"
-        header_institutions: "Users in this institution: %{count}"
-    institutional_admin: Institutional Admin
+        header: "Users in this space: %{count}"
     invite: "Invite people"
     invite_email: "Invite people by email"
     invited: "Users already invited"
@@ -1709,7 +1656,6 @@ en:
   users:
     approve:
       approved: "The user %{username} was approved to access the website!"
-      institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
       not_enabled: "Approval of registrations is not enabled in this website"
     detailed_user:
       from: "From:"
@@ -1721,7 +1667,6 @@ en:
       approve: "Approve: allow user to access the website"
       approve_confirm: "Are you sure you want to allow this user to access the website?"
       cancel_account: "Cancel account?"
-      change_institution: Change user institution
       change_password: "Change password"
       click_to_edit_profile: "Click here to edit your profile"
       did_not_find_info: "Didn't find the information you were looking for?"
@@ -1731,7 +1676,6 @@ en:
         see_your_data: "Click here to see your data that the federation shared with this website"
         title: "You are signed in using a federation!"
         your_idp: "Your identity provider is: %{idp}"
-      institution_placeholder: "Select an institution"
       ldap:
         title: "You are signed in using LDAP!"
       management_options: "Management options"
@@ -1750,12 +1694,6 @@ en:
         weekly: "Every week"
       title: "Edit your account"
       yes_cancel_account: "Yes, cancel my account"
-    registrations:
-      signup_form:
-        institution_hint: Choose one or type to search.
-    update:
-      can_record_reached_limit: "This user's institution has reached its limit of users that can record meetings"
-      error:  "There was an error updating the user"
   username: Username
   vCard: 
     corrupt: "The vCard you sent is corrupted or is a non-supported version"

@@ -1,0 +1,78 @@
+en:
+  activerecord:
+    attributes:
+      institution:
+        acronym: Acronym
+        can_record_limit: Users that can record
+        name: Name
+        user_limit: Maximum of members
+      user:
+        institution_name: "Institution"
+        password: "Password"
+  institution:
+    created: Institution created successfully.
+    duplicate: This institution is a duplicate
+    user_registered:
+      title: "I have registered for your institution"
+      body_html: "Your <a href=\"%{url}\">approval</a> is needed for '%{name}' to be able to log in. You can do this in the management interface."
+    updated: "Instituição atualizada com sucesso"
+  institutions:
+    form:
+      new: New institution
+    edit:
+      title: Edit institution
+    new:
+      title: Create institution
+      button: Create
+    spaces:
+      title: "Spaces in the institution %{name}"
+    users:
+      title: "Users in the institution %{name}"
+  manage:
+    institution:
+      can_record_users:
+        zero: 0 members can record
+        one: 1 member can record
+        other: %{count} members can record
+      can_record_limit: "maximum: %{limit}"
+      destroy: "Remove institution"
+      no_user_limit: "no maximum"
+      users:
+        zero: 0 members
+        one: 1 member
+        other: %{count} members
+      user_limit: "maximum: %{limit}"
+      spaces:
+        zero: 0 spaces
+        one: 1 space
+        other: %{count} spaces
+    institutions:
+      create: "Create a new institution"
+    menu:
+      institutions: Institutions
+      my_institution: "My Institution"
+  profiles:
+    form:
+      no_organization: "<no organization set>"
+  spaces:
+    edit:
+      institution_placeholder: "Select an institution"
+  user:
+    institution: Institution
+    index: 
+      user_list: 
+        header_spaces: "Users in this space: %{count}"
+        header_institutions: "Users in this institution: %{count}"
+    institutional_admin: Institutional Admin
+  users:
+    approve:
+      institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
+    edit:
+      change_institution: Change user institution
+      institution_placeholder: "Select an institution"
+    registrations:
+      signup_form:
+        institution_hint: Choose one or type to search.
+    update:
+      can_record_reached_limit: "This user's institution has reached its limit of users that can record meetings"
+      error:  "There was an error updating the user"

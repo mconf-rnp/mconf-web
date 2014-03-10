@@ -1,0 +1,80 @@
+pt-br:
+  activerecord:
+    attributes:
+      institution:
+        acronym: Sigla
+        can_record_limit: Usuários que podem gravar
+        name: Nome
+        user_limit: Máximo de membros
+      user:
+        institution_name: "Instituição"
+    models:
+      institution: Instituição
+  institution:
+    created: Instituição criada com sucesso.
+    duplicate: Esta instituição é uma duplicata
+    user_registered:
+      title: "Eu me registrei em sua instituição"
+      body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
+    updated: "Instituição atualizada com sucesso"
+  institutions:
+    form:
+      new: Nova instituição
+    edit:
+      title: Editar instituição
+    new:
+      title: Criar instituição
+      button: Criar
+    spaces:
+      title: "Comunidades na instituição %{name}"
+    users:
+      title: "Usuários na instituição %{name}"
+  manage:
+    institution:
+      can_record_users:
+        zero: 0 membros podem gravar
+        one: 1 membro pode gravar
+        other: %{count} membros podem gravar
+      can_record_limit: "máximo: %{limit}"
+      destroy: "Remover instituição"
+      no_user_limit: "sem limite"
+      users:
+        zero: 0 membros
+        one: 1 membro
+        other: %{count} membros
+      user_limit: "máximo: %{limit}"
+      spaces:
+        zero: 0 comunidades
+        one: 1 comunidade
+        other: %{count} comunidades
+    institutions:
+      create: "Criar uma nova instituição"
+    menu:
+      institutions: Instituições
+      my_institution: "Minha instituição"
+  profiles:
+    form:
+      no_organization: "<nenhuma organização atribuída>"
+  spaces:
+    edit:
+      institution_placeholder: "Selecione uma instituição"
+  user:
+    hint:
+      institution: Escolha uma ou digite para buscar.
+    index:
+      user_list:
+        header_spaces: "Usuários nesta comunidade: %{count}"
+        header_institutions: "Usuários nesta instituição: %{count}"
+    institutional_admin: Administrador de instituição
+  users:
+    approve:
+      institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
+    edit:
+      change_institution: Mudar instituição do usuário
+      institution_placeholder: "Selecione uma instituição"
+    registrations:
+      signup_form:
+        institution_hint: Escolha uma ou digite para buscar.
+    update:
+      can_record_reached_limit: "A isntituição deste usuário chegou no limite de usuários que podem gravar reuniões"
+      error:  "Houve um erro atualizando o usuário"

@@ -15,10 +15,6 @@ en:
       cancel: "Cancel"
       or: "or"
     hints:
-      institution:
-        acronym: "Adding an acronym will help users find the right institution when registering."
-        user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
-        can_record_limit: "Optional. Enter a number to limit how many users can record meetings in this intitution. Leave it empty to set no limits."
       invite:
         users: "Search people by name or email. If you can't find them, just add their email address. Type and press enter to insert a new item."
       site:
