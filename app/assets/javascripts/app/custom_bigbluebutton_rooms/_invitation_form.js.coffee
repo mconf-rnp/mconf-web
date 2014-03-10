@@ -22,8 +22,9 @@ bindUsers = ->
     minimumInputLength: 1
     width: 'resolve'
     multiple: true
-    formatSearching: -> I18n.t('invite_people.users.searching')
-    formatInputTooShort: -> I18n.t('invite_people.users.hint')
+    formatSearching: -> I18n.t('custom_bigbluebutton_rooms.invitation_form.users.searching')
+    formatInputTooShort: -> I18n.t('custom_bigbluebutton_rooms.invitation_form.users.hint')
+    formatNoMatches: -> I18n.t('custom_bigbluebutton_rooms.invitation_form.users.no_results')
     tags: true
     tokenSeparators: [",", ";"]
     createSearchChoice: (term, data) ->
@@ -47,25 +48,27 @@ bindDates = ->
     language: I18n.locale
     pickSeconds: false
 
-  initializeDates()
-
   $end = $(endsOnSelector).data("datetimepicker")
   $start = $(startsOnSelector).data("datetimepicker")
 
-  $(startsOnSelector).on 'changeDate', (date, oldDate) ->
-    # updates the date to ignore the seconds
-    $start.setDate(ignoreSeconds($start.getDate()))
-    adjustEndOnStartChange()
-    $end.setStartDate($start.getDate())
-    storeDuration($start, $end)
-    updateDuration()
+  if $start? and $end?
 
-  $(endsOnSelector).on 'changeDate', (val1, val2) ->
-    # updates the date to ignore the seconds
-    $end.setDate(ignoreSeconds($end.getDate()))
-    adjustEndOnEndChange()
-    storeDuration($start, $end)
-    updateDuration()
+    initializeDates()
+
+    $(startsOnSelector).on 'changeDate', (date, oldDate) ->
+      # updates the date to ignore the seconds
+      $start.setDate(ignoreSeconds($start.getDate()))
+      adjustEndOnStartChange()
+      $end.setStartDate($start.getDate())
+      storeDuration($start, $end)
+      updateDuration()
+
+    $(endsOnSelector).on 'changeDate', (val1, val2) ->
+      # updates the date to ignore the seconds
+      $end.setDate(ignoreSeconds($end.getDate()))
+      adjustEndOnEndChange()
+      storeDuration($start, $end)
+      updateDuration()
 
 # Stores the current duration in seconds
 storeDuration = (start, end) ->

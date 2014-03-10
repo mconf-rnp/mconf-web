@@ -62,7 +62,6 @@ class ManageController < ApplicationController
   end
 
   def spam
-    @spam_events = Event.where(:spam => true).all
     @spam_posts = Post.where(:spam => true).all
     render :layout => 'no_sidebar'
   end
