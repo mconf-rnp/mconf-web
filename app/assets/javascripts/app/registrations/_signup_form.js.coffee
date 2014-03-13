@@ -14,6 +14,10 @@ class mconf.SignupForm
       placeholder: I18n.t('users.registrations.signup_form.institution_hint')
       width: 'resolve'
       multiple: false
+      initSelection: (element, callback) ->
+        params = { dataType: "json" }
+        $.ajax("#{urlInstitutions}?q=#{element.val()}", params).done (data) ->
+          callback(data?[0])
       ajax:
         url: urlInstitutions
         dataType: "json"
