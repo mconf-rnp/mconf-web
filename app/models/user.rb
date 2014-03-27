@@ -110,6 +110,10 @@ class User < ActiveRecord::Base
   # TODO: review, see issue #737
   validates :_full_name, :presence => true, :length => { :minimum => 3 }, :on => :create
 
+  # for the associated BigbluebuttonRoom
+  attr_accessible :bigbluebutton_room_attributes
+  accepts_nested_attributes_for :bigbluebutton_room
+
   after_create :create_webconf_room
   after_update :update_webconf_room
 
@@ -227,8 +231,16 @@ class User < ActiveRecord::Base
   end
 
   def disable
+    # Spaces the user admins
+    admin_in = self.permissions.where(:subject_type => 'Space', :role_id => Role.find_by_name('Admin')).map(&:subject)
+
     self.update_attribute(:disabled,true)
     self.permissions.each(&:destroy)
+
+    # Disable spaces if this was the last admin
+    admin_in.each do |space|
+      space.disable if space.admins.empty?
+    end
   end
 
   def enable

@@ -6,7 +6,11 @@
 
 require "spec_helper"
 
-describe SpaceEventsController do
+describe SpaceEventsController, :events => true do
+
+  before(:each, :events => true) do
+    Site.current.update_attributes(:events_enabled => true)
+  end
 
   describe "#index" do
     let(:space) { FactoryGirl.create(:space) }
@@ -44,7 +48,7 @@ describe SpaceEventsController do
     render_views(false)
 
     let(:attrs) { FactoryGirl.attributes_for(:event) }
-    let(:hash) { { :space_id => target.space.to_param } }
+    let(:hash) { { :space_id => target.owner.to_param } }
     let(:hash_with_id) { hash.merge!(:id => target.to_param) }
     let(:hash_with_attrs) { hash_with_id.merge!(:event => attrs) }
 
@@ -54,16 +58,11 @@ describe SpaceEventsController do
 
       context "in a public space" do
         let(:space) { FactoryGirl.create(:public_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
 
         context "he is not a member of" do
           it { should allow_access_to(:index, hash) }
-          it { should allow_access_to(:new, hash) }
-          it { should allow_access_to(:create, hash).via(:post) }
-          it { should allow_access_to(:show, hash_with_id) }
-          it { should allow_access_to(:edit, hash_with_id) }
-          it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          pending "more tests that are not in the engine"
         end
 
         context "he is a member of" do
@@ -71,12 +70,7 @@ describe SpaceEventsController do
             context "with the role '#{role}'" do
               before(:each) { space.add_member!(user, role) }
               it { should allow_access_to(:index, hash) }
-              it { should allow_access_to(:new, hash) }
-              it { should allow_access_to(:create, hash).via(:post) }
-              it { should allow_access_to(:show, hash_with_id) }
-              it { should allow_access_to(:edit, hash_with_id) }
-              it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-              it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+              pending "more tests that are not in the engine"
             end
           end
         end
@@ -84,16 +78,11 @@ describe SpaceEventsController do
 
       context "in a private space" do
         let(:space) { FactoryGirl.create(:private_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
 
         context "he is not a member of" do
           it { should allow_access_to(:index, hash) }
-          it { should allow_access_to(:new, hash) }
-          it { should allow_access_to(:create, hash).via(:post) }
-          it { should allow_access_to(:show, hash_with_id) }
-          it { should allow_access_to(:edit, hash_with_id) }
-          it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          pending "more tests that are not in the engine"
         end
 
         context "he is a member of" do
@@ -101,12 +90,7 @@ describe SpaceEventsController do
             context "with the role '#{role}'" do
               before(:each) { space.add_member!(user, role) }
               it { should allow_access_to(:index, hash) }
-              it { should allow_access_to(:new, hash) }
-              it { should allow_access_to(:create, hash).via(:post) }
-              it { should allow_access_to(:show, hash_with_id) }
-              it { should allow_access_to(:edit, hash_with_id) }
-              it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-              it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+              pending "more tests that are not in the engine"
             end
           end
         end
@@ -120,16 +104,11 @@ describe SpaceEventsController do
 
       context "in a public space" do
         let(:space) { FactoryGirl.create(:public_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
 
         context "he is not a member of" do
           it { should allow_access_to(:index, hash) }
-          it { should_not allow_access_to(:new, hash) }
-          it { should_not allow_access_to(:create, hash).via(:post) }
-          it { should allow_access_to(:show, hash_with_id) }
-          it { should_not allow_access_to(:edit, hash_with_id) }
-          it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          pending "more tests that are not in the engine"
         end
 
         context "he is a member of" do
@@ -139,24 +118,14 @@ describe SpaceEventsController do
 
               context "for an event he did not create" do
                 it { should allow_access_to(:index, hash) }
-                it { should allow_access_to(:new, hash) }
-                it { should allow_access_to(:create, hash).via(:post) }
-                it { should allow_access_to(:show, hash_with_id) }
-                it { should_not allow_access_to(:edit, hash_with_id) }
-                it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-                it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+                pending "more tests that are not in the engine"
               end
 
               context "for an event he created" do
-                let(:target) { FactoryGirl.create(:event, :space => space, :author => user) }
+                let(:target) { FactoryGirl.create(:event, :owner => space) }
 
                 it { should allow_access_to(:index, hash) }
-                it { should allow_access_to(:new, hash) }
-                it { should allow_access_to(:create, hash).via(:post) }
-                it { should allow_access_to(:show, hash_with_id) }
-                it { should allow_access_to(:edit, hash_with_id) }
-                it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-                it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+                pending "more tests that are not in the engine"
               end
 
             end
@@ -166,16 +135,11 @@ describe SpaceEventsController do
 
       context "in a private space" do
         let(:space) { FactoryGirl.create(:private_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
 
         context "he is not a member of" do
           it { should_not allow_access_to(:index, hash) }
-          it { should_not allow_access_to(:new, hash) }
-          it { should_not allow_access_to(:create, hash).via(:post) }
-          it { should_not allow_access_to(:show, hash_with_id) }
-          it { should_not allow_access_to(:edit, hash_with_id) }
-          it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          pending "more tests that are not in the engine"
         end
 
         context "he is a member of" do
@@ -185,24 +149,14 @@ describe SpaceEventsController do
 
               context "for an event he did not create" do
                 it { should allow_access_to(:index, hash) }
-                it { should allow_access_to(:new, hash) }
-                it { should allow_access_to(:create, hash).via(:post) }
-                it { should allow_access_to(:show, hash_with_id) }
-                it { should_not allow_access_to(:edit, hash_with_id) }
-                it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-                it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+                pending "more tests that are not in the engine"
               end
 
               context "for an event he created" do
-                let(:target) { FactoryGirl.create(:event, :space => space, :author => user) }
+                let(:target) { FactoryGirl.create(:event, :owner => space) }
 
                 it { should allow_access_to(:index, hash) }
-                it { should allow_access_to(:new, hash) }
-                it { should allow_access_to(:create, hash).via(:post) }
-                it { should allow_access_to(:show, hash_with_id) }
-                it { should allow_access_to(:edit, hash_with_id) }
-                it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-                it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+                pending "more tests that are not in the engine"
               end
             end
           end
@@ -215,29 +169,18 @@ describe SpaceEventsController do
 
       context "in a public space" do
         let(:space) { FactoryGirl.create(:public_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
         it { should allow_access_to(:index, hash) }
-        it { should_not allow_access_to(:new, hash) }
-        it { should_not allow_access_to(:create, hash).via(:post) }
-        it { should allow_access_to(:show, hash_with_id) }
-        it { should_not allow_access_to(:edit, hash_with_id) }
-        it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+        pending "more tests that are not in the engine"
       end
 
       context "in a private space" do
         let(:space) { FactoryGirl.create(:private_space) }
-        let(:target) { FactoryGirl.create(:event, :space => space) }
+        let(:target) { FactoryGirl.create(:event, :owner => space) }
         it { should_not allow_access_to(:index, hash) }
-        it { should_not allow_access_to(:new, hash) }
-        it { should_not allow_access_to(:create, hash).via(:post) }
-        it { should_not allow_access_to(:show, hash_with_id) }
-        it { should_not allow_access_to(:edit, hash_with_id) }
-        it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+        pending "more tests that are not in the engine"
       end
     end
 
   end
-
 end
