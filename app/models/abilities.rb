@@ -166,8 +166,6 @@ module Abilities
         case perm.subject_type
         when "Space"
           admins = perm.subject.admins
-        when "Institution"
-          admins = perm.subject.admins
         else
           admins = []
         end
@@ -457,10 +455,9 @@ module Abilities
           space = perm.subject
           !space.disabled &&
             is_institution_admin_of_space(user, space)
-        when "Event"
-          space = perm.subject.space
-          !space.disabled &&
-            is_institution_admin_of_space(user, space)
+        when "Institution"
+          admins = perm.subject.admins
+          admins.include?(user)
         else
           false
         end
@@ -470,7 +467,7 @@ module Abilities
         !space.disabled &&
           is_institution_admin_of_space(user, space)
       end
-      can [:read, :create], Event do |event|
+      can [:read, :create], MwebEvents::Event do |event|
         space = event.space
         !space.disabled &&
           is_institution_admin_of_space(user, space)
