@@ -186,7 +186,7 @@ module Abilities
           end
         end
 
-        can :read, MwebEvents::Event
+        can [:read, :select], MwebEvents::Event
 
         # Create events if they have a nil owner or are owned by a space you admin
         can :create, MwebEvents::Event do |e|
@@ -463,11 +463,6 @@ module Abilities
       end
       can [:read, :create, :reply_post], Post do |post|
         space = post.space
-        !space.disabled &&
-          is_institution_admin_of_space(user, space)
-      end
-      can [:read, :create], MwebEvents::Event do |event|
-        space = event.space
         !space.disabled &&
           is_institution_admin_of_space(user, space)
       end

@@ -24,7 +24,7 @@
           = t('.manage')
     - elsif can?(:users, :manage)
       %li
-        = link_to manage_users_path do
+        = link_to main_app.manage_users_path do
           = t('.manage')
         - if current_site.require_registration_approval && current_user.institution.unapproved_users.size > 0
           .label.label-important= current_user.institution.unapproved_users.size
