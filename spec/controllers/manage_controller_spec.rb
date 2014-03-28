@@ -228,8 +228,7 @@ describe ManageController do
 
         context "by username" do
           before {
-            @u1 = user
-            @u1.update_attributes(:username => 'First')
+            @u1 = FactoryGirl.create(:user, :institution => institution, :username => 'First')
             @u2 = FactoryGirl.create(:user, :institution => institution, :username => 'Second')
             @u3 = FactoryGirl.create(:user, :institution => institution, :username => 'Secondary')
           }

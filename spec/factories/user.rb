@@ -25,7 +25,7 @@ FactoryGirl.define do
     u.confirmed_at { Time.now }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
-    u.sequence(:institution_name) { |n| Forgery::Name.unique_full_name(n) }
+    u.institution { FactoryGirl.create(:institution) }
     after(:create) do |u2|
       u2.confirm!
       # set the institution using `institution_name` only if `institution` wasn't

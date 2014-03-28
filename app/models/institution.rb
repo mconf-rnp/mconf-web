@@ -34,9 +34,10 @@ class Institution < ActiveRecord::Base
   # Useful in cases where users have joined a duplicate institution by mistake
   def self.correct_duplicate original, duplicate
     duplicate.permissions.each do |p|
-      original.permissions.create(:user_id => p.user_id, :role_id => p.role_id)
+      p.subject_id = original.id
+      p.save!
     end
-    duplicate.destroy
+    duplicate.reload.destroy
   end
 
   def self.find_or_create_by_name_or_acronym name
@@ -87,7 +88,7 @@ class Institution < ActiveRecord::Base
   end
 
   def to_json
-    { :text => full_name, :id => name}
+    { :text => full_name, :id => id}
   end
 
   def full_name

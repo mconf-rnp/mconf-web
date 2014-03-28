@@ -15,6 +15,9 @@ class Permission < ActiveRecord::Base
   validates :role_id, :presence => true,
     :uniqueness => {:scope => [:user_id, :subject_id, :subject_type]}
 
+  # Only one institution permission per user
+  validates :user_id, :uniqueness => {:scope => [:subject_type]}, :if => lambda { |p| p.subject_type == 'Institution' }
+
   attr_accessible :role_id, :user_id
   attr_accessible :role, :subject, :user
 end

@@ -184,10 +184,7 @@ class User < ActiveRecord::Base
     user.create_profile :full_name => user._full_name
 
     # Send message to the institutional admin
-    institution = Institution.find_by_name(user.institution_name)
-    if institution
-      PrivateSender.user_registered_notification(user, institution)
-    end
+    PrivateSender.user_registered_notification(user, institution) if institution
 
     # Checking if we have to join a space and/or event
     invites = JoinRequest.where :email => user.email
@@ -349,15 +346,8 @@ class User < ActiveRecord::Base
   #
   # Association with an institution
   #
-
-  attr_accessor :institution_name
-  attr_accessible :institution_name
-  attr_accessible :institution
-
-  def set_institution name
-    i = Institution.find_or_create_by_name_or_acronym(name)
-    i.add_member!(self, Role.default_role.name)
-  end
+  attr_accessible :institution, :institution_id
+  after_save :set_institution
 
   def institution_is_full?
     if institution.nil?
@@ -372,19 +362,32 @@ class User < ActiveRecord::Base
     p ? p.subject : nil
   end
 
-  # Remove the user from his institution (if any) and add him to the institution
-  # `new_institution` (if any, otherwise the user will be without an institution set).
-  def institution=(new_institution)
-    institution.remove_member!(self) unless institution.nil?
-    new_institution.add_member!(self, Role.default_role.name) unless new_institution.nil?
+  def institution_id
+    p = Permission.where(:user_id => id, :subject_type => 'Institution').first
+    p ? p.subject_id : nil
   end
 
-  after_commit do |user|
-    # Try to set institution information
-    user.set_institution(user.institution_name) if user.institution_name
+  def institution=(ins)
+    @new_institution = ins
+  end
+
+  def institution_id=(id)
+    @new_institution_id = id
   end
 
   private
+
+  # Remove the user from his institution (if any) and add him to the institution
+  # `new_institution` (if any, otherwise the user will be without an institution set).
+  def set_institution
+    return unless defined?(@new_institution) || defined?(@new_institution_id)
+
+    @new_institution = Institution.where(:id => @new_institution_id).first if @new_institution_id
+    # Remove from old institution
+    institution.remove_member!(self) unless institution.nil?
+    # Add to new one, unless it's nil
+    @new_institution.add_member!(self, Role.default_role.name) unless @new_institution.nil?
+  end
 
   def username_uniqueness
     unless Space.find_by_permalink(self.username).blank?

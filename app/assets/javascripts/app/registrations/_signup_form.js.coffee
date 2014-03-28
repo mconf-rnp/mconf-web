@@ -7,7 +7,7 @@ class mconf.SignupForm
       $username.attr "value", mconf.Base.stringToSlug($fullname.val())
 
     # Dynamic search for institutions
-    idInstitution = '#user_institution_name'
+    idInstitution = '#user_institution_id'
     urlInstitutions = '/institutions/select.json'
     $(idInstitution).select2
       minimumInputLength: 0

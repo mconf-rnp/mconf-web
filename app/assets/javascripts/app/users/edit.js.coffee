@@ -1,7 +1,7 @@
 $ ->
   if isOnPage 'users', 'edit'
     # Dynamic search for institutions
-    idInstitution = '#user_institution_name'
+    idInstitution = '#user_institution_id'
     urlInstitutions = '/institutions/select.json'
     $(idInstitution).select2
       minimumInputLength: 0

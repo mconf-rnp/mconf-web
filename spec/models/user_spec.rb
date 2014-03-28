@@ -128,30 +128,24 @@ describe User do
       let(:user) { FactoryGirl.create(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
       before(:each) do
-        user.update_attributes :institution_name => institution.name
+        user.update_attributes :institution => institution
         user.run_callbacks(:commit)
       end
 
       it { user.institution.should eq(institution) }
     end
 
-    context "sets user institution by name when institution doesn't exist" do
+    context "sets user institution by id" do
       let!(:user) { FactoryGirl.create(:user) }
+      let(:institution) { FactoryGirl.create(:institution, :name => 'Boost Sandwhiches') }
       before(:each) do
-        user.update_attributes :institution_name => 'Boost Sandwhiches'
+        user.update_attributes :institution_id => institution.id
         user.run_callbacks(:commit)
       end
 
       it { user.institution.name.should eq('Boost Sandwhiches') }
-      # it { should change(Institution, :count).by(1) }
     end
 
-    # context "sets user institution by name when user already has one" do
-    #   let(:user) { FactoryGirl.create(:user) }
-    #   before(:each) { user.update_attributes(:institution_name => 'Boost Sandwhiches') }
-    #   it { user.institution.should be(institution) }
-    #   it { should change(Institution, :count).by(1) }
-    # end
   end
 
   describe "on create" do
@@ -591,7 +585,7 @@ describe User do
   # Tests for the association with institutions
   #
 
-  [ :institution_name, :institution ].each do |attribute|
+  [ :institution_id, :institution ].each do |attribute|
     it { should allow_mass_assignment_of(attribute) }
   end
 
@@ -617,19 +611,28 @@ describe User do
 
     it "removes the user from the previous institution" do
       user # force the user to be created and associated with the old institution
-      expect { user.institution = new_institution }.to change(old_institution.users, :count).by(-1)
+      expect {
+        user.institution = new_institution
+        user.save
+      }.to change(old_institution.users, :count).by(-1)
       old_institution.users.should_not include(user)
     end
 
     it "adds the user to the new institution with the default role" do
-      expect { user.institution = new_institution }.to change(new_institution.users, :count).by(1)
+      expect {
+        user.institution = new_institution
+        user.save
+      }.to change(new_institution.users, :count).by(1)
       new_institution.users.should include(user)
       new_institution.user_role(user).should eql('User')
     end
 
     it "allows setting the institution to nil" do
       user # force the user to be created and associated with the old institution
-      expect { user.institution = nil }.to change(old_institution.users, :count).by(-1)
+      expect {
+        user.institution = nil
+        user.save
+      }.to change(old_institution.users, :count).by(-1)
       old_institution.users.should_not include(user)
       user.institution.should be(nil)
     end
