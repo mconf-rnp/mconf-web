@@ -4,12 +4,13 @@ $ ->
     $('input#space_public').on 'click', -> updatePasswords($(this).is(':checked'))
 
     # Dynamic search for institutions
-    idInstitution = '#space_institution_name'
+    idInstitution = '#space_institution_id'
     urlInstitutions = '/institutions/select.json'
     $(idInstitution).select2
       minimumInputLength: 0
       multiple: false
       allowClear: true
+      width: 'resolve'
       placeholder: I18n.t("spaces.edit.institution_placeholder")
       initSelection: (element, callback) ->
         data = { id: element.val(), text: element.val() }

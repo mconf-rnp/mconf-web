@@ -42,9 +42,7 @@ class Space < ActiveRecord::Base
   end
 
   belongs_to :institution
-  attr_accessor :institution_name
-  attr_accessible :institution_name
-  before_update :set_institution
+  attr_accessible :institution, :institution_id
 
   # for the associated BigbluebuttonRoom
   attr_accessible :bigbluebutton_room_attributes
@@ -178,21 +176,6 @@ class Space < ActiveRecord::Base
 
   def pending_join_request_for?(user)
     pending_join_requests.where(:candidate_id => user).size > 0
-  end
-
-  def institution=(new_institution)
-    unless new_institution.nil?
-      write_attribute(:institution_id, new_institution.id)
-    else
-      write_attribute(:institution_id, nil)
-    end
-  end
-
-  def set_institution
-    if institution_name.present?
-      i = Institution.find_or_create_by_name_or_acronym(institution_name)
-      self.institution_id = i.id
-    end
   end
 
   private
