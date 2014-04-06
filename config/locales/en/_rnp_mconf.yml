@@ -6,9 +6,15 @@ en:
         can_record_limit: Users that can record
         name: Name
         user_limit: Maximum of members
+      space:
+        institution_id: "Institution"
+        institution_name: "Institution"
       user:
+        institution_id: "Institution"
         institution_name: "Institution"
         password: "Password"
+    models:
+      institution: Institution
   institution:
     created: Institution created successfully.
     duplicate: This institution is a duplicate

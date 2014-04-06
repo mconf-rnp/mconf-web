@@ -6,8 +6,13 @@ pt-br:
         can_record_limit: Usuários que podem gravar
         name: Nome
         user_limit: Máximo de membros
-      user:
+      space:
+        institution_id: "Instituição"
         institution_name: "Instituição"
+      user:
+        institution_id: "Instituição"
+        institution_name: "Instituição"
+        password: "Senha"
     models:
       institution: Instituição
   institution:
@@ -59,8 +64,7 @@ pt-br:
     edit:
       institution_placeholder: "Selecione uma instituição"
   user:
-    hint:
-      institution: Escolha uma ou digite para buscar.
+    institution: Institution
     index:
       user_list:
         header_spaces: "Usuários nesta comunidade: %{count}"
