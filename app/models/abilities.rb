@@ -186,7 +186,7 @@ module Abilities
           end
         end
 
-        can [:read, :select], MwebEvents::Event
+        can [:select, :read], MwebEvents::Event
 
         # Create events if they have a nil owner or are owned by a space you admin
         can :create, MwebEvents::Event do |e|

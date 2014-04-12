@@ -8,7 +8,10 @@
     - if user_signed_in?
       = link_to t('.create_new_event'), mweb_events.new_event_path, :class => "btn btn-primary btn-large btn-block"
     - else
-      = link_to t('register.one'), main_app.register_path, :class => "btn btn-success btn-large btn-block"
+      - if current_site.registration_enabled?
+        = link_to t('register.one'), main_app.register_path, :class => "btn btn-success btn-large btn-block"
+      - else
+        = link_to t('_other.login'), main_app.login_path, :class => "btn btn-success btn-large btn-block"
 
   = render_sidebar_content_block('event-description-wrapper') do
     .content-block-middle
@@ -40,7 +43,7 @@
   .page-tabs
     .btn-group{ :"data-toggle" => "buttons-radio" }
       - tabs.each do |k, v|
-        - new_params = params.merge(:show => v)
+        - new_params = params.merge(:show => v).except(:page)
         = link_to t(k), events_path(new_params), :id => v, :class => "btn btn-small #{'active' if params[:show] == v or (k == 'upcoming' && !params[:show])}"
 
   .btn-group{ :"data-toggle" => "buttons-radio" }
@@ -52,16 +55,22 @@
 
     = hidden_field_tag :event_filter_text
 
-%div
-  - your = t('.filters.your_events') if params[:my_events]
-  - show = params[:show] || 'upcoming_events'
-  - time = t(".filters.#{show}")
-  = t('.filters.description', :your => your, :time => time.to_s)
-  = t('.count', :count => @events.count)
+
+- if @events.count > 0
+  - nav = page_navigation_links @events
+  .content-block-header
+    = nav unless nav.nil?
+    #event-filter-result
+      - your = t('.filters.your_events') if params[:my_events]
+      - show = params[:show] || 'upcoming_events'
+      - time = t(".filters.#{show}")
+      %p
+        = t('.filters.description', :your => your, :time => time.to_s)
+        = t('.count', :count => @events.total_entries)
 
 #events.content-block
   .content-block-middle.clearfix
-    = render "mweb_events/events/thumbnail_view", :events => @events
+    = render "mweb_events/events/list_view", :events => @events
 
 - nav = page_navigation_links @events
 - unless nav.nil?
