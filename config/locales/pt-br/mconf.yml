@@ -651,7 +651,9 @@ pt-br:
     send_us: "Envie-nos feedback!"
     sent: "Seu e-mail de feedback foi enviado com sucesso. Obrigado"
     webconf:
-      text: "Você saiu da conferência.<br/>Você já pode fechar esta janela."
+      stop_countdown: "Clique aqui para não fechá-la e usá-la para navegar no site"
+      title: "Obrigado por participar desta conferência!"
+      warning: "Esta janela será automaticamente fechada em <span class='countdown'>%{seconds}</span> segundos"
   fill_fields: "Você deve preencher todos os campos"
   find:
     browse: Navegar
@@ -880,6 +882,9 @@ pt-br:
     spaces:
       filter_name: "Nome"
       filter_results: "Filtrar os resultados:"
+    destroy_space:
+      destroy: Remover comunidade
+      destroy_confirm: Tem certeza que deseja remover essa comunidade e todo conteúdo relacionado a ela? Diferente de desabilitar a comunidade essa operação é irreversível!
     spaces_list:
       filter_count_with_text: "%{count} comunidades encontradas para o filtro \"%{value}\""
       filter_count_empty: "%{count} comunidades encontradas"
@@ -1227,6 +1232,9 @@ pt-br:
     new:
       title: "Login"
   shared:
+    copy_modal:
+      title: Aperte Ctrl+C para copiar o texto
+      success: Texto copiado para a área de transferência
     recording_duration:
       duration: "Duração"
       ended_at: "Finalizada em"
@@ -1418,10 +1426,11 @@ pt-br:
       webconf_options: "Opções de webconferência"
     edit:
       change_logo: "Mudar imagem"
-      delete_space: "Remover esta comunidade?"
+      delete_confirmation: "Você tem certeza? Essa comunidade se tornará inacessível a você e a todos outros os usuários!"
+      delete_space: "Desabilitar esta comunidade?"
       other_options: "Outras opções"
       public: "Tornar esta comunidade pública"
-      yes_delete: "Sim, quero excluir esta comunidade"
+      yes_delete: "Sim, quero desabilitar esta comunidade"
     edit_recording:
       title: "Editar sua gravação"
     error:

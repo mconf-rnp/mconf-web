@@ -651,7 +651,9 @@ en:
     send_us: "Send us feedback!"
     sent: "Your feedback information e-mail has been successfully sent. Thank you"
     webconf: 
-      text: "You have logged out of the conference.<br>You may now close this window."
+      stop_countdown: "Click here to stop it from closing and use it to browse this site"
+      title: "Thank you for participating in this conference!"
+      warning: "This window will be automatically closed in <span class='countdown'>%{seconds}</span> seconds"
   fill_fields: "You should fill in all the fields"
   find: 
     browse: Browse
@@ -880,6 +882,9 @@ en:
     spaces:
       filter_name: "Name"
       filter_results: "Filter the results:"
+    destroy_space:
+      destroy: Delete space
+      destroy_confirm: Are you sure you want to delete this space and all content associated with it? Unlike disabling the space this operation is irreversible!
     spaces_list:
       filter_count_with_text: "Found %{count} spaces for filter \"%{value}\""
       filter_count_empty: "Found %{count} spaces"
@@ -1227,6 +1232,9 @@ en:
     new:
       title: "Sign in"
   shared:
+    copy_modal:
+      title: Press Ctrl+C to copy the text
+      success: Text copied to clipboard
     recording_duration:
       duration: "Duration"
       ended_at: "Ended at"
@@ -1418,10 +1426,11 @@ en:
       webconf_options: "Webconference options"
     edit:
       change_logo: "Change picture"
-      delete_space: "Remove this space?"
+      delete_confirmation: "Are you sure? This space will be inaccessible to you and to all the other users!"
+      delete_space: "Disable this space?"
       other_options: "Other options"
       public: "Make this a public space"
-      yes_delete: "Yes, I want to remove this space"
+      yes_delete: "Yes, I want to disable this space"
     edit_recording:
       title: "Edit your recording"
     error:

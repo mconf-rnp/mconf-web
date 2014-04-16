@@ -23,9 +23,6 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_site
 
-  # TODO: review, we shouldn't need this with cancan loading the resources
-  helper_method :space, :space!
-
   # Handle errors - error pages
   unless Rails.application.config.consider_all_requests_local
     rescue_from Exception, :with => :render_500
@@ -34,17 +31,6 @@ class ApplicationController < ActionController::Base
     rescue_from ActionController::UnknownController, :with => :render_404
     rescue_from ::AbstractController::ActionNotFound, :with => :render_404
     rescue_from CanCan::AccessDenied, :with => :render_403
-  end
-
-  # TODO: do we really need this now that cancan loads the resources?
-  def space
-    @space ||= Space.find_with_param(params[:space_id])
-  end
-
-  # This method is the same as space, but raises error if no Space is found
-  # TODO: do we really need this now that cancan loads the resources?
-  def space!
-    space || raise(ActiveRecord::RecordNotFound)
   end
 
   def institution
@@ -73,7 +59,11 @@ class ApplicationController < ActionController::Base
 
   # Where to redirect to after sign in with Devise
   def after_sign_in_path_for(resource)
-    stored_location_for(resource) || my_home_path
+    if request.referer == login_url
+      super
+    else
+      stored_location_for(resource) || request.referer || my_home_path
+    end
   end
 
   # overriding bigbluebutton_rails function
@@ -152,11 +142,16 @@ class ApplicationController < ActionController::Base
   def bigbluebutton_create_options(room)
     ability = Abilities.ability_for(current_user)
 
-    # only enable recording if the room is set to record and if the user has permissions to
-    # used to forcibly disable recording if a user has no permission but the room is set to record
     can_record = ability.can?(:record_meeting, room)
-    record = room.record && can_record
-    { :record => record }
+    if Site.current.webconf_auto_record
+      # show the record button if the user has permissions to record
+      { :record => can_record }
+    else
+      # only enable recording if the room is set to record and if the user has permissions to
+      # used to forcibly disable recording if a user has no permission but the room is set to record
+      record = room.record && can_record
+      { :record => record }
+    end
   end
 
   # loads the web conference room for the current space into `@webconf_room` and fetches information

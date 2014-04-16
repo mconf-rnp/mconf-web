@@ -286,7 +286,69 @@ describe SpacesController do
   end
 
   it "#update"
-  it "#destroy"
+
+  describe "#destroy" do
+    let(:space) { FactoryGirl.create(:space) }
+    subject { delete :destroy, :id => space.to_param}
+
+    context "superusers can destroy spaces" do
+      before(:each) do
+        login_as(FactoryGirl.create(:superuser))
+        space
+      end
+
+      it { expect {subject}.to change(Space, :count).by(-1)}
+      it { should redirect_to(manage_spaces_path) }
+    end
+
+    context "admins of a space can't destroy the space" do
+      before(:each) do
+        user = FactoryGirl.create(:user)
+        login_as(user)
+        space.add_member!(user, 'Admin')
+      end
+
+      it { expect{subject}.to change{Space.with_disabled.count}.by(0) }
+    end
+
+  end
+
+  describe "#disable" do
+    let(:space) { FactoryGirl.create(:space) }
+    subject { delete :disable, :id => space.to_param }
+
+    context "superusers can disable spaces" do
+      before(:each) do
+        request.env['HTTP_REFERER'] = manage_spaces_path
+        login_as(FactoryGirl.create(:superuser))
+        space
+      end
+
+      it { expect{subject}.to change(Space, :count).by(-1)}
+      it {
+        subject
+        space.reload.disabled.should be_true
+      }
+      it { should redirect_to(manage_spaces_path) }
+    end
+
+    context "admins of the space can disable the space" do
+      before(:each) do
+        user = FactoryGirl.create(:user)
+        space.add_member!(user, 'Admin')
+        login_as(user)
+      end
+
+      it { expect{subject}.to change(Space, :count).by(-1) }
+      it {
+        subject
+        space.reload.disabled.should be_true
+      }
+      it { should redirect_to(spaces_path) }
+    end
+
+  end
+
 
   describe "#enable" do
     before(:each) { login_as(FactoryGirl.create(:superuser)) }
@@ -593,6 +655,7 @@ describe SpacesController do
           it { should_not allow_access_to(:user_permissions, hash) }
           it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
           it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
           it { should allow_access_to(:webconference, hash) }
@@ -606,7 +669,8 @@ describe SpacesController do
             it { should allow_access_to(:edit, hash) }
             it { should allow_access_to(:user_permissions, hash) }
             it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+            it { should allow_access_to(:disable, hash_with_attrs).via(:delete) }
+            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
             it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
             it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
             it { should allow_access_to(:webconference, hash) }
@@ -621,6 +685,7 @@ describe SpacesController do
             it { should_not allow_access_to(:user_permissions, hash) }
             it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
             it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+            it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
             it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
             it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
             it { should allow_access_to(:webconference, hash) }
@@ -637,6 +702,7 @@ describe SpacesController do
           it { should_not allow_access_to(:show, hash) }
           it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+          it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
           it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
           it { should_not allow_access_to(:webconference, hash) }
@@ -650,7 +716,8 @@ describe SpacesController do
             it { should allow_access_to(:edit, hash) }
             it { should allow_access_to(:user_permissions, hash) }
             it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+            it { should allow_access_to(:disable, hash_with_attrs).via(:delete) }
             it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
             it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
             it { should allow_access_to(:webconference, hash) }
@@ -665,6 +732,7 @@ describe SpacesController do
             it { should_not allow_access_to(:user_permissions, hash) }
             it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
             it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
+            it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
             it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
             it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
             it { should allow_access_to(:webconference, hash) }

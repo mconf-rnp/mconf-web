@@ -8,9 +8,9 @@
 class SpacesController < ApplicationController
   before_filter :authenticate_user!, :only => [:new, :create]
 
-  load_and_authorize_resource :find_by => :permalink, :except => [:edit_recording, :enable]
+  load_and_authorize_resource :find_by => :permalink, :except => [:edit_recording, :enable, :destroy, :disable]
   load_resource :find_by => :permalink, :parent => true, :only => [:edit_recording]
-  before_filter :load_and_authorize_with_disabled, :only => [:enable]
+  before_filter :load_and_authorize_with_disabled, :only => [:enable, :disable, :destroy]
 
   # all actions that render the sidebar
   before_filter :webconf_room!,
@@ -159,25 +159,33 @@ class SpacesController < ApplicationController
     end
   end
 
-  def destroy
-    @space_destroy = Space.find_with_param(params[:id])
-    @space_destroy.disable
+  def disable
+    @space.disable
     respond_to do |format|
       format.html {
+        flash[:notice] = t('space.disabled')
         if request.referer.present? && request.referer.include?("manage") && current_user.superuser?
-          flash[:notice] = t('space.disabled')
           redirect_to manage_spaces_path
         else
-          flash[:notice] = t('space.deleted')
-          redirect_to(spaces_path)
+          redirect_to spaces_path
         end
+      }
+    end
+  end
+
+  def destroy
+    @space.destroy
+    respond_to do |format|
+      format.html {
+        flash[:notice] = t('space.deleted')
+        redirect_to manage_spaces_path
       }
     end
   end
 
   def user_permissions
     @users = @space.users.order("name ASC")
-    @permissions = space.permissions.sort{
+    @permissions = @space.permissions.sort{
       |x,y| x.user.name <=> y.user.name
     }
     @roles = Space.roles
@@ -287,21 +295,13 @@ class SpacesController < ApplicationController
 
   private
 
-  def space
-    if params[:action] == "enable"
-      @space ||= Space.find_with_disabled_and_param(params[:id])
-    else
-      @space ||= Space.find_with_param(params[:id])
-    end
-  end
-
   def space_to_json_hash
     { :methods => :user_count, :include => {:logo => { :only => [:height, :width], :methods => :logo_image_path } } }
   end
 
   def load_and_authorize_with_disabled
     @space = Space.with_disabled.find_by_permalink(params[:id])
-    authorize! :enable, @space
+    authorize! action_name.to_sym, @space
   end
 
   def load_spaces_examples

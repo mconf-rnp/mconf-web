@@ -52,7 +52,7 @@ module Abilities
 
       # Users
       # Disabled users are only visible to superusers
-      can [:read, :fellows, :current, :select], User, :disabled => false
+      can [:index, :read, :fellows, :current, :select], User, :disabled => false
       can [:edit, :update, :destroy], User, :id => user.id, :disabled => false
 
       # User profiles
@@ -88,8 +88,9 @@ module Abilities
       can [:read, :webconference, :recordings, :leave], Space do |space|
         space.users.include?(user)
       end
-      # Only the admin can destroy or update information on a space
-      can [:destroy, :edit, :update, :user_permissions, :webconference_options], Space do |space|
+      # Only the admin can disable or update information on a space
+      # Only global admins can destroy spaces
+      can [:edit, :update, :user_permissions, :webconference_options, :disable], Space do |space|
         space.admins.include?(user)
       end
 
@@ -213,6 +214,8 @@ module Abilities
 
         can :index, MwebEvents::Participant
         can :create, MwebEvents::Participant
+
+        cannot [:read, :index, :update, :destroy], Space, :disabled => true
       end
     end
 
