@@ -147,3 +147,56 @@ $bg-normal: darken($green-logo, 3);
     color: $font-h-color;
   }
 }
+
+// Custom RNP's frontpage
+#registration-box {
+  text-align: center;
+
+  h2 {
+    text-align: center;
+    color: #404040;
+  }
+
+  .sign-in-cafe {
+    margin: 40px 0 5px 0;
+    font-size: 10px;
+    width: 400px;
+    height: 68px;
+  }
+}
+#login-box {
+  text-align: center;
+
+  h2 {
+    text-align: center;
+    color: #404040;
+  }
+
+  .sign-in-not-on-cafe {
+    margin: 30px 0;
+
+    span {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    i {
+      float: none;
+      margin: 0;
+    }
+  }
+
+  .sign-in-local {
+    margin: 40px 0;
+
+    span {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    i {
+      float: none;
+      margin: 0;
+    }
+  }
+}

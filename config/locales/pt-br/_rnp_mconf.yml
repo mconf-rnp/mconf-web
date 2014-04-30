@@ -22,6 +22,17 @@ pt-br:
       title: "Eu me registrei em sua instituição"
       body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
     updated: "Instituição atualizada com sucesso"
+  frontpage:
+    show:
+      login:
+        cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+        click_here: "(clique aqui para entrar)"
+      other:
+        local_account_text: "Acessar usando uma conta local"
+        local_account_title: "Quer acessar utilizando uma conta local?"
+        register_text: "Criar uma nova conta"
+        register_title: "Sua instituição ainda não é membro da CAFe?"
+        title: "Outras opções"
   institutions:
     form:
       new: Nova instituição

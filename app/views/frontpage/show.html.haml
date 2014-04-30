@@ -9,16 +9,22 @@
 #content
 
   #login-box.form-area
-    %h2= t('.login.title')
-    = render :partial => 'sessions/login_form'
-    .action-links
-      %ul
-        - if current_site.shib_enabled?
-          %li= link_to t('.login.federation'), shibboleth_path, :class => 'shibboleth_login'
-        %li= link_to t('.login.lost_password'), new_user_password_path
-        %li= link_to t(".login.resend_confirmation_email"), new_confirmation_path(resource_name)
+    %h2= t('.other.title')
+    .sign-in-local
+      %span= t('.other.local_account_title')
+      = link_to login_path do
+        = icon_login
+        = t('.other.local_account_text')
+    - if current_site.registration_enabled?
+      .sign-in-not-on-cafe
+        %span= t('.other.register_title')
+        = link_to register_path do
+          = icon_register
+          = t('.other.register_text')
 
-  - if current_site.registration_enabled?
+  - if current_site.shib_enabled?
     #registration-box.form-area
-      %h2= t('.register.title')
-      = render :partial => 'registrations/signup_form'
+      %h2= t('.login.title')
+      = link_to shibboleth_path do
+        = image_tag "logos/shib_federation_big.jpg", :size => "400x68", :class => "sign-in-cafe", :alt => t('.login.cafe_alt')
+        %div= t('.login.click_here')

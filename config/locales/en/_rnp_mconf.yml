@@ -15,6 +15,17 @@ en:
         password: "Password"
     models:
       institution: Institution
+  frontpage:
+    show:
+      login:
+        cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+        click_here: "(click here to sign in)"
+      other:
+        local_account_text: "Sign in with a local account"
+        local_account_title: "Want to sign in using a local account?"
+        register_text: "Create a new account"
+        register_title: "Your institution is not a member of CAFe yet?"
+        title: "Other options"
   institution:
     created: Institution created successfully.
     duplicate: This institution is a duplicate

@@ -227,6 +227,14 @@ module IconsHelper
     icon_constructor nil, "icon-awesome icon-check icon-mconf-is-member", options
   end
 
+  def icon_login(options={})
+    icon_constructor nil, "icon-awesome icon-signin icon-mconf-login", options
+  end
+
+  def icon_register(options={})
+    icon_constructor nil, "icon-awesome icon-plus-sign-alt icon-mconf-register", options
+  end
+
   private
 
   # Base method for most of the methods above
