@@ -175,7 +175,8 @@ class UsersController < ApplicationController
 
   def approve
     if Site.current.require_registration_approval?
-      if @user.approve!
+      ignore_full = can?(:approve_when_full, @user)
+      if @user.approve!(ignore_full)
         @user.skip_confirmation_notification!
         @user.confirm!
         flash[:notice] = t('users.approve.approved', :username => @user.username)
