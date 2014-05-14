@@ -78,6 +78,11 @@ class ShibbolethController < ApplicationController
 
   private
 
+  def set_institution user, shib
+    institution = Institution.where(:identifier => shib.get_institution_identifier).first
+    institution.add_member!(user) if institution.present?
+  end
+
   # Checks if shibboleth is enabled in the current site.
   def check_shib_enabled
     unless current_site.shib_enabled
@@ -113,6 +118,7 @@ class ShibbolethController < ApplicationController
           logger.info "Shibboleth: created a new account: #{token.user.inspect}"
           token.data = shib.get_data()
           token.save! # TODO: what if it fails
+          set_institution token.user, shib # TODO: does it matter if institution is not found?
           flash[:success] = t('shibboleth.create_association.account_created', :url => new_user_password_path)
         else
           token.destroy
@@ -159,6 +165,7 @@ class ShibbolethController < ApplicationController
       token.user = user
       token.data = shib.get_data()
       token.save! # TODO: what if it fails
+      set_institution token.user, shib # TODO: does it matter if institution is not found?
       flash[:success] = t("shibboleth.create_association.account_associated", :email => user.email)
     end
 
