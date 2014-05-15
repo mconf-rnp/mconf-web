@@ -74,6 +74,9 @@ en:
   spaces:
     edit:
       institution_placeholder: "Select an institution"
+  shibboleth:
+    create_association:
+      institution_not_registered: "You are not allowed to access this application because your institution has not adhered to Mconf yet."
   user:
     institution: Institution
     index: 

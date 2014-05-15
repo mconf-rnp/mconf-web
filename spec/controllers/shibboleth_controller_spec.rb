@@ -103,10 +103,41 @@ describe ShibbolethController do
 
     context "if params has no known option, redirects to /secure with a warning" do
       let(:user) { FactoryGirl.create(:user) }
-      before { setup_shib(user.full_name, user.email, user.username, false) }
+      let(:institution) { FactoryGirl.create(:institution) }
+      before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}", false) }
       before(:each) { post :create_association }
       it { should redirect_to(shibboleth_path) }
       it { should set_the_flash.to(I18n.t('shibboleth.create_association.invalid_parameters')) }
+    end
+
+    context "new account with institution not registered" do
+      let(:attrs) { FactoryGirl.attributes_for(:user) }
+      let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
+      let(:principal_name) { "#{attrs[:username]}@invalid_institution.com" }
+      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name, false) }
+      before(:each) {
+        expect {
+          post :create_association
+        }.not_to change{User.count} || change{ShibToken.count}
+      }
+
+      it { should redirect_to(shibboleth_path) }
+      it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
+    end
+
+    context "existing account but institution is not registered" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
+      let(:principal_name) { "#{user.username}@invalid_institution.com" }
+      before { setup_shib(user.full_name, user.email, principal_name, false) }
+      before(:each) {
+        expect {
+          post :create_association
+        }.not_to change{ShibToken.count}
+      }
+
+      it { should redirect_to(shibboleth_path) }
+      it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
     end
 
     context "if params[:new_account] is set" do
