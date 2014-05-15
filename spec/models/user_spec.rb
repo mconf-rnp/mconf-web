@@ -640,6 +640,9 @@ describe User do
 
   describe "#set_institution" do
     it "is called on before_update"
+    it "only update the institution if @new_institution or @new_institution_id is set"
+    it "removes the user from the old institution and add to the new one"
+    it "if can't find the new institution, leave the user with no institution"
   end
 
   describe "on commit" do

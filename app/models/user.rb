@@ -384,11 +384,12 @@ class User < ActiveRecord::Base
   def set_institution
     return unless defined?(@new_institution) || defined?(@new_institution_id)
 
+    # remove the user from the old institution and add to the new one
     @new_institution = Institution.where(:id => @new_institution_id).first if @new_institution_id
-    # Remove from old institution
-    institution.remove_member!(self) unless institution.nil?
-    # Add to new one, unless it's nil
-    @new_institution.add_member!(self, Role.default_role.name) unless @new_institution.nil?
+    if @new_institution != institution
+      institution.remove_member!(self) unless institution.nil?
+      @new_institution.add_member!(self, Role.default_role.name) unless @new_institution.nil?
+    end
   end
 
   def username_uniqueness

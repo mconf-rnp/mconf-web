@@ -10,10 +10,10 @@ $ ->
       minimumInputLength: 0
       multiple: false
       allowClear: true
-      width: 'resolve'
+      width: '100%'
       placeholder: I18n.t("spaces.edit.institution_placeholder")
       initSelection: (element, callback) ->
-        data = { id: element.val(), text: element.val() }
+        data = { id: element.val(), text: element.data("institution-name") }
         callback(data)
       ajax:
         url: urlInstitutions

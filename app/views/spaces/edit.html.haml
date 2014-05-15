@@ -20,8 +20,10 @@
       = f.input :repository
       = f.input :public, :label => t('.public')
       - if current_user.superuser
-        - current_institution = @space.institution.name if @space.institution
-        = f.input :institution_id, :required => false, :input_html => { :value => current_institution }
+        - if @space.institution
+          - current_institution_id = @space.institution.id
+          - current_institution_name = "#{@space.institution.name} (#{@space.institution.acronym})"
+        = f.input :institution_id, :required => false, :input_html => { :value => current_institution_id, :"data-institution-name" => current_institution_name }
 
     = f.button :wrapped, :value => t("_other.save")
 

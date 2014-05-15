@@ -73,7 +73,7 @@ en:
       no_organization: "<no organization set>"
   spaces:
     edit:
-      institution_placeholder: "Select an institution"
+      institution_placeholder: "No institution selected"
   user:
     institution: Institution
     index: 
@@ -86,7 +86,7 @@ en:
       institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
     edit:
       change_institution: Change user institution
-      institution_placeholder: "Select an institution"
+      institution_placeholder: "No institution selected"
     registrations:
       signup_form:
         institution_hint: Choose one or type to search.

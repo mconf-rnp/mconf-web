@@ -73,7 +73,7 @@ pt-br:
       no_organization: "<nenhuma organização atribuída>"
   spaces:
     edit:
-      institution_placeholder: "Selecione uma instituição"
+      institution_placeholder: "Nenhuma instituição selecionada"
   user:
     institution: Institution
     index:
@@ -86,7 +86,7 @@ pt-br:
       institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
     edit:
       change_institution: Mudar instituição do usuário
-      institution_placeholder: "Selecione uma instituição"
+      institution_placeholder: "Nenhuma instituição selecionada"
     registrations:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.

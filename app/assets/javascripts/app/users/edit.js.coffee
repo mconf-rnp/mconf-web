@@ -8,8 +8,9 @@ $ ->
       multiple: false
       allowClear: true
       placeholder: I18n.t("users.edit.institution_placeholder")
+      width: "50%"
       initSelection: (element, callback) ->
-        data = { id: element.val(), text: element.val() }
+        data = { id: element.val(), text: element.data("institution-name") }
         callback(data)
       ajax:
         url: urlInstitutions
