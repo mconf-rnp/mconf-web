@@ -624,6 +624,58 @@ describe UsersController do
         #   Search for this same comment in other files as well.
         # it("doesn't confirm the user") { user.reload.confirmed?.should be_false }
       end
+
+      context "and the institution's limit was reached" do
+        before { user.institution.update_attributes(:user_limit => 0) }
+
+        context "but the current user can still approve users" do
+          before(:each) {
+            post :approve, :id => user.to_param
+          }
+          it { should respond_with(:redirect) }
+          it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
+          it { should redirect_to('/any') }
+          it("approves the user") { user.reload.approved?.should be_true }
+          it("confirms the user") { user.reload.confirmed?.should be_true }
+
+          # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
+          #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
+          # context "skips the confirmation email" do
+          #   before(:each) {
+          #     Site.current.update_attributes(:require_registration_approval => true)
+          #   }
+          #   it {
+          #     user.confirmed?.should be_false # just to make sure wasn't already confirmed
+          #     expect {
+          #       post :approve, :id => user.to_param
+          #     }.not_to change{ ActionMailer::Base.deliveries }
+          #     user.confirmed?.should be_true
+          #   }
+          # end
+        end
+
+        context "and the current user cannot approve users" do
+          before {
+            controller.should_receive(:can?)
+              .with(:approve_when_full, user)
+              .and_return(false)
+          }
+          before(:each) {
+            post :approve, :id => user.to_param
+          }
+          it { should respond_with(:redirect) }
+          it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
+          it { should redirect_to('/any') }
+          it("doesn't approve the user") { user.reload.approved?.should be_false }
+
+          # TODO: Not working yet:
+          #   It's triggering an error related to delayed_job (undefined method `tag=').
+          #   Uncomment this when delayed_job is removed, see #811.
+          #   Search for this same comment in other files as well.
+          # it("doesn't confirm the user") { user.reload.confirmed?.should be_false }
+        end
+
+      end
     end
 
     context "if #require_registration_approval is not set in the current site" do
