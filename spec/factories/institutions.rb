@@ -10,5 +10,6 @@ FactoryGirl.define do
   factory :institution do
     name
     acronym { name_to_acronym(name) }
+    identifier { "#{acronym}.#{Forgery::Internet.top_level_domain}" }
   end
 end

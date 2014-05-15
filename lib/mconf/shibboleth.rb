@@ -82,7 +82,7 @@ module Mconf
     # Returns the institution providing the user principal name
     # for example 123456@institution.org -> institution.org
     def get_institution_identifier
-      get_principal_name.split('@')[-1]
+      get_principal_name.split('@')[-1] if get_principal_name.present?
     end
 
     # Returns the login of the user stored in the session, if any.

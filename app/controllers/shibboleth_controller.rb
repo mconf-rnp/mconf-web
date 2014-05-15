@@ -79,7 +79,8 @@ class ShibbolethController < ApplicationController
   private
 
   def set_institution user, shib
-    institution = Institution.where(:identifier => shib.get_institution_identifier).first
+    id = shib.get_institution_identifier
+    institution = Institution.where(:identifier => id).first if id.present?
     institution.add_member!(user) if institution.present?
   end
 
