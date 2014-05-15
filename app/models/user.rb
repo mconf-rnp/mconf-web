@@ -300,8 +300,8 @@ class User < ActiveRecord::Base
   end
 
   # Sets the user as approved
-  def approve!
-    if institution_is_full?
+  def approve! ignore_full=false
+    if institution_is_full? && !ignore_full
       false
     else
       self.update_attributes(:approved => true)
