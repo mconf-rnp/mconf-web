@@ -74,7 +74,46 @@ describe Institution do
   it ".find_or_create_by_name_or_acronym"
 
   it "#approved_users"
-  it "#full?"
+
+  describe "#full?" do
+    let(:target) { FactoryGirl.create(:institution) }
+
+    context "false if the user limit is nil" do
+      before { target.update_attributes(:user_limit => nil) }
+      it { target.full?.should be_false }
+    end
+
+    context "false if the user limit is an empty string" do
+      before { target.update_attributes(:user_limit => "") }
+      it { target.full?.should be_false }
+    end
+
+    context "false if the number of approved users has not reached the limit yet" do
+      before {
+        FactoryGirl.create(:user, :institution => target)
+        target.update_attributes(:user_limit => 2)
+      }
+      it { target.full?.should be_false }
+    end
+
+    context "true if the number of approved users is equal the limit" do
+      before {
+        FactoryGirl.create(:user, :institution => target)
+        target.update_attributes(:user_limit => 1)
+      }
+      it { target.full?.should be_true }
+    end
+
+    context "true if the number of approved users is bigger than the limit" do
+      before {
+        FactoryGirl.create(:user, :institution => target)
+        FactoryGirl.create(:user, :institution => target)
+        target.update_attributes(:user_limit => 1)
+      }
+      it { target.full?.should be_true }
+    end
+  end
+
   it "#users_that_can_record"
   it "#can_record_full?"
   it "#admins"

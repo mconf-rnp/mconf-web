@@ -393,9 +393,12 @@ describe User do
   end
 
   describe "#approve!" do
-    let(:user) { FactoryGirl.create(:user, :approved => false) }
-    let(:params) {
-      { :username => "any", :email => "any@jaloo.com", :approved => false, :password => "123456" }
+    let(:user) {
+      u = FactoryGirl.create(:user)
+      # won't work if it's set in the factory above, since sometimes the user is automatically
+      # approved when created
+      u.update_attributes(:approved => false)
+      u
     }
 
     context "sets the user as approved" do
@@ -408,6 +411,31 @@ describe User do
         user.should_receive(:update_attributes) { throw Exception.new }
         expect { user.approve! }.to raise_error
       }
+    end
+
+    context "with an user limit in the instutution" do
+      context "doesn't approve the user if the limit was already reached" do
+        before {
+          FactoryGirl.create(:user, :institution => user.institution)
+          user.institution.update_attributes(:user_limit => 1)
+        }
+        subject { user.approve! }
+        it { should be_false }
+        it { user.approved.should be_false }
+      end
+
+      context "works for user limits of 0" do
+        before { user.institution.update_attributes(:user_limit => 0) }
+        subject { user.approve! }
+        it { should be_false }
+        it { user.approved.should be_false }
+      end
+
+      context "ignores empty user limits" do
+        before { user.institution.update_attributes(:user_limit => nil) }
+        before(:each) { user.approve! }
+        it { user.approved.should be_true }
+      end
     end
   end
 
