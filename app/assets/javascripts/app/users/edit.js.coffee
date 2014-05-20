@@ -1,5 +1,10 @@
 $ ->
   if isOnPage 'users', 'edit'
+
+    $("#user_timezone").select2
+      minimumInputLength: 0
+      width: '100%'
+
     # Dynamic search for institutions
     idInstitution = '#user_institution_id'
     urlInstitutions = '/institutions/select.json'
