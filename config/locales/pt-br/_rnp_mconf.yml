@@ -6,6 +6,7 @@ pt-br:
         can_record_limit: Usuários que podem gravar
         name: Nome
         user_limit: Máximo de membros
+        identifier: Identificador
       space:
         institution_id: "Instituição"
         institution_name: "Instituição"
