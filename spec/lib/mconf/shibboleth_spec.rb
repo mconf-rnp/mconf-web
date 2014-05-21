@@ -322,6 +322,46 @@ describe Mconf::Shibboleth do
     end
   end
 
+  describe "#get_institution_identifier" do
+    context "returns nil if there's no shib data in the session" do
+      let(:shibboleth) { Mconf::Shibboleth.new({}) }
+      subject { shibboleth.get_institution_identifier }
+      it { should be_nil }
+    end
+
+    context "when there's shib data in the session" do
+      let(:shibboleth) { Mconf::Shibboleth.new(session) }
+
+      context "returns the identifier pointed by the site's 'shib_principal_name_field'" do
+        let(:session) { { :shib_data => { 'principal_name' => 'my-name@mconf.org' } } }
+        subject { shibboleth.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:shib_principal_name_field => 'principal_name')
+        }
+        it { should eq('mconf.org') }
+      end
+
+      context "if 'shib_principal_name_field' is not set, returns nil" do
+        let(:session) { { :shib_data => { } } }
+        subject { shibboleth.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:shib_principal_name_field => nil)
+        }
+        it { should be_nil }
+      end
+
+      context "returns nil if the name is not set" do
+        let(:session) { { :shib_data => { } } }
+        subject { shibboleth.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:shib_principal_name_field => 'name')
+        }
+        it { should be_nil }
+      end
+    end
+  end
+
+
   describe "#get_login" do
     context "returns nil if there's no shib data in the session" do
       let(:shibboleth) { Mconf::Shibboleth.new({}) }

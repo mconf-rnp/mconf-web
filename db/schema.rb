@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140411200714) do
+ActiveRecord::Schema.define(:version => 20140514163346) do
 
   create_table "activities", :force => true do |t|
     t.integer  "trackable_id"
@@ -176,6 +176,7 @@ ActiveRecord::Schema.define(:version => 20140411200714) do
     t.datetime "updated_at",       :null => false
     t.integer  "user_limit"
     t.integer  "can_record_limit"
+    t.string   "identifier"
   end
 
   create_table "join_requests", :force => true do |t|
