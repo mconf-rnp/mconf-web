@@ -134,7 +134,6 @@ describe ShibbolethController do
           it { subject.identifier.should eq(attrs[:email]) }
           it { subject.user.should_not be_nil } # just in case the find_by_email below fails
           it { subject.user.should eq(User.find_by_email(attrs[:email])) }
-          it { puts subject.data.inspect }
           it { subject.user.institution.should eq(institution) }
           it {
             expected = {}

@@ -5,4 +5,4 @@ en:
         acronym: "Adding an acronym will help users find the right institution when registering."
         user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
         can_record_limit: "Optional. Enter a number to limit how many users can record meetings in this intitution. Leave it empty to set no limits."
-        identifier: "Optional. Identifier provided by federation. For user@ins.org it should be 'ins.org'"
+        identifier: "Optional. Identifier used in the federation. If a user is identified in the federation by \"user@ins.org\", for example, the institution identifier should be \"ins.org\""
