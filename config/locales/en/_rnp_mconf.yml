@@ -71,9 +71,12 @@ en:
   profiles:
     form:
       no_organization: "<no organization set>"
+  shibboleth:
+    create_association:
+      institution_not_registered: "You are not allowed to access this application because your institution has not adhered to Mconf yet."
   spaces:
     edit:
-      institution_placeholder: "No institution selected"
+      institution_placeholder: "Select an institution"
   user:
     institution: Institution
     index: 
@@ -86,7 +89,7 @@ en:
       institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
     edit:
       change_institution: Change user institution
-      institution_placeholder: "No institution selected"
+      institution_placeholder: "Select an institution"
     registrations:
       signup_form:
         institution_hint: Choose one or type to search.

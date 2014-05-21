@@ -16,23 +16,24 @@ class ShibbolethController < ApplicationController
 
   before_filter :check_shib_enabled, :except => [:info]
   before_filter :check_current_user, :except => [:info]
+  before_filter :load_shib_session
+  before_filter :find_institution, :only => [:create_association]
 
   # Log in a user using his shibboleth information
   # The application should only reach this point after authenticating using Shibboleth
   # The authentication is currently made with the Apache module mod_shib
   def login
-    shib = Mconf::Shibboleth.new(session)
-    shib.save_to_session(request.env, Site.current.shib_env_variables)
+    @shib.save_to_session(request.env, Site.current.shib_env_variables)
 
-    unless shib.has_basic_info
+    unless @shib.has_basic_info
        "Shibboleth: couldn't basic user information from session, " +
-        "searching fields #{shib.basic_info_fields.inspect} " +
-        "in: #{shib.get_data.inspect}"
-      @attrs_required = shib.basic_info_fields
-      @attrs_informed = shib.get_data
+        "searching fields #{@shib.basic_info_fields.inspect} " +
+        "in: #{@shib.get_data.inspect}"
+      @attrs_required = @shib.basic_info_fields
+      @attrs_informed = @shib.get_data
       render :attribute_error
     else
-      token = shib.find_token()
+      token = @shib.find_token()
 
       # there's a token with a user associated, logs the user in
       unless token.nil? || token.user.nil?
@@ -52,16 +53,19 @@ class ShibbolethController < ApplicationController
   # Associates the current shib user with an existing user or
   # a new user account (created here as well).
   def create_association
-    shib = Mconf::Shibboleth.new(session)
+
+    # If institution provided via shibboleth is not registered the user can't associate
+    if @institution.nil?
+      flash[:error] = t('shibboleth.create_association.institution_not_registered')
 
     # The federated user has no account yet, create one based on the info returned by
     # shibboleth
-    if params[:new_account]
-      associate_with_new_account(shib)
+    elsif params[:new_account]
+      associate_with_new_account(@shib)
 
     # Associate the shib user with an existing user account
     elsif params[:existent_account]
-      associate_with_existent_account(shib)
+      associate_with_existent_account(@shib)
 
     # invalid request
     else
@@ -72,16 +76,19 @@ class ShibbolethController < ApplicationController
   end
 
   def info
-    @data = Mconf::Shibboleth.new(session).get_data
+    @data = @shib.get_data
     render :layout => false
   end
 
   private
 
-  def set_institution user, shib
-    id = shib.get_institution_identifier
-    institution = Institution.where(:identifier => id).first if id.present?
-    institution.add_member!(user) if institution.present?
+  def load_shib_session
+    @shib = Mconf::Shibboleth.new(session)
+  end
+
+  def find_institution
+    id = @shib.get_institution_identifier
+    @institution = Institution.where(:identifier => id).first if id.present?
   end
 
   # Checks if shibboleth is enabled in the current site.
@@ -119,7 +126,7 @@ class ShibbolethController < ApplicationController
           logger.info "Shibboleth: created a new account: #{token.user.inspect}"
           token.data = shib.get_data()
           token.save! # TODO: what if it fails
-          set_institution token.user, shib # TODO: does it matter if institution is not found?
+          @institution.add_member!(token.user) # Institution exists and user is authenticated
           flash[:success] = t('shibboleth.create_association.account_created', :url => new_user_password_path)
         else
           token.destroy
@@ -166,7 +173,7 @@ class ShibbolethController < ApplicationController
       token.user = user
       token.data = shib.get_data()
       token.save! # TODO: what if it fails
-      set_institution token.user, shib # TODO: does it matter if institution is not found?
+      @institution.add_member!(token.user) # Institution exists and user is authenticated
       flash[:success] = t("shibboleth.create_association.account_associated", :email => user.email)
     end
 

@@ -72,9 +72,12 @@ pt-br:
   profiles:
     form:
       no_organization: "<nenhuma organização atribuída>"
+  shibboleth:
+    create_association:
+      institution_not_registered: "Você não tem acesso a esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
   spaces:
     edit:
-      institution_placeholder: "Nenhuma instituição selecionada"
+      institution_placeholder: "Selecione uma instituição"
   user:
     institution: Institution
     index:
@@ -87,7 +90,7 @@ pt-br:
       institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
     edit:
       change_institution: Mudar instituição do usuário
-      institution_placeholder: "Nenhuma instituição selecionada"
+      institution_placeholder: "Selecione uma instituição"
     registrations:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.
