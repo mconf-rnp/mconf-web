@@ -74,7 +74,7 @@ pt-br:
       no_organization: "<nenhuma organização atribuída>"
   shibboleth:
     create_association:
-      institution_not_registered: "Você não tem acesso a esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
+      institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
   spaces:
     edit:
       institution_placeholder: "Selecione uma instituição"

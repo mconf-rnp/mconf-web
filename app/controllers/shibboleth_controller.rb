@@ -17,7 +17,7 @@ class ShibbolethController < ApplicationController
   before_filter :check_shib_enabled, :except => [:info]
   before_filter :check_current_user, :except => [:info]
   before_filter :load_shib_session
-  before_filter :find_institution, :only => [:create_association]
+  before_filter :find_institution, :only => [:login, :create_association]
 
   # Log in a user using his shibboleth information
   # The application should only reach this point after authenticating using Shibboleth
@@ -32,20 +32,29 @@ class ShibbolethController < ApplicationController
       @attrs_required = @shib.basic_info_fields
       @attrs_informed = @shib.get_data
       render :attribute_error
+
     else
-      token = @shib.find_token()
+      # if institution provided via shibboleth is not registered the user can't log in
+      if @institution.nil?
+        flash[:error] = t('shibboleth.create_association.institution_not_registered')
+        redirect_to request.referer || root_path
 
-      # there's a token with a user associated, logs the user in
-      unless token.nil? || token.user.nil?
-        logger.info "Shibboleth: logging in the user #{token.user.inspect}"
-        sign_in token.user
-        flash.keep # keep the message set before by #create_association
-        redirect_to my_home_path
-
-      # no token means the user has no association yet, render a page to do it
       else
-        logger.info "Shibboleth: first access for this user, rendering the association page"
-        render :associate
+        token = @shib.find_token()
+
+        # there's a token with a user associated, logs the user in
+        unless token.nil? || token.user.nil?
+          logger.info "Shibboleth: logging in the user #{token.user.inspect}"
+          sign_in token.user
+          flash.keep # keep the message set before by #create_association
+          redirect_to my_home_path
+
+        # no token means the user has no association yet, render a page to do it
+        else
+          logger.info "Shibboleth: first access for this user, rendering the association page"
+          render :associate
+        end
+
       end
     end
   end
@@ -54,7 +63,7 @@ class ShibbolethController < ApplicationController
   # a new user account (created here as well).
   def create_association
 
-    # If institution provided via shibboleth is not registered the user can't associate
+    # if institution provided via shibboleth is not registered the user can't log in
     if @institution.nil?
       flash[:error] = t('shibboleth.create_association.institution_not_registered')
 
@@ -193,6 +202,7 @@ class ShibbolethController < ApplicationController
       request.env["Shib-inetOrgPerson-cn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-sn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
+      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "rickastley@dontgiveup.br"
     end
   end
 end

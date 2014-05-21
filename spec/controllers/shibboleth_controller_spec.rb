@@ -66,28 +66,53 @@ describe ShibbolethController do
 
     context "if the user's information is ok" do
       let(:user) { FactoryGirl.create(:user) }
-      before { setup_shib(user.full_name, user.email, user.full_name, false) }
 
-      context "logs the user in if he already has a token" do
-        before { ShibToken.create!(:identifier => user.email, :user => user) }
-        before(:each) {
-          request.flash[:success] = 'message set previously by #create_association'
-          should set_the_flash.to('message set previously by #create_association')
-          get :login
+      context "but the institution is not registered" do
+        let(:principal_name) { "user@invalid_institution.com" }
+        before {
+          setup_shib(user.full_name, user.email, principal_name, false)
         }
-        it { subject.current_user.should eq(user) }
-        it { should redirect_to(my_home_path) }
-        pending("persists the flash messages") {
-          # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
-          #  Testing in the application the flash is persisted, as it should.
-          should set_the_flash.to('message set previously by #create_association')
-        }
+
+        context "with a request.referer" do
+          before(:each) {
+            request.env["HTTP_REFERER"] = "/any"
+            get :login
+          }
+          it { should redirect_to("/any") }
+          it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
+        end
+
+        context "without a request.referer" do
+          before(:each) { get :login }
+          it { should redirect_to(root_path) }
+        end
       end
 
-      context "renders the association page if the user doesn't have a token yet" do
-        before(:each) { get :login }
-        it { should render_template('associate') }
-        it { should render_with_layout('no_sidebar') }
+      context "and the institution is registered" do
+        let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
+        before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}", false) }
+
+        context "logs the user in if he already has a token" do
+          before { ShibToken.create!(:identifier => user.email, :user => user) }
+          before(:each) {
+            request.flash[:success] = 'message set previously by #create_association'
+            should set_the_flash.to('message set previously by #create_association')
+            get :login
+          }
+          it { subject.current_user.should eq(user) }
+          it { should redirect_to(my_home_path) }
+          pending("persists the flash messages") {
+            # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
+            #  Testing in the application the flash is persisted, as it should.
+            should set_the_flash.to('message set previously by #create_association')
+          }
+        end
+
+        context "renders the association page if the user doesn't have a token yet" do
+          before(:each) { get :login }
+          it { should render_template('associate') }
+          it { should render_with_layout('no_sidebar') }
+        end
       end
 
     end
