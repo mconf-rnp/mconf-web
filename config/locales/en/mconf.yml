@@ -147,11 +147,12 @@ en:
         external_help: "External help/FAQ page"
         feedback_url: "Feedback URL"
         ldap_enabled: "LDAP: Enable authentication"
+        ldap_filter: "LDAP: Filter for the user search"
         ldap_host: "LDAP: Server IP or domain"
         ldap_port: "LDAP: Server port"
-        ldap_user: "LDAP: Full DN for the user"
-        ldap_user_password: "LDAP: User password"
-        ldap_user_treebase: "LDAP: Full DN for UsersTreebase"
+        ldap_user: "LDAP: Full DN or user to bind"
+        ldap_user_password: "LDAP: Password to connect"
+        ldap_user_treebase: "LDAP: Full DN for the users tree"
         ldap_username_field: "LDAP: Field to obtain the username"
         ldap_email_field: "LDAP: Field to obtain the user's email"
         ldap_name_field: "LDAP: Field to obtain the user's full name"
@@ -423,8 +424,10 @@ en:
       list_of_rooms: "List of all registered rooms"
     important: Important
     invitation_form:
+      at: "at"
+      duration: "Duration"
       meeting_in: "Inviting people to a meeting in:"
-      timezone: "You are using the timezone %{timezone}"
+      timezone: "You are using the time zone %{timezone}"
       title: "Invite people to a meeting"
       users:
         hint: "Type to start searching"
@@ -1500,8 +1503,8 @@ en:
     thumbnail_view:
       no_spaces: "There are no spaces created yet!"
     unified_space:
-      private: "private space"
-      public: "public space"
+      private: "Private space"
+      public: "Public space"
       user_is_member: "You are a member of this space"
       with_members: "with %{count} members"
     users: "Users in this space"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140514163346) do
+ActiveRecord::Schema.define(:version => 20140601190024) do
 
   create_table "activities", :force => true do |t|
     t.integer  "trackable_id"
@@ -58,10 +58,12 @@ ActiveRecord::Schema.define(:version => 20140514163346) do
     t.string   "meetingid"
     t.string   "name"
     t.datetime "start_time"
-    t.boolean  "running",    :default => false
-    t.boolean  "record",     :default => false
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.boolean  "running",      :default => false
+    t.boolean  "record",       :default => false
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+    t.integer  "creator_id"
+    t.string   "creator_name"
   end
 
   add_index "bigbluebutton_meetings", ["meetingid", "start_time"], :name => "index_bigbluebutton_meetings_on_meetingid_and_start_time", :unique => true
@@ -376,6 +378,7 @@ ActiveRecord::Schema.define(:version => 20140514163346) do
     t.boolean  "events_enabled",                 :default => false
     t.boolean  "registration_enabled",           :default => true,  :null => false
     t.string   "shib_principal_name_field"
+    t.string   "ldap_filter"
   end
 
   create_table "spaces", :force => true do |t|
