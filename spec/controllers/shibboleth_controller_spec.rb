@@ -67,54 +67,56 @@ describe ShibbolethController do
     context "if the user's information is ok" do
       let(:user) { FactoryGirl.create(:user) }
 
-      context "but the institution is not registered" do
-        let(:principal_name) { "user@invalid_institution.com" }
+      context "logs the user in if he already has a token" do
         before {
-          setup_shib(user.full_name, user.email, principal_name, false)
+          setup_shib(user.full_name, user.email, user.email)
+          ShibToken.create!(:identifier => user.email, :user => user)
         }
-
-        context "with a request.referer" do
-          before(:each) {
-            request.env["HTTP_REFERER"] = "/any"
-            get :login
-          }
-          it { should redirect_to("/any") }
-          it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
-        end
-
-        context "without a request.referer" do
-          before(:each) { get :login }
-          it { should redirect_to(root_path) }
-        end
+        before(:each) {
+          request.flash[:success] = 'message set previously by #create_association'
+          should set_the_flash.to('message set previously by #create_association')
+          get :login
+        }
+        it { subject.current_user.should eq(user) }
+        it { should redirect_to(my_home_path) }
+        pending("persists the flash messages") {
+          # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
+          #  Testing in the application the flash is persisted, as it should.
+          should set_the_flash.to('message set previously by #create_association')
+        }
       end
 
-      context "and the institution is registered" do
-        let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
-        before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}", false) }
+      context "and it's the user's first access" do
+        context "but the institution is not registered" do
+          let(:principal_name) { "user@invalid_institution.com" }
+          before { setup_shib(user.full_name, user.email, principal_name) }
 
-        context "logs the user in if he already has a token" do
-          before { ShibToken.create!(:identifier => user.email, :user => user) }
-          before(:each) {
-            request.flash[:success] = 'message set previously by #create_association'
-            should set_the_flash.to('message set previously by #create_association')
-            get :login
-          }
-          it { subject.current_user.should eq(user) }
-          it { should redirect_to(my_home_path) }
-          pending("persists the flash messages") {
-            # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
-            #  Testing in the application the flash is persisted, as it should.
-            should set_the_flash.to('message set previously by #create_association')
-          }
+          context "with a request.referer" do
+            before(:each) {
+              request.env["HTTP_REFERER"] = "/any"
+              get :login
+            }
+            it { should redirect_to("/any") }
+            it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
+          end
+
+          context "without a request.referer" do
+            before(:each) { get :login }
+            it { should redirect_to(root_path) }
+          end
         end
 
-        context "renders the association page if the user doesn't have a token yet" do
-          before(:each) { get :login }
-          it { should render_template('associate') }
-          it { should render_with_layout('no_sidebar') }
+        context "and the institution is registered" do
+          let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
+          before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}") }
+
+          context "renders the association page" do
+            before(:each) { get :login }
+            it { should render_template('associate') }
+            it { should render_with_layout('no_sidebar') }
+          end
         end
       end
-
     end
   end
 
@@ -129,7 +131,7 @@ describe ShibbolethController do
     context "if params has no known option, redirects to /secure with a warning" do
       let(:user) { FactoryGirl.create(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
-      before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}", false) }
+      before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}") }
       before(:each) { post :create_association }
       it { should redirect_to(shibboleth_path) }
       it { should set_the_flash.to(I18n.t('shibboleth.create_association.invalid_parameters')) }
@@ -139,7 +141,7 @@ describe ShibbolethController do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
       let(:principal_name) { "#{attrs[:username]}@invalid_institution.com" }
-      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name, false) }
+      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name) }
       before(:each) {
         expect {
           post :create_association
@@ -154,7 +156,7 @@ describe ShibbolethController do
       let(:user) { FactoryGirl.create(:user) }
       let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
       let(:principal_name) { "#{user.username}@invalid_institution.com" }
-      before { setup_shib(user.full_name, user.email, principal_name, false) }
+      before { setup_shib(user.full_name, user.email, principal_name) }
       before(:each) {
         expect {
           post :create_association
@@ -169,7 +171,7 @@ describe ShibbolethController do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
       let(:principal_name) { "#{attrs[:username]}@#{institution.identifier}" }
-      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name, false) }
+      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name) }
 
       context "redirects to /secure if the user already has a valid token" do
         let(:user) { FactoryGirl.create(:user) }
@@ -233,7 +235,7 @@ describe ShibbolethController do
     context "if params[:existent_account] is set" do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
-      before { setup_shib(attrs[:_full_name], attrs[:email], "#{attrs[:username]}@#{institution.identifier}", false) }
+      before { setup_shib(attrs[:_full_name], attrs[:email], "#{attrs[:username]}@#{institution.identifier}") }
 
       context "if there's no user info in the params, goes back to /secure with an error" do
         before(:each) { post :create_association, :existent_account => true }
@@ -279,7 +281,7 @@ describe ShibbolethController do
         before {
           # the user that is trying to login has to be the same user that has variables
           # on the session, so we do this setup again
-          setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}", false)
+          setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}")
         }
 
         context "goes back to /secure with a success message" do
@@ -340,7 +342,7 @@ describe ShibbolethController do
 
   private
 
-  def setup_shib(name, email, principal, save_to_session=true)
+  def setup_shib(name, email, principal)
     request.env["Shib-inetOrgPerson-cn"] = name
     request.env["Shib-inetOrgPerson-mail"] = email
     request.env["Shib-eduPerson-eduPersonPrincipalName"] = principal

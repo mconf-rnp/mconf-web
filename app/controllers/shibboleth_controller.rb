@@ -26,7 +26,7 @@ class ShibbolethController < ApplicationController
     @shib.save_to_session(request.env, Site.current.shib_env_variables)
 
     unless @shib.has_basic_info
-       "Shibboleth: couldn't basic user information from session, " +
+      logger.error "Shibboleth: couldn't basic user information from session, " +
         "searching fields #{@shib.basic_info_fields.inspect} " +
         "in: #{@shib.get_data.inspect}"
       @attrs_required = @shib.basic_info_fields
@@ -34,28 +34,28 @@ class ShibbolethController < ApplicationController
       render :attribute_error
 
     else
-      # if institution provided via shibboleth is not registered the user can't log in
-      if @institution.nil?
-        flash[:error] = t('shibboleth.create_association.institution_not_registered')
-        redirect_to request.referer || root_path
+      token = @shib.find_token()
 
+      # there's a token with a user associated, logs the user in
+      unless token.nil? || token.user.nil?
+        logger.info "Shibboleth: logging in the user #{token.user.inspect}"
+        sign_in token.user
+        flash.keep # keep the message set before by #create_association
+        redirect_to my_home_path
+
+      # no token means the user has no association yet, render a page to do it
       else
-        token = @shib.find_token()
-
-        # there's a token with a user associated, logs the user in
-        unless token.nil? || token.user.nil?
-          logger.info "Shibboleth: logging in the user #{token.user.inspect}"
-          sign_in token.user
-          flash.keep # keep the message set before by #create_association
-          redirect_to my_home_path
-
-        # no token means the user has no association yet, render a page to do it
+        # if institution provided via shibboleth is not registered the user can't log in for the first time
+        if @institution.nil?
+          logger.info "Shibboleth: first access for this user but his institution (#{@shib.get_institution_identifier}) is not registered, won't be able to sign in"
+          flash[:error] = t('shibboleth.create_association.institution_not_registered')
+          redirect_to request.referer || root_path
         else
           logger.info "Shibboleth: first access for this user, rendering the association page"
           render :associate
         end
-
       end
+
     end
   end
 
@@ -198,10 +198,11 @@ class ShibbolethController < ApplicationController
       request.env["Shib-Authentication-Method"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-AuthnContext-Class"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-brEduPerson-brEduAffiliationType"] = "student;position;faculty"
-      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "75a988943825d2871e1cfa75473ec0@ufrgs.br"
       request.env["Shib-inetOrgPerson-cn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-sn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
+      request.env["inetOrgPerson-cn"] = "Rick Astley"
+      request.env["inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
       request.env["Shib-eduPerson-eduPersonPrincipalName"] = "rickastley@dontgiveup.br"
     end
   end
