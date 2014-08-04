@@ -144,7 +144,7 @@ module Mconf
     def get_principal_name
       result = nil
       if @session.has_key?(ENV_KEY)
-        result = @session[ENV_KEY][Site.current.ldap_email_field]
+        result = @session[ENV_KEY][Site.current.ldap_principal_name_field]
         result = result.clone unless result.nil?
       end
       result

@@ -71,6 +71,13 @@ describe Devise::Strategies::LdapAuthenticatable do
                   .with(ldap_user1, Site.current).and_return(@user)
               }
 
+              context "vinculates the user to his institution" do
+                let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
+                before {
+                  
+                }
+              end
+
               it("calls and returns #success!(user)") {
                 target.should_receive(:success!).with(@user).and_return("return of success!")
                 target.authenticate!.should eq("return of success!")

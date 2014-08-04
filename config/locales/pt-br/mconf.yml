@@ -156,6 +156,7 @@ pt-br:
         ldap_username_field: "LDAP: Campo para obter o nome de usuário"
         ldap_email_field: "LDAP: Campo para obter o email"
         ldap_name_field: "LDAP: Campo para obter o nome completo"
+        ldap_principal_name_field: "LDAP: Campo para principal name"
         locale: "Idioma"
         name: "Nome"
         presence_domain: "Domínio do bate-papo XMPP"
