@@ -103,4 +103,98 @@ describe Devise::Strategies::LdapAuthenticatable do
     it "converts the username passed to a string"
     it "converts the full_name passed to a string"
   end
+
+  describe "#get_principal_name" do
+    context "returns nil if there's no shib data in the session" do
+      let(:ldap) { Mconf::LDAP.new({}) }
+      subject { ldap.get_principal_name }
+      it { should be_nil }
+    end
+
+    context "when there's ldap data in the session" do
+      let(:ldap) { Mconf::LDAP.new(session) }
+
+      context "returns the name pointed by the site's 'ldap_principal_name_field'" do
+        let(:session) { { :ldap_data => { 'principal_name' => 'my-name' } } }
+        subject { ldap.get_principal_name }
+        before {
+          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
+        }
+        it { should eq('my-name') }
+      end
+
+      context "if 'ldap_principal_name_field' is not set, returns nil" do
+        let(:session) { { :ldap_data => { } } }
+        subject { ldap.get_principal_name }
+        before {
+          Site.current.update_attributes(:shib_principal_name_field => nil)
+        }
+        it { should be_nil }
+      end
+
+      context "returns nil if the name is not set" do
+        let(:session) { { :ldap_data => { } } }
+        subject { ldap.get_principal_name }
+        before {
+          Site.current.update_attributes(:shib_principal_name_field => 'name')
+        }
+        it { should be_nil }
+      end
+
+      # see issue #973
+      context "clones the result string to prevent it from being modified" do
+        let(:original) { 'my-name' }
+        let(:session) { { :ldap_data => { 'principal_name' => original } } }
+        before {
+          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
+          @subject = ldap.get_principal_name
+
+          # something that would alter the string pointed by it
+          @subject.gsub!(/my-name/, 'altered-name')
+        }
+        it { @subject.should eq('altered-name') }
+        it { original.should eq('my-name') }
+      end
+    end
+  end
+
+  describe "#get_institution_identifier" do
+    context "returns nil if there's no ldap data in the session" do
+      let(:ldap) { Mconf::LDAP.new({}) }
+      subject { ldap.get_institution_identifier }
+      it { should be_nil }
+    end
+
+    context "when there's ldap data in the session" do
+      let(:ldap) { Mconf::LDAP.new(session) }
+
+      context "returns the identifier pointed by the site's 'ldap_principal_name_field'" do
+        let(:session) { { :ldap_data => { 'principal_name' => 'my-name@mconf.org' } } }
+        subject { ldap.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
+        }
+        it { should eq('mconf.org') }
+      end
+
+      context "if 'ldap_principal_name_field' is not set, returns nil" do
+        let(:session) { { :ldap_data => { } } }
+        subject { ldap.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:ldap_principal_name_field => nil)
+        }
+        it { should be_nil }
+      end
+
+      context "returns nil if the name is not set" do
+        let(:session) { { :ldap_data => { } } }
+        subject { ldap.get_institution_identifier }
+        before {
+          Site.current.update_attributes(:ldap_principal_name_field => 'name')
+        }
+        it { should be_nil }
+      end
+    end
+  end
+
 end

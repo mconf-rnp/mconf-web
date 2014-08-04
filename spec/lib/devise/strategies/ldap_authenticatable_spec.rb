@@ -72,10 +72,7 @@ describe Devise::Strategies::LdapAuthenticatable do
               }
 
               context "vinculates the user to his institution" do
-                let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
-                before {
-                  
-                }
+                it "should vinculate the user to his institution"
               end
 
               it("calls and returns #success!(user)") {

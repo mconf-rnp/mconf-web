@@ -64,6 +64,22 @@ module Mconf
       !@session.nil? && @session.has_key?(ENV_KEY)
     end
 
+    # Returns the "principalName" attribute
+    def get_principal_name
+      result = nil
+      if @session.has_key?(ENV_KEY)
+        result = @session[ENV_KEY][Site.current.ldap_principal_name_field]
+        result = result.clone unless result.nil?
+      end
+      result
+    end
+
+    # Returns the institution providing the user principal name
+    # for example 123456@institution.org -> institution.org
+    def get_institution_identifier
+      get_principal_name.split('@')[-1] if get_principal_name.present?
+    end
+
     private
 
     # Searches for a LdapToken using the user email as identifier
@@ -138,23 +154,5 @@ module Mconf
       end
       [username, email, name]
     end
-
-    # Returns the "principalName" attribute
-    # TODO: provide an attribute like "principalName", now using email field
-    def get_principal_name
-      result = nil
-      if @session.has_key?(ENV_KEY)
-        result = @session[ENV_KEY][Site.current.ldap_principal_name_field]
-        result = result.clone unless result.nil?
-      end
-      result
-    end
-
-    # Returns the institution providing the user principal name
-    # for example 123456@institution.org -> institution.org
-    def get_institution_identifier
-      get_principal_name.split('@')[-1] if get_principal_name.present?
-    end
-
   end
 end
