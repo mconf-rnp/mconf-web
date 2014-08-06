@@ -30,7 +30,7 @@ FactoryGirl.define do
       u2.confirm!
       # set the institution using `institution_name` only if `institution` wasn't
       # already specified
-      u2.set_institution(u2.institution_name) if u2.institution.nil?
+      #u2.set_institution(u2.institution_name) if u2.institution.nil?
     end
   end
 

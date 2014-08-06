@@ -66,8 +66,8 @@ module Devise
                 else
                   unless user.institution # if already there's an institution does not set it
                     institution_id = ldap_helper.get_institution_identifier
-                    institution = Institution.where(:identifier => id).first if id.present?
-                    insititution.add_member!(user)
+                    institution = Institution.where(:identifier => institution_id).first if institution_id.present?
+                    institution.add_member!(user)
                   end
                   ldap_helper.sign_user_in(user)
                   success!(user)

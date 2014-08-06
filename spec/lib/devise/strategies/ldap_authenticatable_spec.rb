@@ -71,10 +71,6 @@ describe Devise::Strategies::LdapAuthenticatable do
                   .with(ldap_user1, Site.current).and_return(@user)
               }
 
-              context "vinculates the user to his institution" do
-                it "should vinculate the user to his institution"
-              end
-
               it("calls and returns #success!(user)") {
                 target.should_receive(:success!).with(@user).and_return("return of success!")
                 target.authenticate!.should eq("return of success!")
@@ -84,6 +80,36 @@ describe Devise::Strategies::LdapAuthenticatable do
                 Mconf::LDAP.any_instance.should_receive(:sign_user_in).with(@user)
                 target.authenticate!
               }
+            end
+
+            context "vinculates the user to his institution" do
+              let(:user) { FactoryGirl.create(:user, :institution => nil) }
+              let(:user2) { FactoryGirl.create(:user) }
+              let(:institution) { FactoryGirl.create(:institution, :identifier => "mamamia.org") }
+
+              context "user already has an institution" do
+                before {
+                  Mconf::LDAP.any_instance.should_receive(:find_or_create_user)
+                    .with(ldap_user1, Site.current).and_return(user2)
+                }
+                it {
+                  expect(user2.institution).not_to be_nil
+                  target.authenticate! }
+              end
+
+              context "user has not an institution" do
+                before {
+                  Mconf::LDAP.any_instance.should_receive(:find_or_create_user)
+                    .with(ldap_user1, Site.current).and_return(user)
+                  Mconf::LDAP.any_instance.should_receive(:get_institution_identifier)
+                    .and_return("mamamia.org")
+                }
+                it("should set the institution to his user") {
+                  institution
+                  target.authenticate!
+                  expect(user.institution).to eql(institution)
+                }
+              end
             end
 
             context "but there was an error creating the internal structures" do
