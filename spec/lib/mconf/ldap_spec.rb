@@ -6,7 +6,7 @@
 
 require 'spec_helper'
 
-describe Devise::Strategies::LdapAuthenticatable do
+describe Mconf::LDAP do
   let(:target) { Mconf::LDAP.new(nil) }
 
   describe "#initialize" do
@@ -25,6 +25,7 @@ describe Devise::Strategies::LdapAuthenticatable do
     it "returns :name if the name is nil"
     it "returns :name if the name is ''"
     it "returns nil if all attributes are ok"
+    it "returns nil even if the principal name is not set"
   end
 
   describe "#find_or_create_user" do
@@ -104,97 +105,96 @@ describe Devise::Strategies::LdapAuthenticatable do
     it "converts the full_name passed to a string"
   end
 
-  describe "#get_principal_name" do
-    context "returns nil if there's no shib data in the session" do
-      let(:ldap) { Mconf::LDAP.new({}) }
-      subject { ldap.get_principal_name }
-      it { should be_nil }
-    end
+  describe "#set_user_institution" do
+    let(:ldap) { Mconf::LDAP.new({}) }
+    before {
+      Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
+    }
 
-    context "when there's ldap data in the session" do
-      let(:ldap) { Mconf::LDAP.new(session) }
+    context "if the user has no institution set yet" do
+      let(:user) { FactoryGirl.create(:user, :institution => nil) }
 
-      context "returns the name pointed by the site's 'ldap_principal_name_field'" do
-        let(:session) { { :ldap_data => { 'principal_name' => 'my-name' } } }
-        subject { ldap.get_principal_name }
-        before {
-          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
-        }
-        it { should eq('my-name') }
+      context "does nothing if the user has no principal name set" do
+        let(:ldap_user) { base_ldap_user("principal_name" => nil) }
+        before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
+        it { @result.should be_true }
+        it { user.institution.should be_nil }
       end
 
-      context "if 'ldap_principal_name_field' is not set, returns nil" do
-        let(:session) { { :ldap_data => { } } }
-        subject { ldap.get_principal_name }
-        before {
-          Site.current.update_attributes(:shib_principal_name_field => nil)
-        }
-        it { should be_nil }
+      context "does nothing if the user has a principal name without an institution in it" do
+        let(:ldap_user) { base_ldap_user("principal_name" => "any-without-institution") }
+        before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
+        it { @result.should be_true }
+        it { user.institution.should be_nil }
       end
 
-      context "returns nil if the name is not set" do
-        let(:session) { { :ldap_data => { } } }
-        subject { ldap.get_principal_name }
-        before {
-          Site.current.update_attributes(:shib_principal_name_field => 'name')
-        }
-        it { should be_nil }
+      context "does nothing if there's no institution with the identifier found" do
+        let(:ldap_user) { base_ldap_user("principal_name" => "user@institution.com") }
+        before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
+        subject { ldap.set_user_institution(user, Site.current, ldap_user) }
+        it { @result.should be_true }
+        it { user.institution.should be_nil }
       end
 
-      # see issue #973
-      context "clones the result string to prevent it from being modified" do
-        let(:original) { 'my-name' }
-        let(:session) { { :ldap_data => { 'principal_name' => original } } }
-        before {
-          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
-          @subject = ldap.get_principal_name
-
-          # something that would alter the string pointed by it
-          @subject.gsub!(/my-name/, 'altered-name')
+      context "adds the user in the institution if an institution is found" do
+        let(:ldap_user) { base_ldap_user("principal_name" => "user@institution.com") }
+        let(:institution) { FactoryGirl.create(:institution, identifier: "institution.com") }
+        before(:each) {
+          institution
+          @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { @subject.should eq('altered-name') }
-        it { original.should eq('my-name') }
-      end
-    end
-  end
-
-  describe "#get_institution_identifier" do
-    context "returns nil if there's no ldap data in the session" do
-      let(:ldap) { Mconf::LDAP.new({}) }
-      subject { ldap.get_institution_identifier }
-      it { should be_nil }
-    end
-
-    context "when there's ldap data in the session" do
-      let(:ldap) { Mconf::LDAP.new(session) }
-
-      context "returns the identifier pointed by the site's 'ldap_principal_name_field'" do
-        let(:session) { { :ldap_data => { 'principal_name' => 'my-name@mconf.org' } } }
-        subject { ldap.get_institution_identifier }
-        before {
-          Site.current.update_attributes(:ldap_principal_name_field => 'principal_name')
-        }
-        it { should eq('mconf.org') }
+        it { @result.should be_true }
+        it { user.institution.should eql(institution) }
       end
 
-      context "if 'ldap_principal_name_field' is not set, returns nil" do
-        let(:session) { { :ldap_data => { } } }
-        subject { ldap.get_institution_identifier }
-        before {
+      context "uses `mail` as the default field to get the principal name" do
+        let(:ldap_user) { base_ldap_user("mail" => "user@institution.com") }
+        let(:institution) { FactoryGirl.create(:institution, identifier: "institution.com") }
+        before(:each) {
+          institution
           Site.current.update_attributes(:ldap_principal_name_field => nil)
+          @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { should be_nil }
+        it { @result.should be_true }
+        it { user.institution.should eql(institution) }
       end
 
-      context "returns nil if the name is not set" do
-        let(:session) { { :ldap_data => { } } }
-        subject { ldap.get_institution_identifier }
-        before {
-          Site.current.update_attributes(:ldap_principal_name_field => 'name')
+      # all previous tests use string keys
+      context "works if the principal name is set with a symbol key" do
+        let(:ldap_user) { base_ldap_user(mail: "user@institution.com") }
+        let(:institution) { FactoryGirl.create(:institution, identifier: "institution.com") }
+        before(:each) {
+          institution
+          @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { should be_nil }
+        it { @result.should be_true }
+        it { user.institution.should eql(institution) }
       end
+    end
+
+    context "doesn't change the institution if the user already has an institution set" do
+      let(:institution1) { FactoryGirl.create(:institution, identifier: "institution.com") }
+      let(:institution2) { FactoryGirl.create(:institution, identifier: "another.com") }
+      let(:user) { FactoryGirl.create(:user, institution: institution1) }
+      let(:ldap_user) { { principal_name: "user@another.com" } }
+      before(:each) {
+        institution1
+        institution2
+        @result = ldap.set_user_institution(user, ldap_user, Site.current)
+      }
+      it { @result.should be_false }
+      it { user.institution.should eql(institution1) }
     end
   end
 
+  # Creates a real object that's returned by LDAP with the information of the user.
+  # A lot better to use the real object here, since it has some particularities not so
+  # easy to reproduce with mocks.
+  def base_ldap_user(hash)
+    r = Net::LDAP::Entry.new
+    hash.each do |key, value|
+      r[key] = value
+    end
+    r
+  end
 end

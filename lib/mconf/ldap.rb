@@ -19,7 +19,7 @@ module Mconf
     def validate_user(ldap_user, ldap_configs)
 
       # get the username, full name and email from the data returned by the server
-      username, email, name = user_info(ldap_user, ldap_configs)
+      username, email, name, _ = user_info(ldap_user, ldap_configs)
 
       if username.blank?
         :username
@@ -38,7 +38,7 @@ module Mconf
       Rails.logger.info "LDAP: finding or creating user"
 
       # get the username, full name and email from the data returned by the server
-      username, email, name = user_info(ldap_user, ldap_configs)
+      username, email, name, _ = user_info(ldap_user, ldap_configs)
 
       # creates the token and the internal account, if needed
       token = find_or_create_token(email)
@@ -64,20 +64,22 @@ module Mconf
       !@session.nil? && @session.has_key?(ENV_KEY)
     end
 
-    # Returns the "principalName" attribute
-    def get_principal_name
-      result = nil
-      if @session.has_key?(ENV_KEY)
-        result = @session[ENV_KEY][Site.current.ldap_principal_name_field]
-        result = result.clone unless result.nil?
+    # Automatically sets the institution in the user, if possible.
+    # If the user already has an institution set, won't change it.
+    # `user` is the User instance, and `ldap_user` is the user information returned
+    # by LDAP.
+    def set_user_institution(user, ldap_user, ldap_configs)
+      if user.institution.nil?
+        id = get_institution_identifier(ldap_user, ldap_configs)
+        Rails.logger.info "LDAP: user has no institution set, searching for #{id}"
+        institution = Institution.where(:identifier => id).first unless id.nil?
+        Rails.logger.info "LDAP: found #{institution.inspect}"
+        institution.add_member!(user) unless institution.nil?
+        true
+      else
+        Rails.logger.info "LDAP: user already has an institution set, won't change it"
+        false
       end
-      result
-    end
-
-    # Returns the institution providing the user principal name
-    # for example 123456@institution.org -> institution.org
-    def get_institution_identifier
-      get_principal_name.split('@')[-1] if get_principal_name.present?
     end
 
     private
@@ -137,22 +139,44 @@ module Mconf
     end
 
     def user_info(ldap_user, ldap_configs)
-      if ldap_user[ldap_configs.ldap_username_field]
+      # get them as strings since they were symbols but we use to compare
+      # with strings in the db
+      attrs = ldap_user.attribute_names.map(&:to_s)
+      if attrs.include?(ldap_configs.ldap_username_field)
         username = ldap_user[ldap_configs.ldap_username_field].first
       else
-        username = ldap_user.uid
+        username = ldap_user["uid"].first
       end
-      if ldap_user[ldap_configs.ldap_email_field]
+      if attrs.include?(ldap_configs.ldap_email_field)
         email = ldap_user[ldap_configs.ldap_email_field].first
       else
-        email = ldap_user.mail
+        email = ldap_user["mail"].first
       end
-      if ldap_user[ldap_configs.ldap_name_field]
+      if attrs.include?(ldap_configs.ldap_name_field)
         name = ldap_user[ldap_configs.ldap_name_field].first
       else
-        name = ldap_user.cn
+        name = ldap_user["cn"].first
       end
-      [username, email, name]
+      if attrs.include?(ldap_configs.ldap_principal_name_field)
+        pn = ldap_user[ldap_configs.ldap_principal_name_field].first
+      else
+        pn = ldap_user["mail"].first
+      end
+
+      [username, email, name, pn]
     end
+
+    # Returns the institution identifier taken from the user's principal name.
+    # Returns nil if an institution can't be found.
+    # Example: 123456@institution.org -> institution.org
+    def get_institution_identifier(ldap_user, ldap_configs)
+      _, _, _, pn = user_info(ldap_user, ldap_configs)
+      if pn.present? && pn.index("@")
+        pn.split('@')[-1]
+      else
+        nil
+      end
+    end
+
   end
 end
