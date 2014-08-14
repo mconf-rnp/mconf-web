@@ -71,6 +71,12 @@ describe Devise::Strategies::LdapAuthenticatable do
                   .with(ldap_user1, Site.current).and_return(@user)
               }
 
+              it("calls Mconf::LDAP#set_user_institution") {
+                Mconf::LDAP.any_instance.should_receive(:set_user_institution)
+                  .with(@user, ldap_user1, Site.current)
+                target.authenticate!
+              }
+
               it("calls and returns #success!(user)") {
                 target.should_receive(:success!).with(@user).and_return("return of success!")
                 target.authenticate!.should eq("return of success!")
@@ -80,6 +86,22 @@ describe Devise::Strategies::LdapAuthenticatable do
                 Mconf::LDAP.any_instance.should_receive(:sign_user_in).with(@user)
                 target.authenticate!
               }
+            end
+
+            # just an extra test to make sure the institution is set in the user,
+            # even though we already test that set_user_institution was called
+            context "on success vinculates the user to his institution" do
+              let(:user) { FactoryGirl.create(:user, :institution => nil) }
+              let(:ldap_user1) { { mail: "user@institution.com" } }
+              let(:institution) { FactoryGirl.create(:institution, :identifier => "institution.com") }
+
+              before {
+                institution
+                Mconf::LDAP.any_instance.should_receive(:find_or_create_user)
+                  .with(ldap_user1, Site.current).and_return(user)
+              }
+              before(:each) { target.authenticate! }
+              it { expect(user.institution).to eql(institution) }
             end
 
             context "but there was an error creating the internal structures" do

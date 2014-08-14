@@ -64,6 +64,7 @@ module Devise
                   Rails.logger.error "LDAP: authentication failed: application wasn't able to create a new user"
                   fail(I18n.t('devise.strategies.ldap_authenticatable.create_failed'))
                 else
+                  ldap_helper.set_user_institution(user, ldap_user.first, configs)
                   ldap_helper.sign_user_in(user)
                   success!(user)
                 end
