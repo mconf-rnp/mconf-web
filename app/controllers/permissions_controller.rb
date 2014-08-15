@@ -10,26 +10,14 @@
 
 class PermissionsController < ApplicationController
   load_and_authorize_resource
-  before_filter :subject
 
   def update
-    @permission[:role_id] = params[:join_request][:role_id]
-
-    if @permission.update_attributes(params[:permission])
-      respond_to do |format|
-        format.html {
-          flash[:success] = t('permission.update.success')
-          redirect_to request.referer
-        }
-      end
+    if @permission.update_attributes(permited(params[:permission]))
+      flash[:success] = t('permission.update.success')
     else
-      respond_to do |format|
-        format.html {
-          flash[:error] = @update_errors
-          redirect_to request.referer
-        }
-      end
+      flash[:error] = t('permission.update.failure')
     end
+    redirect_to request.referer
   end
 
   def destroy
@@ -42,10 +30,15 @@ class PermissionsController < ApplicationController
     end
   end
 
-  private
-
-  def subject
-    @subject ||= @permission.subject
+  def permited obj
+    unless obj.nil?
+      obj.permit(*allowed_params)
+    else
+      []
+    end
   end
 
+  def allowed_params
+    [ :role_id ]
+  end
 end

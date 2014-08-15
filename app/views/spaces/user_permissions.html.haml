@@ -1,3 +1,5 @@
+- page_title t('spaces.admin_tabs.users'), :in => @space.name
+
 - spaces_menu_at :admin
 = render :partial => 'spaces/menu'
 
@@ -15,7 +17,7 @@
           = simple_form_for :permission, :url => permission_path(permission), :html => { :method => :put, :class => 'form-inline' } do |f|
             .input.select
               - roles = Space.roles.map { |r| [ r.translated_name, r.id ] }
-              = select :join_request, :role_id, roles, :selected => permission.role_id
+              = select :permission, :role_id, roles, :selected => permission.role_id
             = f.submit t('update'), :class => "btn btn-small"
         .thread-title
           = link_to sanitize(user.name), user_path(user)

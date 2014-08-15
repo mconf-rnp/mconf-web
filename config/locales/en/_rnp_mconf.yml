@@ -50,19 +50,19 @@ en:
       can_record_users:
         zero: 0 members can record
         one: 1 member can record
-        other: %{count} members can record
+        other: "%{count} members can record"
       can_record_limit: "maximum: %{limit}"
       destroy: "Remove institution"
       no_user_limit: "no maximum"
       users:
         zero: 0 members
         one: 1 member
-        other: %{count} members
+        other: "%{count} members"
       user_limit: "maximum: %{limit}"
       spaces:
         zero: 0 spaces
         one: 1 space
-        other: %{count} spaces
+        other: "%{count} spaces"
     institutions:
       create: "Create a new institution"
     menu:

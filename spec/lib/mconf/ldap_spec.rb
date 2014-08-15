@@ -63,19 +63,19 @@ describe Mconf::LDAP do
     context "if the session is not defined" do
       let(:ldap) { Mconf::LDAP.new(nil) }
       subject { ldap.signed_in? }
-      it { should be_false }
+      it { should be_falsey }
     end
 
     context "if the session has no :ldap_data key" do
       let(:ldap) { Mconf::LDAP.new({}) }
       subject { ldap.signed_in? }
-      it { should be_false }
+      it { should be_falsey }
     end
 
     context "if the session has :ldap_data key" do
       let(:ldap) { Mconf::LDAP.new({ :ldap_data => {} }) }
       subject { ldap.signed_in? }
-      it { should be_true }
+      it { should be_truthy }
     end
   end
 

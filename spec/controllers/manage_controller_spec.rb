@@ -5,6 +5,8 @@ describe ManageController do
   describe "#users" do
     before { User.destroy_all } # exclude seeded user(s)
 
+    it { should_authorize :manage, :users }
+
     describe "if the current user is a superuser" do
       let(:user) { FactoryGirl.create(:superuser) }
       before(:each) { sign_in(user) }
@@ -31,7 +33,7 @@ describe ManageController do
         FactoryGirl.create(:user)
         get :users
         assigns(:users).each do |user|
-          user.association(:profile).loaded?.should be_true
+          user.association(:profile).loaded?.should be_truthy
         end
       end
 
@@ -44,7 +46,7 @@ describe ManageController do
           @u4 = FactoryGirl.create(:user, :_full_name => 'Be user')
         }
         before(:each) { get :users }
-        it { assigns(:users).count.should be(4) }
+        it { assigns(:users).size.should be(4) }
         it { assigns(:users)[0].should eql(@u3) }
         it { assigns(:users)[1].should eql(@u4) }
         it { assigns(:users)[2].should eql(@u2) }
@@ -58,7 +60,7 @@ describe ManageController do
 
         context "if no page is passed in params" do
           before(:each) { get :users }
-          it { assigns(:users).count.should be(20) }
+          it { assigns(:users).size.should be(20) }
           it { controller.params[:page].should be_nil }
         end
 
@@ -128,7 +130,7 @@ describe ManageController do
 
       context "if params[:partial] is set" do
         before(:each) { get :users, :partial => true }
-        it { should render_template(:users_list) }
+        it { should render_template('manage/_users_list') }
         it { should_not render_with_layout }
       end
 
@@ -275,6 +277,8 @@ describe ManageController do
 
   describe "#spaces" do
 
+    it { should_authorize :manage, :spaces }
+
     describe "if the current user is a superuser" do
       let(:user) { FactoryGirl.create(:superuser) }
       before(:each) { sign_in(user) }
@@ -291,7 +295,7 @@ describe ManageController do
           @s3 = FactoryGirl.create(:space, :disabled => true)
         }
         before(:each) { get :spaces }
-        it { assigns(:spaces).count.should be(3) }
+        it { assigns(:spaces).size.should be(3) }
         it { assigns(:spaces).should include(@s1) }
         it { assigns(:spaces).should include(@s2) }
         it { assigns(:spaces).should include(@s3) }
@@ -305,7 +309,7 @@ describe ManageController do
           @s4 = FactoryGirl.create(:space, :name => 'Be space')
         }
         before(:each) { get :spaces }
-        it { assigns(:spaces).count.should be(4) }
+        it { assigns(:spaces).size.should be(4) }
         it { assigns(:spaces)[0].should eql(@s3) }
         it { assigns(:spaces)[1].should eql(@s4) }
         it { assigns(:spaces)[2].should eql(@s2) }
@@ -357,7 +361,7 @@ describe ManageController do
 
       context "if params[:partial] is set" do
         before(:each) { get :spaces, :partial => true }
-        it { should render_template(:spaces_list) }
+        it { should render_template('manage/_spaces_list') }
         it { should_not render_with_layout }
       end
 
@@ -470,6 +474,8 @@ describe ManageController do
     it "sets @spam_posts to all posts marked as spam"
     it "renders manage/spam"
     it "renders with the layout no_sidebar"
+
+    it { should_authorize :manage, :spam }
   end
 
   describe "#institutions" do

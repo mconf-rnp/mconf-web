@@ -47,7 +47,8 @@ class MyController < ApplicationController
 
   def home
     @user_spaces = current_user.spaces
-    @contents_per_page = 5
+    @user_pending_spaces = current_user.pending_spaces
+    @contents_per_page = 15
     @all_contents = current_user.all_activity.limit(@contents_per_page).order('updated_at DESC')
     @private_messages = current_user.unread_private_messages
   end
@@ -55,8 +56,8 @@ class MyController < ApplicationController
   def activity
     @contents_per_page = params[:per_page] || 20
 
-    @all_contents = current_user.all_activity
-      .paginate(:page => params[:page], :per_page => @contents_per_page.to_i, :order => 'updated_at DESC')
+    @all_contents = current_user.all_activity.order('updated_at DESC')
+      .paginate(:page => params[:page], :per_page => @contents_per_page.to_i)
   end
 
   # Renders a json with the webconference rooms accessible to the current user

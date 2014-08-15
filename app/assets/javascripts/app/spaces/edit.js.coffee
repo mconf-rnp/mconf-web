@@ -3,6 +3,17 @@ $ ->
     updatePasswords($('input#space_public').is(':checked'))
     $('input#space_public').on 'click', -> updatePasswords($(this).is(':checked'))
 
+    uploaderCallbacks =
+      onComplete: (id, name, response) ->
+        if response.success
+          $.get response.redirect_url, (data) ->
+            # show the crop modal
+            mconf.Modal.showWindow
+              data: data
+
+    mconf.Uploader.bind
+      callbacks: uploaderCallbacks
+
     # Dynamic search for institutions
     idInstitution = '#space_institution_id'
     urlInstitutions = '/institutions/select.json'

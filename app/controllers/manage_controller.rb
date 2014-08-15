@@ -18,9 +18,7 @@ class ManageController < ApplicationController
       query = current_user.institution.users
     end
     query = query.joins(:profile).includes(:profile).order("profiles.full_name")
-    if name.blank?
-      query = query.all
-    else
+    if name.present?
       query = query.where("profiles.full_name like ? OR users.username like ? OR users.email like ?", "%#{name}%", "%#{name}%", "%#{name}%")
     end
     @users = query.paginate(:page => params[:page], :per_page => 20)
@@ -42,9 +40,7 @@ class ManageController < ApplicationController
       query = current_user.institution.spaces
     end
     query = query.order("name")
-    if name.blank?
-      query = query.all
-    else
+    if name.present?
       query = query.where("name like ?", "%#{name}%")
     end
     @spaces = query.paginate(:page => params[:page], :per_page => 20)

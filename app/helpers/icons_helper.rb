@@ -231,6 +231,22 @@ module IconsHelper
     icon_constructor nil, "icon-awesome icon-check icon-mconf-is-member", options
   end
 
+  def icon_options(options={})
+    icon_constructor nil, "icon-awesome icon-gears icon-mconf-options", options
+  end
+
+  def icon_join_request(options={})
+    icon_constructor nil, "icon-awesome icon-hand-up icon-mconf-join-request", options
+  end
+
+  def icon_join_space(options={})
+    icon_constructor nil, "icon-awesome icon-signin icon-mconf-join-space", options
+  end
+
+  def icon_leave_space(options={})
+    icon_constructor nil, "icon-awesome icon-signout icon-mconf-leave-space", options
+  end
+
   def icon_login(options={})
     icon_constructor nil, "icon-awesome icon-signin icon-mconf-login", options
   end

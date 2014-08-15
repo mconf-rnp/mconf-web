@@ -21,6 +21,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :set_time_zone
 
+  before_filter :store_location
+
   helper_method :current_site
 
   # Handle errors - error pages
@@ -59,11 +61,9 @@ class ApplicationController < ActionController::Base
 
   # Where to redirect to after sign in with Devise
   def after_sign_in_path_for(resource)
-    if [login_url, new_user_session_url].include?(request.referer)
-      super
-    else
-      stored_location_for(resource) || request.referer || my_home_path
-    end
+    return_to = stored_location_for(resource) || my_home_path
+    clear_stored_location
+    return_to
   end
 
   # overriding bigbluebutton_rails function
@@ -150,12 +150,12 @@ class ApplicationController < ActionController::Base
     can_record = ability.can?(:record_meeting, room)
     if Site.current.webconf_auto_record
       # show the record button if the user has permissions to record
-      { :record => can_record }
+      { :record_meeting => can_record }
     else
       # only enable recording if the room is set to record and if the user has permissions to
       # used to forcibly disable recording if a user has no permission but the room is set to record
-      record = room.record && can_record
-      { :record => record }
+      record = room.record_meeting && can_record
+      { :record_meeting => record }
     end
   end
 
@@ -181,21 +181,48 @@ class ApplicationController < ActionController::Base
     Time.zone = Mconf::Timezone.user_time_zone(current_user)
   end
 
+  def render_error number
+    render :template => "/errors/error_#{number}", :status => number, :layout => "error"
+  end
+
   def render_404(exception)
     # FIXME: this is never triggered, see the bottom of routes.rb
     @exception = exception
-    render :template => "/errors/error_404", :status => 404, :layout => "error"
+    render_error 404
   end
 
   def render_500(exception)
     @exception = exception
     pp exception
-    render :template => "/errors/error_500", :status => 500, :layout => "error"
+    render_error 500
   end
 
   def render_403(exception)
     @exception = exception
-    render :template => "/errors/error_403", :status => 403, :layout => "error"
+    render_error 403
+  end
+
+  # Store last url for post-login redirect to whatever the user last visited.
+  # From: https://github.com/plataformatec/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
+  def store_location
+    ignored_paths = [ "/login", "/users/login", "/users",
+                      "/register", "/users/register",
+                      "/logout",
+                      "/users/password",
+                      "/users/confirmation/new",
+                      "/secure", "/secure/info",
+                      "/secure/associate" ]
+    if (!ignored_paths.include?(request.path) &&
+        !request.xhr? && # don't store ajax calls
+        (request.format == "text/html" || request.content_type == "text/html"))
+      session[:user_return_to] = request.fullpath
+      # session[:last_request_time] = Time.now.utc.to_i
+    end
+  end
+
+  # Removes the stored location used to redirect post-login.
+  def clear_stored_location
+    session[:user_return_to] = nil
   end
 
 end
