@@ -17,14 +17,13 @@ class ShibbolethController < ApplicationController
   before_filter :check_shib_enabled, :except => [:info]
   before_filter :check_current_user, :except => [:info]
   before_filter :load_shib_session
+  before_filter :save_shib_to_session, only: [:login]
   before_filter :find_institution, :only => [:login, :create_association]
 
   # Log in a user using his shibboleth information
   # The application should only reach this point after authenticating using Shibboleth
   # The authentication is currently made with the Apache module mod_shib
   def login
-    @shib.save_to_session(request.env, Site.current.shib_env_variables)
-
     unless @shib.has_basic_info
       logger.error "Shibboleth: couldn't basic user information from session, " +
         "searching fields #{@shib.basic_info_fields.inspect} " +
@@ -47,7 +46,8 @@ class ShibbolethController < ApplicationController
       else
         # if institution provided via shibboleth is not registered the user can't log in for the first time
         if @institution.nil?
-          logger.info "Shibboleth: first access for this user but his institution (#{@shib.get_institution_identifier}) is not registered, won't be able to sign in"
+          inst_str = "#{@shib.get_institution_identifier}, #{@institution.inspect}"
+          logger.info "Shibboleth: first access for this user but his institution (#{inst_str}) is not registered, won't be able to sign in"
           flash[:error] = t('shibboleth.create_association.institution_not_registered')
           redirect_to request.referer || root_path
         else
@@ -65,6 +65,8 @@ class ShibbolethController < ApplicationController
 
     # if institution provided via shibboleth is not registered the user can't log in
     if @institution.nil?
+      inst_str = "#{@shib.get_institution_identifier}, #{@institution.inspect}"
+      logger.info "Shibboleth: trying to create association for user but his institution (#{inst_str}) is not registered, won't be able to"
       flash[:error] = t('shibboleth.create_association.institution_not_registered')
 
     # The federated user has no account yet, create one based on the info returned by
@@ -95,9 +97,14 @@ class ShibbolethController < ApplicationController
     @shib = Mconf::Shibboleth.new(session)
   end
 
+  def save_shib_to_session
+    @shib.save_to_session(request.env, Site.current.shib_env_variables)
+  end
+
   def find_institution
     id = @shib.get_institution_identifier
     @institution = Institution.where(:identifier => id).first if id.present?
+    logger.info "Shibboleth: loaded the institution: #{@institution.inspect}"
   end
 
   # Checks if shibboleth is enabled in the current site.
