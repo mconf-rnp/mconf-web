@@ -94,10 +94,12 @@ class ShibbolethController < ApplicationController
   private
 
   def load_shib_session
+    logger.info "Shibboleth: creating a new Mconf::Shibboleth object"
     @shib = Mconf::Shibboleth.new(session)
   end
 
   def save_shib_to_session
+    logger.info "Shibboleth: saving env to session"
     @shib.save_to_session(request.env, Site.current.shib_env_variables)
   end
 

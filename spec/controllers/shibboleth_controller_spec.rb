@@ -131,7 +131,10 @@ describe ShibbolethController do
     context "if params has no known option, redirects to /secure with a warning" do
       let(:user) { FactoryGirl.create(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
-      before { setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}") }
+      before {
+        setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}")
+        save_shib_to_session
+      }
       before(:each) { post :create_association }
       it { should redirect_to(shibboleth_path) }
       it { should set_the_flash.to(I18n.t('shibboleth.create_association.invalid_parameters')) }
@@ -141,7 +144,10 @@ describe ShibbolethController do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
       let(:principal_name) { "#{attrs[:username]}@invalid_institution.com" }
-      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name) }
+      before {
+        setup_shib(attrs[:_full_name], attrs[:email], principal_name)
+        save_shib_to_session
+      }
       before(:each) {
         expect {
           post :create_association
@@ -156,7 +162,10 @@ describe ShibbolethController do
       let(:user) { FactoryGirl.create(:user) }
       let(:institution) { FactoryGirl.create(:institution, :identifier => 'mamamia.org') }
       let(:principal_name) { "#{user.username}@invalid_institution.com" }
-      before { setup_shib(user.full_name, user.email, principal_name) }
+      before {
+        setup_shib(user.full_name, user.email, principal_name)
+        save_shib_to_session
+      }
       before(:each) {
         expect {
           post :create_association
@@ -171,7 +180,10 @@ describe ShibbolethController do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
       let(:principal_name) { "#{attrs[:username]}@#{institution.identifier}" }
-      before { setup_shib(attrs[:_full_name], attrs[:email], principal_name) }
+      before {
+        setup_shib(attrs[:_full_name], attrs[:email], principal_name)
+        save_shib_to_session
+      }
 
       context "redirects to /secure if the user already has a valid token" do
         let(:user) { FactoryGirl.create(:user) }
@@ -235,7 +247,10 @@ describe ShibbolethController do
     context "if params[:existent_account] is set" do
       let(:attrs) { FactoryGirl.attributes_for(:user) }
       let(:institution) { FactoryGirl.create(:institution) }
-      before { setup_shib(attrs[:_full_name], attrs[:email], "#{attrs[:username]}@#{institution.identifier}") }
+      before {
+        setup_shib(attrs[:_full_name], attrs[:email], "#{attrs[:username]}@#{institution.identifier}")
+        save_shib_to_session
+      }
 
       context "if there's no user info in the params, goes back to /secure with an error" do
         before(:each) { post :create_association, :existent_account => true }
@@ -282,6 +297,7 @@ describe ShibbolethController do
           # the user that is trying to login has to be the same user that has variables
           # on the session, so we do this setup again
           setup_shib(user.full_name, user.email, "#{user.username}@#{institution.identifier}")
+          save_shib_to_session
         }
 
         context "goes back to /secure with a success message" do
@@ -342,12 +358,18 @@ describe ShibbolethController do
 
   private
 
+  # Sets up the login via shibboleth, including user information in the enviroment.
+  # Doesn't automatically save this information in the session because this is something
+  # ShibbolethController should do and it should be tested for it.
   def setup_shib(name, email, principal)
     request.env["Shib-inetOrgPerson-cn"] = name
     request.env["Shib-inetOrgPerson-mail"] = email
     request.env["Shib-eduPerson-eduPersonPrincipalName"] = principal
     Site.current.update_attributes(:shib_enabled => true)
-    # save it to the session, as #login would do
+  end
+
+  # Save it to the session, as #login would do
+  def save_shib_to_session
     @shib = Mconf::Shibboleth.new(session)
     @shib.save_to_session(request.env)
   end
