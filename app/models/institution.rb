@@ -1,5 +1,5 @@
 class Institution < ActiveRecord::Base
-  attr_accessible :acronym, :name, :user_limit, :can_record_limit, :identifier
+  attr_accessible :acronym, :name, :user_limit, :can_record_limit, :identifier, :force_shib_login
 
   validates :name, :presence => true, :uniqueness => true
 

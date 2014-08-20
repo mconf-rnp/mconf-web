@@ -4,6 +4,7 @@ pt-br:
       institution:
         acronym: Sigla
         can_record_limit: Usuários que podem gravar
+        force_shib_login: Somente login via federação
         name: Nome
         user_limit: Máximo de membros
         identifier: Identificador
@@ -75,6 +76,8 @@ pt-br:
   shibboleth:
     create_association:
       institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
+    error:
+      force_shib_login: "Desculpe, você não pode se logar localmente, sua instituição só permite login via federação."
   spaces:
     edit:
       institution_placeholder: "Selecione uma instituição"

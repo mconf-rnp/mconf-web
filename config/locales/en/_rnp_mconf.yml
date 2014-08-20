@@ -4,6 +4,7 @@ en:
       institution:
         acronym: Acronym
         can_record_limit: Users that can record
+        force_shib_login: Force login only via federation
         name: Name
         user_limit: Maximum of members
       space:
@@ -74,6 +75,8 @@ en:
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
+    error:
+      force_shib_login: "Sorry, you can't login locally because your institution only allow login via federation."
   spaces:
     edit:
       institution_placeholder: "Select an institution"

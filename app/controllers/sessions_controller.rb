@@ -10,4 +10,21 @@ class SessionsController < Devise::SessionsController
 
   # To allow other applications to sign in users in Mconf-Web
   skip_before_filter :verify_authenticity_token, :only => [:create]
+  prepend_before_filter :check_force_shib_login, :only => [:create]
+
+  private
+
+  def check_force_shib_login
+    if (params.has_key?(:user))
+      user = User.where(username: params[:user][:login]).first
+      if !user.institution.nil? && user.institution.force_shib_login?
+        flash[:error] = I18n.t('shibboleth.error.force_shib_login')
+        redirect_to root_path
+        false
+      else
+        true
+      end
+    end
+  end
+
 end
