@@ -59,11 +59,9 @@ class ApplicationController < ActionController::Base
 
   # Where to redirect to after sign in with Devise
   def after_sign_in_path_for(resource)
-    if [login_url, new_user_session_url].include?(request.referer)
-      super
-    else
-      stored_location_for(resource) || request.referer || my_home_path
-    end
+    return_to = stored_location_for(resource) || my_home_path
+    clear_stored_location
+    return_to
   end
 
   # overriding bigbluebutton_rails function
@@ -196,6 +194,10 @@ class ApplicationController < ActionController::Base
   def render_403(exception)
     @exception = exception
     render :template => "/errors/error_403", :status => 403, :layout => "error"
+  end
+
+  def clear_stored_location
+    session[:user_return_to] = nil
   end
 
 end
