@@ -19,6 +19,8 @@ group :assets do
   gem 'select2-rails'
 end
 
+gem 'psych', :git => 'https://github.com/lfzawacki/psych.git', :branch => 'gemfile-style'
+
 gem 'mysql2', '~> 0.3.0'
 gem 'rake'
 gem 'therubyracer', :require => 'v8'
