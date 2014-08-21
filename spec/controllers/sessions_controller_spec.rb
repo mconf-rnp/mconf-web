@@ -18,4 +18,21 @@ describe SessionsController do
     it "authenticates a user via LDAP and logs the user in"
   end
 
+  context "institution only allow login via federation" do
+    let(:institution) { FactoryGirl.create(:institution, :acronym => "UFRGS") }
+    let(:user) { FactoryGirl.create(:user, :institution => institution) }
+    let(:params) { { :user => {:login => user.username, :password => user.password, :remember_me => "0"} } }
+    before {
+      institution.update_attributes(:force_shib_login => true)
+      @request.env["devise.mapping"] = Devise.mappings[:user]
+      controller.stub(:params).and_return(params)
+    }
+    before(:each){
+      login_as(user)
+      put :create
+    }
+    it { should set_the_flash.to(I18n.t('users.registrations.shibboleth.error.force_shib_login')) }
+    it { should redirect_to(root_path)}
+  end
+
 end

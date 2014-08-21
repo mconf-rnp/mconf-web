@@ -75,8 +75,6 @@ en:
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
-    error:
-      force_shib_login: "Sorry, you can't login locally because your institution only allow login via federation."
   spaces:
     edit:
       institution_placeholder: "Select an institution"
@@ -94,6 +92,10 @@ en:
       change_institution: Change user institution
       institution_placeholder: "Select an institution"
     registrations:
+      shibboleth:
+        error:
+          force_shib_login: "Sorry, you can't login locally because your institution only allow login via federation. Please use the CAFe to login."
+          force_shib_registration: "Sorry, you can't register locally 'cause your institution only allow login via federation. You must use the CAFe to login."
       signup_form:
         institution_hint: Choose one or type to search.
     update:
