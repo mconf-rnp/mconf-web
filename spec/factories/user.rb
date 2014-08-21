@@ -25,6 +25,7 @@ FactoryGirl.define do
     u.notification { User::NOTIFICATION_VIA_EMAIL }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
+    u.association :institution
     after(:create) { |u2| u2.confirm!; u2.reload }
   end
 
