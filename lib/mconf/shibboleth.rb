@@ -91,7 +91,7 @@ module Mconf
 
     # Returns all the shibboleth data stored in the session.
     def get_data
-      @session[ENV_KEY]
+      @session[ENV_KEY].try(:dup)
     end
 
     # Returns whether the user is signed in via federation or not.
