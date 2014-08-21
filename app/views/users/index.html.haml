@@ -1,3 +1,8 @@
+- page_title t('spaces.menu.users'), :in => @space.name
+
+- spaces_menu_at :users
+= render :partial => 'spaces/menu'
+
 - if params[:space_id]
   - page_title t('spaces.menu.users'), :in => @space.name
   - spaces_menu_at :users
