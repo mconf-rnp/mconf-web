@@ -53,7 +53,7 @@ class ManageController < ApplicationController
   end
 
   def institutions
-    @institutions = Institution.find(:all, :order => "name").paginate(:page => params[:page], :per_page => 20)
+    @institutions = Institution.order(:name).paginate(:page => params[:page], :per_page => 20)
     render :layout => 'no_sidebar'
   end
 
