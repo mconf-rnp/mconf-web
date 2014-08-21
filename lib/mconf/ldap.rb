@@ -141,23 +141,22 @@ module Mconf
     def user_info(ldap_user, ldap_configs)
       # get them as strings since they were symbols but we use to compare
       # with strings in the db
-      attrs = ldap_user.attribute_names.map(&:to_s)
-      if attrs.include?(ldap_configs.ldap_username_field)
+      if ldap_user[ldap_configs.ldap_username_field].present?
         username = ldap_user[ldap_configs.ldap_username_field].first
       else
         username = ldap_user["uid"].first
       end
-      if attrs.include?(ldap_configs.ldap_email_field)
+      if ldap_user[ldap_configs.ldap_email_field].present?
         email = ldap_user[ldap_configs.ldap_email_field].first
       else
         email = ldap_user["mail"].first
       end
-      if attrs.include?(ldap_configs.ldap_name_field)
+      if ldap_user[ldap_configs.ldap_name_field].present?
         name = ldap_user[ldap_configs.ldap_name_field].first
       else
         name = ldap_user["cn"].first
       end
-      if attrs.include?(ldap_configs.ldap_principal_name_field)
+      if ldap_user[ldap_configs.ldap_principal_name_field].present?
         pn = ldap_user[ldap_configs.ldap_principal_name_field].first
       else
         pn = ldap_user["mail"].first
