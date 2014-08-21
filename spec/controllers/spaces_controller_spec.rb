@@ -379,7 +379,7 @@ describe SpacesController do
       end
 
       describe "sets the user's institution as the space's institution" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { Space.last.institution.should eq(user.institution) }
         it { user.institution.spaces.should include(Space.last) }
       end
@@ -387,7 +387,7 @@ describe SpacesController do
       describe "doesn't set an institution in the space if the user has no institution" do
         before(:each) {
           user.update_attributes(:institution => nil)
-          attrs = space.attributes
+          attrs = space_attributes
           attrs.delete('institution_id')
           post :create, :space => attrs
         }
@@ -468,7 +468,7 @@ describe SpacesController do
 
       let(:space_allowed_params) {
         [ :name, :description, :logo_image, :public, :permalink, :disabled,
-          :repository, :crop_x, :crop_y, :crop_w, :crop_h,
+          :repository, :crop_x, :crop_y, :crop_w, :crop_h, :institution_id,
           :bigbluebutton_room_attributes =>
           [ :id, :attendee_password, :moderator_password, :default_layout,
             :welcome_msg, :presenter_share_only, :auto_start_video, :auto_start_audio ] ]
