@@ -427,7 +427,7 @@ describe Space do
     describe "#permissions" do
       it { space.permissions.klass == Permission }
       it { space.permissions.length.should be(3) }
-      it { space.permissions.should include(*Permission.where(:user_id => @users)) }
+      it { space.permissions.should include(*Permission.where(:user_id => @users, :subject_type => 'Space')) }
     end
 
     describe "#admins" do

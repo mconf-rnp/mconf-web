@@ -54,7 +54,7 @@ describe User do
     end
 
     it "has the user as owner" do
-      user.bigbluebutton_room.owner.should be(user)
+      user.bigbluebutton_room.owner.should eq(user)
     end
 
     it "has param and name equal the user's username" do
@@ -724,10 +724,6 @@ describe User do
   #
   # Tests for the association with institutions
   #
-
-  [ :institution_id, :institution ].each do |attribute|
-    it { should allow_mass_assignment_of(attribute) }
-  end
 
   describe "#institution" do
     let(:user) { FactoryGirl.create(:user) }
