@@ -457,7 +457,7 @@ describe Mconf::Shibboleth do
     context "returns nil if there's no shib data in the session" do
       let(:shibboleth) { Mconf::Shibboleth.new({}) }
       subject { shibboleth.get_data }
-      it { should be_nil }
+      it { should be_blank }
     end
 
     context "returns the data when there's shib data in the session" do
