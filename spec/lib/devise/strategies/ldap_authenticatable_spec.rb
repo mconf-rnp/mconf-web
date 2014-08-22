@@ -48,8 +48,8 @@ describe Devise::Strategies::LdapAuthenticatable do
         }
 
         context "if the binding of the target user is successful" do
-          let(:ldap_user1) { { anything: 1 } }
-          let(:ldap_user2) { { anything: 2 } }
+          let(:ldap_user1) { { 'anything' => 1 } }
+          let(:ldap_user2) { { 'anything' => 2 } }
           before {
             filter = double(:filter)
             target.should_receive(:ldap_filter).and_return(filter)
@@ -92,7 +92,7 @@ describe Devise::Strategies::LdapAuthenticatable do
             # even though we already test that set_user_institution was called
             context "on success vinculates the user to his institution" do
               let(:user) { FactoryGirl.create(:user, :institution => nil) }
-              let(:ldap_user1) { { mail: "user@institution.com" } }
+              let(:ldap_user1) { { 'mail' => ["user@institution.com"] } }
               let(:institution) { FactoryGirl.create(:institution, :identifier => "institution.com") }
 
               before {
