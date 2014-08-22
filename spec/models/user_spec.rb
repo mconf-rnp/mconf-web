@@ -28,17 +28,18 @@ describe User do
 
   it { should validate_presence_of(:email) }
 
-  [ :email, :password, :password_confirmation,
-    :remember_me, :login, :username, :receive_digest, :approved ].each do |attribute|
-    it { should allow_mass_assignment_of(attribute) }
-  end
+  # Make sure it's being tested in the controller
+  # [ :email, :password, :password_confirmation,
+  #   :remember_me, :login, :username, :receive_digest, :approved ].each do |attribute|
+  #   it { should allow_mass_assignment_of(attribute) }
+  # end
 
   describe "#profile" do
     let(:user) { FactoryGirl.create(:user) }
 
     it "is created when the user is created" do
       user.profile.should_not be_nil
-      user.profile.should be_an_instance_of(Profile)
+      user.profile.should be_kind_of(Profile)
     end
   end
 
@@ -49,11 +50,11 @@ describe User do
 
     it "is created when the user is created" do
       user.bigbluebutton_room.should_not be_nil
-      user.bigbluebutton_room.should be_an_instance_of(BigbluebuttonRoom)
+      user.bigbluebutton_room.should be_kind_of(BigbluebuttonRoom)
     end
 
     it "has the user as owner" do
-      user.bigbluebutton_room.owner.should be(user)
+      user.bigbluebutton_room.owner.should eq(user)
     end
 
     it "has param and name equal the user's username" do
@@ -72,7 +73,7 @@ describe User do
       user.bigbluebutton_room.moderator_password.length.should be(8)
     end
 
-    pending "has the server as the first server existent"
+    skip "has the server as the first server existent"
   end
 
   describe "#username" do
@@ -155,7 +156,7 @@ describe User do
 
         context "automatically approves the user" do
           before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
-          it { @user.approved?.should be_true }
+          it { @user.should be_approved }
         end
       end
 
@@ -164,7 +165,7 @@ describe User do
 
         context "doesn't approve the user" do
           before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
-          it { @user.approved?.should be_false }
+          it { @user.should_not be_approved }
         end
       end
     end
@@ -175,13 +176,20 @@ describe User do
     let(:other_user) { FactoryGirl.create(:user)}
 
     before(:each) do
-      FactoryGirl.create(:event, :owner => user)
-      FactoryGirl.create(:event, :owner => user)
+      @events = [
+      FactoryGirl.create(:event, :owner => user),
+      FactoryGirl.create(:event, :owner => user),
+      FactoryGirl.create(:event, :owner => nil)
+      ]
     end
 
     it { user.events.size.should eql(2) }
+    it { user.events.should include(@events[0], @events[1]) }
+    it { user.events.should_not include(@events[2]) }
     it { other_user.events.should be_empty }
   end
+
+  skip "#has_events_in_this_space?"
 
   describe "#accessible_rooms" do
     let(:user) { FactoryGirl.create(:user) }
@@ -211,12 +219,12 @@ describe User do
 
     context "for a user in the database" do
       let(:user) { FactoryGirl.create(:user) }
-      it { should be_false }
+      it { should be false }
     end
 
     context "for a user not in the database" do
       let(:user) { FactoryGirl.build(:user) }
-      it { should be_true }
+      it { should be true }
     end
   end
 
@@ -377,18 +385,83 @@ describe User do
     end
   end
 
+  describe "#private_fellows" do
+    context "returns the private fellows of the current user" do
+      let(:user) { FactoryGirl.create(:user) }
+      subject { user.private_fellows }
+      before do
+        private_space = FactoryGirl.create(:space, :public => false)
+        public_space = FactoryGirl.create(:space, :public => true)
+        private_space.add_member! user
+        public_space.add_member! user
+
+        @users = Helpers.create_fellows(2, private_space)
+        @users += Helpers.create_fellows(2, public_space)
+        # 2 extra not fellows
+        2.times { FactoryGirl.create(:user) }
+      end
+      it { subject.length.should == 2 }
+      it { should include(@users[0], @users[1]) }
+      it { should_not include(@users[2],@users[3]) }
+    end
+
+    context "orders by name" do
+      let(:user) { FactoryGirl.create(:user) }
+      subject { user.private_fellows }
+      before do
+        space = FactoryGirl.create(:space, :public => false)
+        space.add_member! user
+        @users = Helpers.create_fellows(5, space)
+        @users.sort_by!{ |u| u.name }
+      end
+      it { subject.length.should == 5 }
+      it { should == @users }
+    end
+
+    context "don't return duplicates" do
+      let(:user) { FactoryGirl.create(:user) }
+      subject { user.private_fellows }
+      before do
+        space1 = FactoryGirl.create(:private_space)
+        space2 = FactoryGirl.create(:private_space)
+        space1.add_member! user
+        space2.add_member! user
+        @fellow = FactoryGirl.create(:user)
+        space1.add_member! @fellow
+        space2.add_member! @fellow
+      end
+      it { subject.length.should == 1 }
+      it { should include(@fellow) }
+      it { should_not include(user) }
+    end
+
+    context "don't return the user himself" do
+      let(:user) { FactoryGirl.create(:user) }
+      subject { user.private_fellows }
+      before do
+        space = FactoryGirl.create(:private_space)
+        space.add_member! user
+        @users = Helpers.create_fellows(2, space)
+      end
+      it { subject.length.should == 2 }
+      it { should include(@users[0]) }
+      it { should include(@users[1]) }
+      it { should_not include(user) }
+    end
+  end
+
   describe ".with_disabled" do
     let(:user1) { FactoryGirl.create(:user, :disabled => true) }
     let(:user2) { FactoryGirl.create(:user, :disabled => false) }
 
     context "finds users even if disabled" do
-      subject { User.with_disabled.all }
-      it { should include(user1) }
-      it { should include(user2) }
+      subject { User.with_disabled }
+      it { should be_include(user1) }
+      it { should be_include(user2) }
     end
 
     context "returns a Relation object" do
-      it { User.with_disabled.should be_an_instance_of(ActiveRecord::Relation) }
+      it { User.with_disabled.should be_kind_of(ActiveRecord::Relation) }
     end
   end
 
@@ -403,7 +476,7 @@ describe User do
 
     context "sets the user as approved" do
       before { user.approve! }
-      it { user.approved.should be_true }
+      it { user.approved.should be true }
     end
 
     context "throws an exception if fails to update the user" do
@@ -453,7 +526,7 @@ describe User do
 
     context "sets the user as disapproved" do
       before { user.disapprove! }
-      it { user.approved.should be_false }
+      it { user.should_not be_approved }
     end
 
     context "throws an exception if fails to update the user" do
@@ -470,19 +543,19 @@ describe User do
 
       context "true if the user was approved" do
         let(:user) { FactoryGirl.create(:user, :approved => true) }
-        it { user.active_for_authentication?.should be_true }
+        it { user.should be_active_for_authentication }
       end
 
       context "false if the user was not approved" do
         let(:user) { FactoryGirl.create(:user, :approved => false) }
-        it { user.active_for_authentication?.should be_false }
+        it { user.should_not be_active_for_authentication }
       end
     end
 
     context "if #require_registration_approval is not set in the current site" do
       context "true even if the user was not approved" do
         let(:user) { FactoryGirl.create(:user, :approved => false) }
-        it { user.active_for_authentication?.should be_true }
+        it { user.should be_active_for_authentication }
       end
     end
   end
@@ -507,6 +580,36 @@ describe User do
         let(:user) { FactoryGirl.create(:user, :approved => false) }
         it { user.inactive_message.should be(:inactive) }
       end
+    end
+  end
+
+  describe "#pending_spaces" do
+    before do
+      @spaces = [
+        FactoryGirl.create(:space),
+        FactoryGirl.create(:space),
+        FactoryGirl.create(:space),
+        FactoryGirl.create(:space, :disabled => true)]
+      @user = FactoryGirl.create(:user)
+
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[0], :request_type => 'request')
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[1], :request_type => 'invite')
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[3], :request_type => 'request')
+    end
+
+    # Currently makes no differentiation between invites or requests
+    # skip "removes possible duplicates"
+    it "returns all spaces in which the user has a pending join request he sent" do
+      @user.pending_spaces.should include(@spaces[0], @spaces[1])
+    end
+    it "returns all spaces in which the user has a pending join request he received" do
+      @user.pending_spaces.should include(@spaces[1])
+    end
+
+    it { @user.pending_spaces.should_not include(@spaces[2]) }
+
+    it "doesn't return spaces that are disabled" do
+      @user.pending_spaces.should_not include(@spaces[3])
     end
   end
 
@@ -538,13 +641,12 @@ describe User do
         it { space.disabled.should be(false) }
       end
     end
-
-
   end
 
+  # TODO: :index is nested into spaces, how to test it here?
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([ :fellows, :current, :select, :approve, :manage_user,
-                                 :manage_can_record, :manage_approved ])
+    set_custom_ability_actions([ :fellows, :current, :select, :approve, :enable, :disable,
+      :manage_user, :manage_can_record, :manage_approved ])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -582,7 +684,11 @@ describe User do
         it { should be_able_to(:manage, target) }
       end
 
-      context "he can do anything" do
+      context "over his own account" do
+        it { should be_able_to(:manage, user) }
+      end
+
+      context "he can do anything over all resources" do
         it { should be_able_to(:manage, :all) }
       end
     end
@@ -618,10 +724,6 @@ describe User do
   #
   # Tests for the association with institutions
   #
-
-  [ :institution_id, :institution ].each do |attribute|
-    it { should allow_mass_assignment_of(attribute) }
-  end
 
   describe "#institution" do
     let(:user) { FactoryGirl.create(:user) }

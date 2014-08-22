@@ -49,11 +49,15 @@ class PostsController < ApplicationController
   end
 
   def new
-    @post = Post.new
+    respond_to do |format|
+      format.html {
+        render :partial => "new_post"
+      }
+    end
   end
 
   def create
-    @post = Post.new(params[:post])
+    @post = Post.new(post_params)
     @post.space = @space
     @post.author = current_user
 
@@ -70,7 +74,7 @@ class PostsController < ApplicationController
   end
 
   def update
-    if @post.update_attributes(params[:post])
+    if @post.update_attributes(post_params)
       respond_to do |format|
         format.html {
           flash[:success] = t('post.updated')
@@ -115,6 +119,18 @@ class PostsController < ApplicationController
     end
   end
 
+  def post_params
+    unless params[:post].blank?
+      params[:post].permit(*post_allowed_params)
+    else
+      {}
+    end
+  end
+
+  def post_allowed_params
+    [:title, :text]
+  end
+
   private
 
   def get_posts
@@ -145,7 +161,6 @@ class PostsController < ApplicationController
 
   def after_create_with_errors
     # This should be in the view
-    params[:form] = 'attachments' if @post.attachments.any?
     flash[:error] = @post.errors.to_xml
     get_posts
     render :index
@@ -158,7 +173,6 @@ class PostsController < ApplicationController
 
   def after_update_with_errors
     # This should be in the view
-    params[:form] = 'attachments' if @post.attachments.any?
     flash[:error] = @post.errors.to_xml
     posts
     render :index

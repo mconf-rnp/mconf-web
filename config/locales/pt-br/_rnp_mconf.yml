@@ -51,19 +51,19 @@ pt-br:
       can_record_users:
         zero: 0 membros podem gravar
         one: 1 membro pode gravar
-        other: %{count} membros podem gravar
+        other: "%{count} membros podem gravar"
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
       no_user_limit: "sem limite"
       users:
         zero: 0 membros
         one: 1 membro
-        other: %{count} membros
+        other: "%{count} membros"
       user_limit: "máximo: %{limit}"
       spaces:
         zero: 0 comunidades
         one: 1 comunidade
-        other: %{count} comunidades
+        other: "%{count} comunidades"
     institutions:
       create: "Criar uma nova instituição"
     menu:

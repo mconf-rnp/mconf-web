@@ -17,7 +17,7 @@ class InstitutionsController < ApplicationController
   end
 
   def create
-    @institution = Institution.new(params[:institution])
+    @institution = Institution.new(institution_params)
 
     if @institution.save
       flash[:success] = t('institution.created')
@@ -33,7 +33,7 @@ class InstitutionsController < ApplicationController
   end
 
   def update
-    if @institution.update_attributes(params[:institution])
+    if @institution.update_attributes(institution_params)
       respond_to do |format|
         format.html {
           flash[:success] = t('institution.updated')
@@ -96,5 +96,18 @@ class InstitutionsController < ApplicationController
       }
     end
   end
+
+  def institution_params
+    unless params[:institution].blank?
+      params[:institution].permit(*institution_allowed_params)
+    else
+      {}
+    end
+  end
+
+  def institution_allowed_params
+    [ :acronym, :name, :user_limit, :can_record_limit, :identifier ]
+  end
+
 
 end

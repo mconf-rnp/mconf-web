@@ -20,6 +20,10 @@ describe UsersController do
     context "if has @institution set" do
       it "sets @users to all users in the institution ordered by name"
     end
+
+    # TODO: how to test nested authorization? might have to adapt should_authorize
+    # it { should_authorize Space, :index }
+    # it { should_authorize User, :index }
   end
 
   describe "#show" do
@@ -37,10 +41,14 @@ describe UsersController do
       get :show, :id => FactoryGirl.create(:superuser).to_param
       response.response_code.should == 200
     end
+
+    it { should_authorize an_instance_of(User), :show, :id => FactoryGirl.create(:user).to_param }
   end
 
   describe "#edit" do
     let(:user) { FactoryGirl.create(:user) }
+
+    it { should_authorize an_instance_of(User), :edit, :id => user.to_param }
 
     context "template and layout" do
       before(:each) { sign_in(user) }
@@ -73,9 +81,34 @@ describe UsersController do
   end
 
   describe "#update" do
+    it { should_authorize an_instance_of(User), :update, :via => :post, :id => FactoryGirl.create(:user).to_param, :user => {} }
+
+    context "params_handling" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:user_attributes) { FactoryGirl.attributes_for(:user) }
+      let(:params) {
+        {
+          :id => user.to_param,
+          :controller => "users",
+          :action => "update",
+          :user => user_attributes
+        }
+      }
+
+      let(:user_allowed_params) {
+        [ :password, :password_confirmation, :remember_me, :current_password,
+          :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification ]
+      }
+      before {
+        sign_in(user)
+        user_attributes.stub(:permit).and_return(user_attributes)
+        controller.stub(:params).and_return(params)
+      }
+      before(:each) { put :update, :id => user.to_param, :user => user_attributes }
+      it { user_attributes.should have_received(:permit).with(*user_allowed_params) }
+    end
 
     context "attributes that the user can't update" do
-
       context "trying to update username" do
         before(:each) do
           @user = FactoryGirl.create(:user)
@@ -94,61 +127,99 @@ describe UsersController do
       end
 
       context "trying to update email" do
+        let(:old_email) { FactoryGirl.generate(:email) }
+        let(:user) { FactoryGirl.create(:user, :email => old_email) }
+        let(:new_email) { FactoryGirl.generate(:email) }
+
         before(:each) do
-          @user = FactoryGirl.create(:user)
-          sign_in @user
+          sign_in user
 
-          @old_email = @user.email
-          @new_email = FactoryGirl.generate(:email)
-
-          put :update, :id => @user.to_param, :user => { :email => @new_email }
-          @user.reload
+          put :update, :id => user.to_param, :user => { :email => new_email }
+          user.reload
         end
 
         it { response.status.should == 302 }
-        it { response.should redirect_to edit_user_path(@user) }
-        it { @user.email.should_not == @new_email }
-        it { @user.email.should == @old_email }
+        it { response.should redirect_to edit_user_path(user) }
+        it { user.email.should_not eq(new_email) }
+        it { user.email.should eq(old_email) }
       end
     end
 
     context "attributes that the user can update" do
       context "trying to update timezone" do
+        let(:old_tz) { FactoryGirl.generate(:timezone) }
+        let(:user) { FactoryGirl.create(:user, :timezone => old_tz) }
+        let(:new_tz) { FactoryGirl.generate(:timezone) }
 
         before(:each) do
-          @user = FactoryGirl.create(:user)
-          sign_in @user
+          sign_in user
 
-          @old_tz = @user.timezone
-          @new_tz = FactoryGirl.generate(:timezone)
-
-          put :update, :id => @user.to_param, :user => { :timezone => @new_tz }
-          @user.reload
+          put :update, :id => user.to_param, :user => { :timezone => new_tz }
+          user.reload
         end
 
         it { response.status.should == 302 }
-        it { response.should redirect_to edit_user_path(@user) }
-        it { @user.timezone.should_not == @old_tz }
-        it { @user.timezone.should == @new_tz }
+        it { response.should redirect_to edit_user_path(user) }
+        it { user.timezone.should_not eq(old_tz) }
+        it { user.timezone.should eq(new_tz) }
       end
 
       context "trying to update notifications" do
+        let!(:old_not) { User::NOTIFICATION_VIA_EMAIL }
+        let(:user) { FactoryGirl.create(:user, :notification => old_not) }
+        let!(:new_not) { User::NOTIFICATION_VIA_PM }
 
         before(:each) do
-          @user = FactoryGirl.create(:user)
-          sign_in @user
+          sign_in user
 
-          @old_not = @user.notification
-          @new_not = @user.notification == User::RECEIVE_DIGEST_DAILY ? User::RECEIVE_DIGEST_WEEKLY : User::RECEIVE_DIGEST_DAILY
-
-          put :update, :id => @user.to_param, :user => { :notification => @new_not }
-          @user.reload
+          put :update, :id => user.to_param, :user => { :notification => new_not }
+          user.reload
         end
 
         it { response.status.should == 302 }
-        it { response.should redirect_to edit_user_path(@user) }
-        it { @user.notification.should_not == @old_not }
-        it { @user.notification.should == @new_not }
+        it { response.should redirect_to edit_user_path(user) }
+        it { user.notification.should_not eq(old_not) }
+        it { user.notification.should eq(new_not) }
+      end
+
+      context "trying to update password" do
+        context "when local authentication is enabled" do
+          before { Site.current.update_attributes(local_auth_enabled: true)}
+          before(:each) do
+            @user = FactoryGirl.create(:user, :password => "foobar", :password_confirmation => "foobar")
+            sign_in @user
+
+            @old_encrypted = @user.encrypted_password
+            @new_pass = "newpass"
+
+            put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass, :current_password => "foobar" }
+            @user = User.find_by_username(@user.username)
+          end
+
+          it { response.status.should == 302 }
+          it { should set_the_flash.to(I18n.t('user.updated')) }
+          it { response.should redirect_to edit_user_path(@user) }
+          it { @user.encrypted_password.should_not == @old_encrypted }
+        end
+
+        context "when local authentication is disabled" do
+          before { Site.current.update_attributes(local_auth_enabled: false)}
+          before(:each) do
+            @user = FactoryGirl.create(:user, :password => "foobar", :password_confirmation => "foobar")
+            sign_in @user
+
+            @old_encrypted = @user.encrypted_password
+            @new_pass = "newpass"
+
+            put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass, :current_password => "foobar" }
+            @user = User.find_by_username(@user.username)
+          end
+
+          it { response.status.should == 302 }
+          it { should set_the_flash.to(I18n.t('user.updated')) }
+          it { response.should redirect_to edit_user_path(@user) }
+          it { @user.encrypted_password.should == @old_encrypted }
+        end
       end
 
     end
@@ -288,7 +359,7 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('user.disabled', :username => user.username)) }
       it { should redirect_to(manage_users_path) }
-      it("disables the user") { user.reload.disabled.should be_true }
+      it("disables the user") { user.reload.disabled.should be_truthy }
     end
 
     context "the user removing himself" do
@@ -297,8 +368,10 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('devise.registrations.destroyed')) }
       it { should redirect_to(root_path) }
-      it("disables the user") { user.reload.disabled.should be_true }
+      it("disables the user") { user.reload.disabled.should be_truthy }
     end
+
+    it { should_authorize an_instance_of(User), :destroy, :via => :delete, :id => user.to_param }
   end
 
   describe "#enable" do
@@ -328,8 +401,10 @@ describe UsersController do
       before(:each) { post :enable, :id => user.to_param }
       it { should redirect_to(manage_users_path) }
       it { should set_the_flash.to(I18n.t('user.enabled')) }
-      it { user.reload.disabled.should be_false }
+      it { user.reload.disabled.should be_falsey }
     end
+
+    it { should_authorize an_instance_of(User), :enable, :id => FactoryGirl.create(:user).to_param }
   end
 
   describe "#select" do
@@ -361,13 +436,11 @@ describe UsersController do
         end
 
         context "matches users by name" do
-          let(:unique_str) { "123123456456" }
+          let!(:unique_str) { "123123456456" }
           before do
             FactoryGirl.create(:user, :_full_name => "Yet Another User")
             FactoryGirl.create(:user, :_full_name => "Abc de Fgh")
-            FactoryGirl.create(:user, :_full_name => "Marcos #{unique_str} Silva") do |u|
-              @users = [u]
-            end
+            @users = [FactoryGirl.create(:user, :_full_name => "Marcos #{unique_str} Silva")]
           end
           before(:each) { get :select, :q => unique_str, :format => :json }
           it { should assign_to(:users).with(@users) }
@@ -379,9 +452,7 @@ describe UsersController do
           before do
             FactoryGirl.create(:user, :username => "Yet-Another-User")
             FactoryGirl.create(:user, :username => "Abc-de-Fgh")
-            FactoryGirl.create(:user, :username => "Marcos-#{unique_str}-Silva") do |u|
-              @users = [u]
-            end
+            @users = [FactoryGirl.create(:user, :username => "Marcos-#{unique_str}-Silva")]
           end
           before(:each) { get :select, :q => unique_str, :format => :json }
           it { should assign_to(:users).with(@users) }
@@ -441,6 +512,8 @@ describe UsersController do
           it("third user") { assigns(:users)[2].should eql(@u2) }
           it("fourth user") { assigns(:users)[3].should eql(@u1) }
         end
+
+        it { should_authorize User, :select }
       end
     end
   end
@@ -492,12 +565,13 @@ describe UsersController do
             @users = Helpers.create_fellows(10, space)
             @users = @users.first(3)
             subject.current_user.should_receive(:fellows).with(nil, 3).and_return(@users)
-         end
+          end
           before(:each) { get :fellows, :limit => 3, :format => :json }
           it { should assign_to(:users).with(@users) }
           it { response.body.should == expected.to_json }
         end
 
+        it { should_authorize User, :fellows }
       end
     end
   end
@@ -564,6 +638,8 @@ describe UsersController do
           end
         }
       end
+
+      it { should_authorize User, :current }
     end
   end
 
@@ -586,8 +662,8 @@ describe UsersController do
         it { should respond_with(:redirect) }
         it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
         it { should redirect_to('/any') }
-        it("approves the user") { user.reload.approved?.should be_true }
-        it("confirms the user") { user.reload.confirmed?.should be_true }
+        it("approves the user") { user.reload.approved?.should be_truthy }
+        it("confirms the user") { user.reload.confirmed?.should be_truthy }
 
         # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
         #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
@@ -686,8 +762,10 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('users.approve.not_enabled')) }
       it { should redirect_to('/any') }
-      it { user.reload.approved?.should be_true } # auto approved
+      it { user.reload.approved?.should be_truthy } # auto approved
     end
+
+    it { should_authorize an_instance_of(User), :approve, :via => :post, :id => user.to_param }
   end
 
   describe "#disapprove" do
@@ -705,7 +783,7 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('users.disapprove.disapproved', :username => user.username)) }
       it { should redirect_to('/any') }
-      it("disapproves the user") { user.reload.approved?.should be_false }
+      it("disapproves the user") { user.reload.approved?.should be_falsey }
     end
 
     context "if #require_registration_approval is not set in the current site" do
@@ -716,159 +794,9 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('users.disapprove.not_enabled')) }
       it { should redirect_to('/any') }
-      it("user is still (auto) approved") { user.reload.approved?.should be_true } # auto approved on registration
+      it("user is still (auto) approved") { user.reload.approved?.should be_truthy } # auto approved on registration
     end
+
+    it { should_authorize an_instance_of(User), :disapprove, :via => :post, :id => user.to_param }
   end
-
-  # TODO: refactor to use the same style used to test SpacesController, with the matcher allow_access_to
-  describe "abilities", :abilities => true do
-
-    context "for a superuser", :user => "superuser" do
-      let(:another_user) { FactoryGirl.create(:user) }
-      let(:user) { FactoryGirl.create(:superuser) }
-      before(:each) { login_as(user) }
-
-      context "can access #index" do
-        let(:space) { FactoryGirl.create(:space) }
-        let(:do_action) { get :index, :space_id => space }
-        it_should_behave_like "it can access an action"
-      end
-
-      [:show, :edit].each do |action|
-        describe "can access ##{action}" do
-          let(:do_action) { get action, :id => user }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:show, :edit].each do |action|
-        describe "can access ##{action} for other users" do
-          let(:do_action) { get action, :id => another_user }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:update, :destroy, :enable].each do |action|
-        describe "can access ##{action}" do
-          let(:do_action) { post action, :id => user.to_param, :user => {} }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      [:update, :destroy, :enable].each do |action|
-        describe "can access ##{action} for other users" do
-          let(:do_action) { post action, :id => another_user.to_param, :user => {} }
-          it_should_behave_like "it can access an action"
-        end
-      end
-    end
-
-    context "for a normal user", :user => "normal" do
-      let(:another_user) { FactoryGirl.create(:user) }
-      let(:user) { FactoryGirl.create(:user) }
-      before(:each) { login_as(user) }
-
-      # On the collection
-
-      describe "can access #index" do
-        let(:space) { FactoryGirl.create(:space, :public => true) }
-        before(:each) { get :index, :space_id => space.to_param }
-        it { should respond_with(:success) }
-      end
-
-      [:current, :select].each do |action|
-        describe "can access ##{action}.json" do
-          let(:do_action) { get action, :format => :json }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      describe "can access #current.xml" do
-        let(:do_action) { get :current, :format => :xml }
-        it_should_behave_like "it can access an action"
-      end
-
-      # On the user himself
-
-      [:show, :edit].each do |action|
-        describe "can access ##{action}" do
-          let(:do_action) { get action, :id => user }
-          it_should_behave_like "it can access an action"
-        end
-      end
-
-      describe "can access #update" do
-        let(:do_action) { post :edit, :id => user }
-        it_should_behave_like "it can access an action"
-      end
-
-      describe "can access #destroy" do
-        let(:do_action) { delete :destroy, :id => user }
-        it_should_behave_like "it can access an action"
-      end
-
-      [:enable].each do |action|
-        describe "cannot access ##{action}" do
-          let(:do_action) { post :enable, :id => user }
-          it_should_behave_like "it cannot access an action"
-        end
-      end
-
-      # For other users
-
-      describe "can access #show for other users" do
-        let(:do_action) { get :show, :id => another_user }
-        it_should_behave_like "it can access an action"
-      end
-
-      [:edit].each do |action|
-        describe "cannot access ##{action} for other users" do
-          let(:do_action) { get action, :id => another_user }
-          it_should_behave_like "it cannot access an action"
-        end
-      end
-
-      [:enable, :update, :destroy].each do |action|
-        describe "cannot access ##{action}" do
-          let(:do_action) { post action, :id => another_user, :user => {} }
-          it_should_behave_like "it cannot access an action"
-        end
-      end
-
-    end
-
-    context "for an anonymous user", :user => "anonymous" do
-      let(:user) { FactoryGirl.create(:user) }
-
-      describe "can access #index" do
-        let(:space) { FactoryGirl.create(:space, :public => true) }
-        let(:do_action) { get :index, :space_id => space }
-        it_should_behave_like "it can access an action"
-      end
-
-      describe "can access #show" do
-        let(:do_action) { get :show, :id => user }
-        it_should_behave_like "it can access an action"
-      end
-
-      [:edit].each do |action|
-        describe "cannot access ##{action}" do
-          let(:do_action) { get action, :id => user }
-          it_should_behave_like "it cannot access an action"
-        end
-      end
-
-      [:update, :destroy, :enable].each do |action|
-        describe "cannot access ##{action}" do
-          let(:do_action) { post action, :id => user }
-          it_should_behave_like "it cannot access an action"
-        end
-      end
-    end
-
-    pending "for a disabled user:"
-    pending "for showing public email in profile"
-
-  end
-
 end

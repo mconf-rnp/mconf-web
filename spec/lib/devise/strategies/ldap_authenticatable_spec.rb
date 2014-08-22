@@ -14,12 +14,12 @@ describe Devise::Strategies::LdapAuthenticatable do
   describe "#valid?" do
     context "if ldap_enabled?" do
       before { Site.current.update_attributes(:ldap_enabled => true) }
-      it { target.valid?.should be_true }
+      it { target.valid?.should be_truthy }
     end
 
     context "if not ldap_enabled?" do
       before { Site.current.update_attributes(:ldap_enabled => false) }
-      it { target.valid?.should be_false }
+      it { target.valid?.should be_falsey }
     end
   end
 
@@ -48,8 +48,8 @@ describe Devise::Strategies::LdapAuthenticatable do
         }
 
         context "if the binding of the target user is successful" do
-          let(:ldap_user1) { { anything: 1 } }
-          let(:ldap_user2) { { anything: 2 } }
+          let(:ldap_user1) { { 'anything' => 1 } }
+          let(:ldap_user2) { { 'anything' => 2 } }
           before {
             filter = double(:filter)
             target.should_receive(:ldap_filter).and_return(filter)
@@ -92,7 +92,7 @@ describe Devise::Strategies::LdapAuthenticatable do
             # even though we already test that set_user_institution was called
             context "on success vinculates the user to his institution" do
               let(:user) { FactoryGirl.create(:user, :institution => nil) }
-              let(:ldap_user1) { { mail: "user@institution.com" } }
+              let(:ldap_user1) { { 'mail' => ["user@institution.com"] } }
               let(:institution) { FactoryGirl.create(:institution, :identifier => "institution.com") }
 
               before {
@@ -310,12 +310,12 @@ describe Devise::Strategies::LdapAuthenticatable do
   describe "#ldap_enabled?" do
     context "if LDAP is enabled in the current site" do
       before { Site.current.update_attributes(:ldap_enabled => true) }
-      it("returns true") { target.ldap_enabled?.should be_true }
+      it("returns true") { target.ldap_enabled?.should be_truthy }
     end
 
     context "if LDAP is disabled in the current site" do
       before { Site.current.update_attributes(:ldap_enabled => false) }
-      it("returns false") { target.ldap_enabled?.should be_false }
+      it("returns false") { target.ldap_enabled?.should be_falsey }
     end
   end
 

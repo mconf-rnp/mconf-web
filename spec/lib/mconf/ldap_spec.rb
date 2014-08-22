@@ -63,19 +63,19 @@ describe Mconf::LDAP do
     context "if the session is not defined" do
       let(:ldap) { Mconf::LDAP.new(nil) }
       subject { ldap.signed_in? }
-      it { should be_false }
+      it { should be_falsey }
     end
 
     context "if the session has no :ldap_data key" do
       let(:ldap) { Mconf::LDAP.new({}) }
       subject { ldap.signed_in? }
-      it { should be_false }
+      it { should be_falsey }
     end
 
     context "if the session has :ldap_data key" do
       let(:ldap) { Mconf::LDAP.new({ :ldap_data => {} }) }
       subject { ldap.signed_in? }
-      it { should be_true }
+      it { should be_truthy }
     end
   end
 
@@ -117,14 +117,14 @@ describe Mconf::LDAP do
       context "does nothing if the user has no principal name set" do
         let(:ldap_user) { base_ldap_user("principal_name" => nil) }
         before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
-        it { @result.should be_true }
+        it { @result.should be(true) }
         it { user.institution.should be_nil }
       end
 
       context "does nothing if the user has a principal name without an institution in it" do
         let(:ldap_user) { base_ldap_user("principal_name" => "any-without-institution") }
         before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
-        it { @result.should be_true }
+        it { @result.should be(true) }
         it { user.institution.should be_nil }
       end
 
@@ -132,7 +132,7 @@ describe Mconf::LDAP do
         let(:ldap_user) { base_ldap_user("principal_name" => "user@institution.com") }
         before(:each) { @result = ldap.set_user_institution(user, ldap_user, Site.current) }
         subject { ldap.set_user_institution(user, Site.current, ldap_user) }
-        it { @result.should be_true }
+        it { @result.should be(true) }
         it { user.institution.should be_nil }
       end
 
@@ -143,7 +143,7 @@ describe Mconf::LDAP do
           institution
           @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { @result.should be_true }
+        it { @result.should be(true) }
         it { user.institution.should eql(institution) }
       end
 
@@ -155,7 +155,7 @@ describe Mconf::LDAP do
           Site.current.update_attributes(:ldap_principal_name_field => nil)
           @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { @result.should be_true }
+        it { @result.should be(true) }
         it { user.institution.should eql(institution) }
       end
 
@@ -167,8 +167,8 @@ describe Mconf::LDAP do
           institution
           @result = ldap.set_user_institution(user, ldap_user, Site.current)
         }
-        it { @result.should be_true }
-        it { user.institution.should eql(institution) }
+        it { @result.should be(true) }
+        it { user.reload.institution.should eql(institution) }
       end
     end
 
@@ -182,7 +182,7 @@ describe Mconf::LDAP do
         institution2
         @result = ldap.set_user_institution(user, ldap_user, Site.current)
       }
-      it { @result.should be_false }
+      it { @result.should be(false) }
       it { user.institution.should eql(institution1) }
     end
   end

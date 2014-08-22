@@ -1,14 +1,11 @@
 class Institution < ActiveRecord::Base
-  attr_accessible :acronym, :name, :user_limit, :can_record_limit, :identifier
-
   validates :name, :presence => true, :uniqueness => true
 
   validates :user_limit, :numericality => true, :allow_blank => true
   validates :can_record_limit, :numericality => true, :allow_blank => true
 
-  has_many :permissions, :foreign_key => "subject_id",
-           :conditions => { :permissions => {:subject_type => 'Institution'} },
-           :dependent => :destroy
+  has_many :permissions, -> { where(:subject_type => 'Institution') },
+           :foreign_key => "subject_id", :dependent => :destroy
 
   has_many :users, :through => :permissions
 

@@ -9,11 +9,142 @@ require "spec_helper"
 describe SpacesController do
   render_views
 
+  shared_examples "an action that rescues from CanCan::AccessDenied" do
+    context "when there's a user logged in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) { sign_in(user) }
+
+      context "and the user has no pending join request" do
+        before(:each) { do_action }
+        it { should redirect_to(new_space_join_request_path(space)) }
+        it { should set_the_flash.to(I18n.t("spaces.error.need_join_to_access")) }
+      end
+
+      context "and the user has a pending invitation" do
+        before(:each) {
+          @invitation = FactoryGirl.create(:join_request, :group => space, :candidate => user, :request_type => "invite")
+        }
+        before(:each) { do_action }
+        it { space.pending_invitation_for?(user).should be_truthy }
+        it { should redirect_to(space_join_request_path(space, @invitation)) }
+        it { should set_the_flash.to(I18n.t("spaces.error.already_invited")) }
+      end
+
+      context "and the user has a pending join request" do
+        before(:each) {
+          @invitation = FactoryGirl.create(:join_request, :group => space, :candidate => user, :request_type => "request")
+        }
+        before(:each) { do_action }
+        it { space.pending_join_request_for?(user).should be_truthy }
+        it { should redirect_to(new_space_join_request_path(space)) }
+        it { should_not set_the_flash }
+      end
+    end
+
+    context "when there's no user logged in" do
+      before(:each) { do_action }
+
+      context "and the user has no pending join request" do
+        it { should respond_with(:forbidden) }
+        it { should set_the_flash.to(I18n.t("space.access_forbidden")) }
+        it { should render_template("errors/error_403") }
+        it { should render_with_layout("error") }
+      end
+    end
+  end
+
+  shared_examples "an action that does not rescue from CanCan::AccessDenied" do
+    context "when there's a user logged in" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) { sign_in(user) }
+
+      context "and the user has no pending join request" do
+        before(:each) { do_action }
+        it { should respond_with(:forbidden) }
+        it { should set_the_flash.to(I18n.t("space.access_forbidden")) }
+        it { should render_template("errors/error_403") }
+        it { should render_with_layout("error") }
+      end
+
+      context "and the user has a pending invitation" do
+        before(:each) {
+          @invitation = FactoryGirl.create(:join_request, :group => space, :candidate => user, :request_type => "invite")
+        }
+        before(:each) { do_action }
+        it { space.pending_invitation_for?(user).should be_truthy }
+        it { should respond_with(:forbidden) }
+        it { should set_the_flash.to(I18n.t("space.access_forbidden")) }
+        it { should render_template("errors/error_403") }
+        it { should render_with_layout("error") }
+      end
+
+      context "and the user has a pending join request" do
+        before(:each) {
+          @invitation = FactoryGirl.create(:join_request, :group => space, :candidate => user, :request_type => "request")
+        }
+        before(:each) { do_action }
+        it { space.pending_join_request_for?(user).should be_truthy }
+        it { should respond_with(:forbidden) }
+        it { should set_the_flash.to(I18n.t("space.access_forbidden")) }
+        it { should render_template("errors/error_403") }
+        it { should render_with_layout("error") }
+      end
+    end
+
+    context "when there's no user logged in" do
+      before(:each) { do_action }
+
+      context "and the user has no pending join request" do
+        it { should respond_with(:forbidden) }
+        it { should set_the_flash.to(I18n.t("space.access_forbidden")) }
+        it { should render_template("errors/error_403") }
+        it { should render_with_layout("error") }
+      end
+    end
+  end
+
+  describe "rescue_from exceptions" do
+    context "rescues from CanCan::AccessDenied" do
+      let(:space) { FactoryGirl.create(:space) }
+      before { controller.stub(:authorize!) { raise CanCan::AccessDenied.new("Not authorized!", action, space) } }
+
+      context "on #show" do
+        let(:action) { :show }
+        let(:do_action) { get :show, :id => space.to_param }
+        include_examples "an action that rescues from CanCan::AccessDenied"
+      end
+
+      context "on #edit" do
+        let(:action) { :edit }
+        let(:do_action) { get :edit, :id => space.to_param }
+        include_examples "an action that rescues from CanCan::AccessDenied"
+      end
+
+      context "on #update" do
+        let(:action) { :update }
+        let(:do_action) { put :update, :id => space.to_param, :space_attributes => FactoryGirl.attributes_for(:space) }
+        include_examples "an action that does not rescue from CanCan::AccessDenied"
+      end
+
+      context "on #destroy" do
+        let(:action) { :destroy }
+        let(:do_action) { delete :destroy, :id => space.to_param }
+        include_examples "an action that does not rescue from CanCan::AccessDenied"
+      end
+
+      # note: not testing all the other actions that do not rescue from CanCan::AccessDenied,
+      #   just the two above
+
+    end
+  end
+
   describe "#index" do
     it "sets param[:view] to 'thumbnails' if not set"
     it "sets param[:view] to 'thumbnails' if different than 'list'"
     it "uses param[:view] as 'list' if already set to this value"
     # TODO: there's a lot more to test here
+
+    it { should_authorize Space, :index }
 
     context "if there's a user signed in" do
 
@@ -43,7 +174,7 @@ describe SpacesController do
 
           before(:each) { get :index }
           it { should assign_to(:user_spaces).with([]) }
-          it { assigns(:user_spaces).should be_an_instance_of(ActiveRecord::Relation) }
+          it { assigns(:user_spaces).should be_kind_of(ActiveRecord::Relation) }
         end
       end
 
@@ -56,6 +187,8 @@ describe SpacesController do
     let(:target) { FactoryGirl.create(:public_space) }
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
+
+    it { should_authorize an_instance_of(Space), :show, :id => target.to_param }
 
     it {
       get :show, :id => target.to_param
@@ -174,6 +307,8 @@ describe SpacesController do
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
 
+    it { should_authorize an_instance_of(Space), :new }
+
     before(:each) { get :new }
 
     context "template and view" do
@@ -195,42 +330,56 @@ describe SpacesController do
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
 
+    it { should_authorize an_instance_of(Space), :create, :via => :post, :space => {} }
+
     context "with valid attributes" do
-      let(:space) { FactoryGirl.build(:space) }
+      let(:space_attributes) { FactoryGirl.attributes_for(:space) }
 
       describe "creates the new space with the correct attributes" do
         before(:each) {
           expect {
-            post :create, :space => space.attributes
+            post :create, :space => space_attributes
           }.to change(Space, :count).by(1)
         }
 
         # TODO: for some reason the matcher is not found, maybe we just need to update rspec and other gems
-        pending { Space.last.should have_same_attibutes_as(space) }
+        skip { Space.last.should have_same_attibutes_as(space) }
       end
 
       context "redirects to the new space" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { should redirect_to(space_path(Space.last)) }
       end
 
       describe "assigns @space with the new space" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { should assign_to(:space).with(Space.last) }
       end
 
       describe "sets the flash with a success message" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { should set_the_flash.to(I18n.t('space.created')) }
       end
 
       describe "adds the user as an admin in the space" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { Space.last.admins.should include(user) }
       end
 
+      describe "creates a new activity for the space created" do
+        before(:each) {
+          expect {
+            post :create, :space => space_attributes
+          }.to change(RecentActivity, :count).by(1)
+        }
+        it { RecentActivity.last.trackable.should eq(Space.last) }
+        it { RecentActivity.last.owner.should eq(Space.last) }
+        it { RecentActivity.last.parameters[:username].should eq(user.full_name) }
+        it { RecentActivity.last.parameters[:user_id].should eq(user.id) }
+      end
+
       describe "sets the user's institution as the space's institution" do
-        before(:each) { post :create, :space => space.attributes }
+        before(:each) { post :create, :space => space_attributes }
         it { Space.last.institution.should eq(user.institution) }
         it { user.institution.spaces.should include(Space.last) }
       end
@@ -238,20 +387,22 @@ describe SpacesController do
       describe "doesn't set an institution in the space if the user has no institution" do
         before(:each) {
           user.update_attributes(:institution => nil)
-          attrs = space.attributes
+          attrs = space_attributes
           attrs.delete('institution_id')
           post :create, :space => attrs
         }
         it { Space.last.institution.should be(nil) }
       end
-
-      it "creates a new activity for the space created"
     end
 
     context "with invalid attributes" do
       let(:invalid_attributes) { FactoryGirl.attributes_for(:space, :name => nil) }
 
-      it "assigns @space with the new space"
+      describe "assigns @space with the new space" do
+        before(:each) { post :create, :space => invalid_attributes }
+        # TODO: maybe we could be more specific here
+        it { should assign_to(:space).with_kind_of(Space) }
+      end
 
       describe "renders the view spaces/new with the correct layout" do
         before(:each) { post :create, :space => invalid_attributes }
@@ -264,7 +415,15 @@ describe SpacesController do
         it_behaves_like "assigns @spaces_examples"
       end
 
-      it "does not create a new activity for the space that failed to be created"
+      describe "does not create a new activity for the space that failed to be created" do
+        let(:does_not_create_activity) {
+          expect {
+            post :create, :space => invalid_attributes
+          }.to change(RecentActivity, :count).by(0)
+        }
+        it { does_not_create_activity }
+      end
+
     end
   end
 
@@ -272,6 +431,8 @@ describe SpacesController do
     let(:space) { FactoryGirl.create(:space) }
     let(:user) { FactoryGirl.create(:superuser) }
     before(:each) { sign_in(user) }
+
+    it { should_authorize an_instance_of(Space), :edit, :id => space.to_param }
 
     before(:each) { get :edit, :id => space.to_param }
 
@@ -285,7 +446,42 @@ describe SpacesController do
     end
   end
 
-  it "#update"
+  describe "#update" do
+    let(:space) { FactoryGirl.create(:space) }
+    let(:user) { FactoryGirl.create(:superuser) }
+    let(:referer) { "/any" }
+    before do
+      sign_in(user)
+      request.env["HTTP_REFERER"] = referer
+    end
+
+    context "params_handling" do
+      let(:space_attributes) { FactoryGirl.attributes_for(:space) }
+      let(:params) {
+        {
+          :id => space.permalink,
+          :controller => "spaces",
+          :action => "update",
+          :space => space_attributes
+        }
+      }
+
+      let(:space_allowed_params) {
+        [ :name, :description, :logo_image, :public, :permalink, :disabled,
+          :repository, :crop_x, :crop_y, :crop_w, :crop_h, :institution_id,
+          :bigbluebutton_room_attributes =>
+          [ :id, :attendee_password, :moderator_password, :default_layout,
+            :welcome_msg, :presenter_share_only, :auto_start_video, :auto_start_audio ] ]
+      }
+      before {
+        space_attributes.stub(:permit).and_return(space_attributes)
+        controller.stub(:params).and_return(params)
+      }
+      before(:each) { put :update, :id => space.to_param, :space => space_attributes }
+      it { space_attributes.should have_received(:permit).with(*space_allowed_params) }
+      it { should redirect_to(referer) }
+    end
+  end
 
   describe "#destroy" do
     let(:space) { FactoryGirl.create(:space) }
@@ -327,7 +523,7 @@ describe SpacesController do
       it { expect{subject}.to change(Space, :count).by(-1)}
       it {
         subject
-        space.reload.disabled.should be_true
+        space.reload.disabled.should be_truthy
       }
       it { should redirect_to(manage_spaces_path) }
     end
@@ -342,13 +538,12 @@ describe SpacesController do
       it { expect{subject}.to change(Space, :count).by(-1) }
       it {
         subject
-        space.reload.disabled.should be_true
+        space.reload.disabled.should be_truthy
       }
       it { should redirect_to(spaces_path) }
     end
 
   end
-
 
   describe "#enable" do
     before(:each) { login_as(FactoryGirl.create(:superuser)) }
@@ -377,9 +572,11 @@ describe SpacesController do
       before(:each) { post :enable, :id => space.to_param }
       it { should redirect_to(manage_spaces_path) }
       it { should set_the_flash.to(I18n.t('space.enabled')) }
-      it { space.reload.disabled.should be_false }
+      it { space.reload.disabled.should be_falsey }
     end
   end
+
+
 
   it "#leave"
 
@@ -506,6 +703,9 @@ describe SpacesController do
   end
 
   describe "#select" do
+
+    it { should_authorize Space, :select }
+
     context ".json" do
       let(:expected) {
         @spaces.map do |s|
@@ -566,216 +766,47 @@ describe SpacesController do
     end
   end
 
-  describe "abilities", :abilities => true do
-    render_views(false)
+  describe "#user_permission" do
+    let(:target) { FactoryGirl.create(:space) }
+    let(:user) { FactoryGirl.create(:superuser) }
+    before(:each) { sign_in(user) }
 
-    let(:hash) { { :id => target.to_param } }
-    let(:attrs) { FactoryGirl.attributes_for(:space) }
-    let(:hash_with_attrs) { hash.merge!(:space => attrs) }
-    let(:hash_recording) { { :space_id => target.to_param, :id => recording.recordid } }
+    it { should_authorize an_instance_of(Space), :user_permissions, :id => target.to_param }
 
-    context "for a superuser", :user => "superuser" do
-      let(:user) { FactoryGirl.create(:superuser) }
-      before(:each) { login_as(user) }
+    context "layout and view" do
+      before(:each) { get :user_permissions, :id => target.to_param }
 
-      it { should allow_access_to(:index) }
-      it { should allow_access_to(:new) }
-      it { should allow_access_to(:create).via(:post) }
-      it { should allow_access_to(:select) }
-
-      # the permissions are always the same, doesn't matter the type of room, so
-      # we have them all in this common method
-      shared_examples_for "a superuser accessing a webconf room in SpacesController" do
-        it { should allow_access_to(:show, hash) }
-        it { should allow_access_to(:edit, hash) }
-        it { should allow_access_to(:user_permissions, hash) }
-        it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-        it { should allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-        it { should allow_access_to(:enable, hash_with_attrs).via(:post) }
-        it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
-        it { should allow_access_to(:webconference, hash) }
-        it { should allow_access_to(:recordings, hash) }
-        it { should allow_access_to(:edit_recording, hash_recording) }
-      end
-
-      context "in a public space" do
-        let(:target) { FactoryGirl.create(:public_space) }
-        let(:recording) { FactoryGirl.create(:bigbluebutton_recording, :room => target.bigbluebutton_room) }
-
-        context "he is not a member of" do
-          it_should_behave_like "a superuser accessing a webconf room in SpacesController"
-        end
-
-        context "he is a member of" do
-          Space::USER_ROLES.each do |role|
-            context "with the role '#{role}'" do
-              before(:each) { target.add_member!(user, role) }
-              it_should_behave_like "a superuser accessing a webconf room in SpacesController"
-            end
-          end
-        end
-      end
-
-      context "in a private space" do
-        let(:target) { FactoryGirl.create(:private_space) }
-        let(:recording) { FactoryGirl.create(:bigbluebutton_recording, :room => target.bigbluebutton_room) }
-
-        context "he is not a member of" do
-          it_should_behave_like "a superuser accessing a webconf room in SpacesController"
-        end
-
-        context "he is a member of" do
-          Space::USER_ROLES.each do |role|
-            context "with the role '#{role}'" do
-              before(:each) { target.add_member!(user, role) }
-              it_should_behave_like "a superuser accessing a webconf room in SpacesController"
-            end
-          end
-        end
-      end
-
+      it { should respond_with(:success) }
+      it { assigns(:space).should eq(target) }
+      it { should render_template(/user_permissions/) }
+      it { should render_with_layout("spaces_show") }
     end
 
-    context "for a normal user", :user => "normal" do
+    context "user is not a member of the space" do
       let(:user) { FactoryGirl.create(:user) }
-      before(:each) { login_as(user) }
+      before(:each) { get :user_permissions, :id => target.to_param }
 
-      it { should allow_access_to(:index) }
-      it { should allow_access_to(:new) }
-      it { should allow_access_to(:create).via(:post) }
-      it { should allow_access_to(:select) }
-
-      context "in a public space" do
-        let(:target) { FactoryGirl.create(:public_space) }
-        let(:recording) { FactoryGirl.create(:bigbluebutton_recording, :room => target.bigbluebutton_room) }
-
-        context "he is not a member of" do
-          it { should allow_access_to(:show, hash) }
-          it { should_not allow_access_to(:edit, hash) }
-          it { should_not allow_access_to(:user_permissions, hash) }
-          it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-          it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
-          it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
-          it { should allow_access_to(:webconference, hash) }
-          it { should allow_access_to(:recordings, hash) }
-        end
-
-        context "he is a member of" do
-          context "with the role 'Admin'" do
-            before(:each) { target.add_member!(user, "Admin") }
-            it { should allow_access_to(:show, hash) }
-            it { should allow_access_to(:edit, hash) }
-            it { should allow_access_to(:user_permissions, hash) }
-            it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:disable, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:webconference, hash) }
-            it { should allow_access_to(:recordings, hash) }
-            it { should allow_access_to(:edit_recording, hash_recording) }
-          end
-
-          context "with the role 'User'" do
-            before(:each) { target.add_member!(user, "User") }
-            it { should allow_access_to(:show, hash) }
-            it { should_not allow_access_to(:edit, hash) }
-            it { should_not allow_access_to(:user_permissions, hash) }
-            it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:webconference, hash) }
-            it { should allow_access_to(:recordings, hash) }
-          end
-        end
-      end
-
-      context "in a private space" do
-        let(:target) { FactoryGirl.create(:private_space) }
-        let(:recording) { FactoryGirl.create(:bigbluebutton_recording, :room => target.bigbluebutton_room) }
-
-        context "he is not a member of" do
-          it { should_not allow_access_to(:show, hash) }
-          it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-          it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
-          it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
-          it { should_not allow_access_to(:webconference, hash) }
-          it { should_not allow_access_to(:recordings, hash) }
-        end
-
-        context "he is a member of" do
-          context "with the role 'Admin'" do
-            before(:each) { target.add_member!(user, "Admin") }
-            it { should allow_access_to(:show, hash) }
-            it { should allow_access_to(:edit, hash) }
-            it { should allow_access_to(:user_permissions, hash) }
-            it { should allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-            it { should allow_access_to(:disable, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:webconference, hash) }
-            it { should allow_access_to(:recordings, hash) }
-            it { should allow_access_to(:edit_recording, hash_recording) }
-          end
-
-          context "with the role 'User'" do
-            before(:each) { target.add_member!(user, "User") }
-            it { should allow_access_to(:show, hash) }
-            it { should_not allow_access_to(:edit, hash) }
-            it { should_not allow_access_to(:user_permissions, hash) }
-            it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-            it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:disable, hash_with_attrs).via(:delete) }
-            it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:leave, hash_with_attrs).via(:post) }
-            it { should allow_access_to(:webconference, hash) }
-            it { should allow_access_to(:recordings, hash) }
-          end
-        end
-      end
-
+      it { should respond_with(403) }
     end
 
-    context "for an anonymous user", :user => "anonymous" do
-      it { should allow_access_to(:index) }
-      it { should require_authentication_for(:new) }
-      it { should require_authentication_for(:create).via(:post) }
-      it { should allow_access_to(:select) }
+    context "user is a normal member of the space" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) {
+        target.add_member!(user)
+        get :user_permissions, :id => target.to_param
+      }
 
-      context "in a public space" do
-        let(:target) { FactoryGirl.create(:public_space) }
-        it { should allow_access_to(:show, hash) }
-        it { should_not allow_access_to(:edit, hash) }
-        it { should_not allow_access_to(:user_permissions, hash) }
-        it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-        it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
-        it { should allow_access_to(:webconference, hash) }
-        it { should allow_access_to(:recordings, hash) }
-      end
-
-      context "in a private space" do
-        let(:target) { FactoryGirl.create(:private_space) }
-        it { should_not allow_access_to(:show, hash) }
-        it { should_not allow_access_to(:edit, hash) }
-        it { should_not allow_access_to(:user_permissions, hash) }
-        it { should_not allow_access_to(:update, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:destroy, hash_with_attrs).via(:delete) }
-        it { should_not allow_access_to(:enable, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:leave, hash_with_attrs).via(:post) }
-        it { should_not allow_access_to(:webconference, hash) }
-        it { should_not allow_access_to(:recordings, hash) }
-      end
+      it { should respond_with(403) }
     end
 
+    context "user is admin of the space" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) {
+        target.add_member!(user, 'Admin')
+        get :user_permissions, :id => target.to_param
+      }
+
+      it { should respond_with(:success) }
+    end
   end
-
 end

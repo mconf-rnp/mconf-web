@@ -15,9 +15,6 @@ describe Institution do
   it { should validate_uniqueness_of(:name) }
   it { should validate_presence_of(:permalink) }
 
-  it { should allow_mass_assignment_of(:name) }
-  it { should allow_mass_assignment_of(:acronym) }
-
   describe ".spaces" do
     let(:target) { FactoryGirl.create(:institution) }
     before {

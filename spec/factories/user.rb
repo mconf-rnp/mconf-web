@@ -22,13 +22,11 @@ FactoryGirl.define do
     u.approved true
     u.superuser false
     u.receive_digest { User::RECEIVE_DIGEST_NEVER }
-    u.confirmed_at { Time.now }
+    u.notification { User::NOTIFICATION_VIA_EMAIL }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
-    u.institution { FactoryGirl.create(:institution) }
-    after(:create) do |u2|
-      u2.confirm!
-    end
+    u.association :institution
+    after(:create) { |u2| u2.confirm!; u2.reload }
   end
 
   factory :user, :parent => :user_unconfirmed do |u|

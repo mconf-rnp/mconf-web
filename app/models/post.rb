@@ -11,27 +11,13 @@ class Post < ActiveRecord::Base
 
   belongs_to :space
   belongs_to :author, :polymorphic => true
-  has_many :post_attachments, :dependent => :destroy
-  has_many :attachments, :through => :post_attachments
-
-  accepts_nested_attributes_for :attachments, :allow_destroy => true
 
   acts_as_tree #:order => 'updated_at ASC'
 
-  scope :public, lambda { |arg|
-    join(:space).where('public = ?', true)
-  }
+  scope :public_posts, -> { join(:space).where('public = ?', true) }
 
   validates_presence_of :title, :unless => Proc.new { |post| post.parent.present? }
-  validates_presence_of :text, :if => Proc.new { |post| post.attachments.empty? }
-
-  # Fill attachments author and space
-  before_validation do |post|
-    post.attachments.each do |a|
-      a.space  ||= post.space
-      a.author = post.author
-    end
-  end
+  validates_presence_of :text
 
   # Update parent Posts when commenting to it
   after_save do |post|
@@ -43,20 +29,11 @@ class Post < ActiveRecord::Base
   end
 
   def author
-    case author_type
-    when User
-      User.find_by_id_with_disabled(author_id)
-    when NilClass
-      nil
-    else
-      author_type.constantize.find_by_id author_id
-    end
+    User.with_disabled.where(:id => author_id).first
   end
 
   def space
-    space_id.present? ?
-      Space.find_with_disabled(space_id) :
-      nil
+    Space.with_disabled.where(:id => space_id).first
   end
 
   # This method return the 3 last comment of a thread if the thread has more than 3 comments.
@@ -66,7 +43,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.last_news(space)
-    return Post.find(:all, :conditions => {:space_id => space, :parent_id => nil}, :order => "updated_at DESC", :limit => 4)
+    return Post.where(:space_id => space, :parent_id => nil).order("updated_at DESC").limit(4)
   end
 
   def new_activity key, user

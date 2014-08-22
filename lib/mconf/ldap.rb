@@ -141,26 +141,25 @@ module Mconf
     def user_info(ldap_user, ldap_configs)
       # get them as strings since they were symbols but we use to compare
       # with strings in the db
-      attrs = ldap_user.attribute_names.map(&:to_s)
-      if attrs.include?(ldap_configs.ldap_username_field)
-        username = ldap_user[ldap_configs.ldap_username_field].first
+      if ldap_user[ldap_configs.ldap_username_field].present?
+        username = ldap_user[ldap_configs.ldap_username_field].try(:first)
       else
-        username = ldap_user["uid"].first
+        username = ldap_user["uid"].try(:first)
       end
-      if attrs.include?(ldap_configs.ldap_email_field)
-        email = ldap_user[ldap_configs.ldap_email_field].first
+      if ldap_user[ldap_configs.ldap_email_field].present?
+        email = ldap_user[ldap_configs.ldap_email_field].try(:first)
       else
-        email = ldap_user["mail"].first
+        email = ldap_user["mail"].try(:first)
       end
-      if attrs.include?(ldap_configs.ldap_name_field)
-        name = ldap_user[ldap_configs.ldap_name_field].first
+      if ldap_user[ldap_configs.ldap_name_field].present?
+        name = ldap_user[ldap_configs.ldap_name_field].try(:first)
       else
-        name = ldap_user["cn"].first
+        name = ldap_user["cn"].try(:first)
       end
-      if attrs.include?(ldap_configs.ldap_principal_name_field)
-        pn = ldap_user[ldap_configs.ldap_principal_name_field].first
+      if ldap_user[ldap_configs.ldap_principal_name_field].present?
+        pn = ldap_user[ldap_configs.ldap_principal_name_field].try(:first)
       else
-        pn = ldap_user["mail"].first
+        pn = ldap_user["mail"].try(:first)
       end
 
       [username, email, name, pn]
