@@ -95,7 +95,6 @@ pt-br:
     registrations:
       shibboleth:
         error:
-          force_shib_login: "Desculpe, você não pode se logar localmente, sua instituição só permite login via federação. Por favor, utilize o CAFe para realizar o login."
           force_shib_registration: "Desculpe, você não pode se registrar localmente, sua instituição só permite login via federação. Você deve utilizar o CAFe para o login."
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.

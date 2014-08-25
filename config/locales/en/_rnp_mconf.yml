@@ -80,8 +80,8 @@ en:
       institution_placeholder: "Select an institution"
   user:
     institution: Institution
-    index: 
-      user_list: 
+    index:
+      user_list:
         header_spaces: "Users in this space: %{count}"
         header_institutions: "Users in this institution: %{count}"
     institutional_admin: Institutional Admin
@@ -94,7 +94,6 @@ en:
     registrations:
       shibboleth:
         error:
-          force_shib_login: "Sorry, you can't login locally because your institution only allow login via federation. Please use the CAFe to login."
           force_shib_registration: "Sorry, you can't register locally 'cause your institution only allow login via federation. You must use the CAFe to login."
       signup_form:
         institution_hint: Choose one or type to search.

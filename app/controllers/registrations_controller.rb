@@ -28,21 +28,14 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  private
-
   def check_shib_login_only
     if params.has_key?(:user)
       institution_id = params[:user][:institution_id]
-      unless institution_id.blank?
-        institution = Institution.where(id: institution_id).first
-        if institution.force_shib_login?
-          flash[:error] = I18n.t('users.registrations.shibboleth.error.force_shib_registration')
-          redirect_to root_path
-          false
-        end
+      institution = Institution.where(id: institution_id).first
+      if institution && institution.force_shib_login?
+        flash[:error] = I18n.t('users.registrations.shibboleth.error.force_shib_registration')
+        redirect_to root_path
       end
-    else
-      true
     end
   end
 
