@@ -77,12 +77,12 @@ describe Institution do
 
     context "false if the user limit is nil" do
       before { target.update_attributes(:user_limit => nil) }
-      it { target.full?.should be_false }
+      it { target.full?.should be_falsey }
     end
 
     context "false if the user limit is an empty string" do
       before { target.update_attributes(:user_limit => "") }
-      it { target.full?.should be_false }
+      it { target.full?.should be_falsey }
     end
 
     context "false if the number of approved users has not reached the limit yet" do
@@ -90,7 +90,7 @@ describe Institution do
         FactoryGirl.create(:user, :institution => target)
         target.update_attributes(:user_limit => 2)
       }
-      it { target.full?.should be_false }
+      it { target.full?.should be_falsey }
     end
 
     context "true if the number of approved users is equal the limit" do
@@ -98,7 +98,7 @@ describe Institution do
         FactoryGirl.create(:user, :institution => target)
         target.update_attributes(:user_limit => 1)
       }
-      it { target.full?.should be_true }
+      it { target.full?.should be_truthy }
     end
 
     context "true if the number of approved users is bigger than the limit" do
@@ -107,7 +107,7 @@ describe Institution do
         FactoryGirl.create(:user, :institution => target)
         target.update_attributes(:user_limit => 1)
       }
-      it { target.full?.should be_true }
+      it { target.full?.should be_truthy }
     end
   end
 

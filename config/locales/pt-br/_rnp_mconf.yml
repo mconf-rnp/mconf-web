@@ -4,6 +4,7 @@ pt-br:
       institution:
         acronym: Sigla
         can_record_limit: Usuários que podem gravar
+        force_shib_login: Somente login via federação
         name: Nome
         user_limit: Máximo de membros
         identifier: Identificador
@@ -92,6 +93,9 @@ pt-br:
       change_institution: Mudar instituição do usuário
       institution_placeholder: "Selecione uma instituição"
     registrations:
+      shibboleth:
+        error:
+          force_shib_registration: "Desculpe, você não pode se registrar localmente, sua instituição só permite login via federação. Você deve utilizar o CAFe para o login."
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.
     update:

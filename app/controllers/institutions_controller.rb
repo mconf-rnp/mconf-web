@@ -106,7 +106,7 @@ class InstitutionsController < ApplicationController
   end
 
   def institution_allowed_params
-    [ :acronym, :name, :user_limit, :can_record_limit, :identifier ]
+    [ :acronym, :name, :user_limit, :can_record_limit, :identifier, :force_shib_login ]
   end
 
 
