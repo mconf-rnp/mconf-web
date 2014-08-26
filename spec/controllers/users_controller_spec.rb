@@ -799,4 +799,5 @@ describe UsersController do
 
     it { should_authorize an_instance_of(User), :disapprove, :via => :post, :id => user.to_param }
   end
+
 end

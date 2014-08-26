@@ -59,7 +59,7 @@ describe ShibbolethController do
           expected = {}
           expected["Shib-inetOrgPerson-cn"] = attrs[:_full_name]
           expected["Shib-inetOrgPerson-mail"] = attrs[:email]
-          expected["Shib-eduPerson-eduPersonPrincipalName"] = principal_name
+          expected["Shib-eduPerson-eduPersonPrincipalName"] = attrs[:_full_name]
           subject.data.should eq(expected)
         }
         it { controller.should redirect_to(shibboleth_path) }
@@ -96,6 +96,7 @@ describe ShibbolethController do
       let(:run_route) { get :login }
       it_should_behave_like "has the before_filter :check_shib_enabled"
       it_should_behave_like "has the before_filter :check_current_user"
+      skip "has the before_filter :load_shib_session"
     end
 
     # to make sure we're not forgetting a call to #test_data (happened before)
@@ -126,6 +127,7 @@ describe ShibbolethController do
       }
 
       context "logs the user in if he already has a token" do
+        before { ShibToken.create!(:identifier => user.email, :user => user) }
         before(:each) {
           ShibToken.create!(:identifier => user.email, :user => user)
           request.flash[:success] = 'message set previously by #create_association'
@@ -202,6 +204,34 @@ describe ShibbolethController do
       let(:run_route) { post :create_association }
       it_should_behave_like "has the before_filter :check_shib_enabled"
       it_should_behave_like "has the before_filter :check_current_user"
+      skip "has the before_filter :load_shib_session"
+
+      context "has the before filter: ckeck_shib_always_new_account" do
+
+        context "when the flag shib_always_new_account is on" do
+          before {
+            Site.current.update_attributes(:shib_enabled => true,
+                                           :shib_always_new_account => true)
+          }
+          it { expect { post :create_association }.to raise_error(ActionController::RoutingError) }
+        end
+
+        context "when flag shib_always_new_account is off" do
+          before {
+            Site.current.update_attributes(:shib_enabled => true,
+                                           :shib_always_new_account => false)
+          }
+          context "should be able to call create_association" do
+            before(:each) { post :create_association }
+            it { expect { post :create_association }.not_to raise_error }
+            it("calls the action in the controller") {
+              controller.stub(:render) # prevent ActionView::MissingTemplate
+              controller.should_receive(:create_association)
+              post :create_association
+            }
+          end
+        end
+      end
     end
 
     context "if params has no known option, redirects to /secure with a warning" do
@@ -321,6 +351,10 @@ describe ShibbolethController do
 
       context "calls #associate_with_new_account" do
         let(:run_route) { post :create_association, :new_account => true }
+        before {
+          setup_shib(attrs[:_full_name], attrs[:email])
+          save_shib_to_session
+        }
         it_should_behave_like "a caller of #associate_with_new_account"
       end
     end

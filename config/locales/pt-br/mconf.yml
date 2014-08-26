@@ -162,7 +162,6 @@ pt-br:
         ldap_username_field: "LDAP: Campo para obter o nome de usuário"
         ldap_email_field: "LDAP: Campo para obter o email"
         ldap_name_field: "LDAP: Campo para obter o nome completo"
-        ldap_principal_name_field: "LDAP: Campo para principal name (ID único)"
         local_auth_enabled: "Habilitar autenticação local"
         locale: "Idioma"
         name: "Nome"
@@ -191,9 +190,9 @@ pt-br:
         xmpp_server: "Endereço do servidor XMPP"
         webconf_auto_record: "Atribuir automaticamente a opção de gravação ao iniciar uma conferência"
       space:
-        attendee_password: "Senha de participante"
+        attendee_key: "Chave para participantes"
         description: "Descrição"
-        moderator_password: "Senha de moderador"
+        moderator_key: "Chave para moderadores"
         name: "Nome"
         permalink: "Identificador"
         public: "Pública"
@@ -264,6 +263,7 @@ pt-br:
     not_selected: "Nenhum documento selecionado"
     one: Anexo
     other: Anexos
+    repository_disabled: O repositório de documentos desta comunidade está desabilitado.
     selected:
       none: "Nenhum arquivo selecionado"
       one: "arquivo selecionado"
@@ -1060,10 +1060,10 @@ pt-br:
         event: "%{username} mudou sua função no evento %{event}"
         space: "%{username} mudou sua função na comunidade %{space}"
     updated: "Desempenho do usuário foi atualizado com sucesso"
-  permission:
     other: "Direitos de acesso"
     update:
       success: "Direitos de acesso atualizados"
+      failure: "Problema ao atualizar os direitos de acesso"
   personal_information: "Informações pessoais"
   phone:
     mobile: Celular
@@ -1094,6 +1094,11 @@ pt-br:
     updated: "Mensagem atualizada!"
     wall: Mural
   posts:
+    index:
+      new_post: "Enviar uma mensagem"
+      no_messages: "Não existem mensagens no mural"
+    new_post:
+      title: "Adicionando uma mensagem"
     post_with_children:
       by: "de"
   prav: PRAV

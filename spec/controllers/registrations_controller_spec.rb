@@ -62,7 +62,7 @@ describe RegistrationsController do
     describe "if registrations are disabled in the site"
   end
 
-  context "institution is on CAFe and do not allow local registration" do
+  context "institution is on CAFe and does not allow local registration" do
     let(:institution) { FactoryGirl.create(:institution) }
     let(:user) { FactoryGirl.create(:user, :institution => institution) }
     let(:params) { { :user => {:email => user.email, :_full_name=> user.username, :username => user.username, 

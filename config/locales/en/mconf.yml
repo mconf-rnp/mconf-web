@@ -191,9 +191,9 @@ en:
         xmpp_server: "XMPP Server Address"
         webconf_auto_record: "Automatically set the recording flag when creating a web conference"
       space:
-        attendee_password: "Attendee password"
+        attendee_key: "Key for attendees"
         description: "Description"
-        moderator_password: "Moderator password"
+        moderator_key: "Key for moderators"
         name: "Name"
         permalink: "Identifier"
         public: "Public"
@@ -1095,11 +1095,6 @@ en:
     updated: "Message updated!"
     wall: Wall
   posts:
-    index:
-      new_post: "Send a new message"
-      no_messages: "There are no messages in the wall"
-    new_post:
-      title: "Post a new message"
     post_with_children:
       by: "by"
   prav: PRAV
