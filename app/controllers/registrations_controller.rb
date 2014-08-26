@@ -8,6 +8,7 @@
 class RegistrationsController < Devise::RegistrationsController
   layout 'no_sidebar'
 
+  prepend_before_filter :check_shib_login_only, :only => [:create]
   before_filter :check_registration_enabled, :only => [:new, :create]
   before_filter :configure_permitted_parameters, :only => [:create]
 
@@ -34,6 +35,17 @@ class RegistrationsController < Devise::RegistrationsController
 
   def allowed_params
     [:email, :_full_name, :username]
+  end
+
+  def check_shib_login_only
+    if params.has_key?(:user)
+      institution_id = params[:user][:institution_id]
+      institution = Institution.where(id: institution_id).first
+      if institution && institution.force_shib_login?
+        flash[:error] = I18n.t('users.registrations.shibboleth.error.force_shib_registration')
+        redirect_to root_path
+      end
+    end
   end
 
 end

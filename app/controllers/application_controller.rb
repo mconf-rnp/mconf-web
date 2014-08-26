@@ -225,4 +225,8 @@ class ApplicationController < ActionController::Base
     session[:user_return_to] = nil
   end
 
+  def clear_stored_location
+    session[:user_return_to] = nil
+  end
+
 end

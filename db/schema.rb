@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140804173423) do
+ActiveRecord::Schema.define(version: 20140820134038) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -152,11 +152,12 @@ ActiveRecord::Schema.define(version: 20140804173423) do
     t.string   "name"
     t.string   "acronym"
     t.string   "permalink"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.integer  "user_limit"
     t.integer  "can_record_limit"
     t.string   "identifier"
+    t.boolean  "force_shib_login", default: false
   end
 
   create_table "invitations", force: true do |t|
@@ -373,9 +374,9 @@ ActiveRecord::Schema.define(version: 20140804173423) do
     t.boolean  "registration_enabled",           default: true,  null: false
     t.string   "shib_principal_name_field"
     t.string   "ldap_filter"
-    t.string   "ldap_principal_name_field"
     t.boolean  "shib_always_new_account",        default: false
     t.boolean  "local_auth_enabled",             default: true
+    t.string   "ldap_principal_name_field"
   end
 
   create_table "spaces", force: true do |t|
