@@ -20,6 +20,9 @@ def has_success_message message=nil
 end
 
 def has_failure_message message=nil
-  page.should have_css('#notification-flashs > div[name=alert]')
-  page.find('#notification-flashs > div[name=alert]').should have_content(message)
+  # TODO
+  # we sometimes show success on 'alert' and sometimes on 'error'
+  error_css = '#notification-flashs > div[name=alert],div[name=error]'
+  page.should have_css(error_css)
+  page.find(error_css).should have_content(message)
 end
