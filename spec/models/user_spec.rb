@@ -493,27 +493,27 @@ describe User do
           user.institution.update_attributes(:user_limit => 1)
         }
         subject { user.approve! }
-        it { should be_false }
-        it { user.approved.should be_false }
+        it { should be_falsey }
+        it { user.approved.should be_falsey }
       end
 
       context "doesn't approve the user if the user limit is 0" do
         before { user.institution.update_attributes(:user_limit => 0) }
         subject { user.approve! }
-        it { should be_false }
-        it { user.approved.should be_false }
+        it { should be_falsey }
+        it { user.approved.should be_falsey }
       end
 
       context "ignores empty user limits" do
         before { user.institution.update_attributes(:user_limit => nil) }
         before(:each) { user.approve! }
-        it { user.approved.should be_true }
+        it { user.approved.should be_truthy }
       end
 
       context "ignores the limit if ignore_full is set" do
         before { user.institution.update_attributes(:user_limit => 0) }
         before(:each) { user.approve!(true) }
-        it { user.approved.should be_true }
+        it { user.approved.should be_truthy }
       end
     end
   end
