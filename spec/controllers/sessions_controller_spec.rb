@@ -7,10 +7,11 @@
 require 'spec_helper'
 
 describe SessionsController do
+  render_views
+
+  before { @request.env["devise.mapping"] = Devise.mappings[:user] }
 
   describe "#new" do
-    before { @request.env["devise.mapping"] = Devise.mappings[:user] }
-
     context "if there's already a user signed in" do
       before do
         login_as(FactoryGirl.create(:user))
@@ -30,21 +31,26 @@ describe SessionsController do
     it "authenticates a user via LDAP and logs the user in"
   end
 
-  context "institution only allow login via federation" do
-    let(:institution) { FactoryGirl.create(:institution, :acronym => "UFRGS") }
-    let(:user) { FactoryGirl.create(:user, :institution => institution) }
-    let(:params) { { :user => {:login => user.username, :password => user.password, :remember_me => "0"} } }
-    before {
-      institution.update_attributes(:force_shib_login => true)
-      @request.env["devise.mapping"] = Devise.mappings[:user]
-      controller.stub(:params).and_return(params)
-    }
-    before(:each){
-      login_as(user)
-      put :create
-    }
-    it { should set_the_flash.to(I18n.t('users.registrations.shibboleth.error.force_shib_login')) }
-    it { should redirect_to(root_path)}
+  describe "#create" do
+
+    context "the user's institution allows forces login via federation" do
+      let(:institution) { FactoryGirl.create(:institution, acronym: "UFRGS", force_shib_login: true) }
+      let(:user) { FactoryGirl.create(:user, institution: institution) }
+      let(:params) { { user: { login: user.username, password: user.password, remember_me: "0" } } }
+      before {
+        request.env["HTTP_REFERER"] = "/"
+        Site.current.update_attributes(local_auth_enabled: true)
+      }
+      before(:each) { post :create, params }
+      it {
+        # check in the body and not in the flash message because somehow the error doesn't
+        # appear as a flash message (devise sets it in some other way?)
+        response.body.should match(I18n.t('devise.failure.force_shib_login'))
+      }
+      it { should render_template(:new) }
+      it { should_not be_signed_in }
+    end
+
   end
 
 end
