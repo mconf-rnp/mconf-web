@@ -1,6 +1,29 @@
 include Warden::Test::Helpers
 Warden.test_mode!
 
+def enable_shib
+  Site.current.update_attributes(
+    :shib_enabled => true,
+    :shib_name_field => "Shib-inetOrgPerson-cn",
+    :shib_email_field => "Shib-inetOrgPerson-mail",
+    :shib_principal_name_field => "Shib-eduPerson-eduPersonPrincipalName"
+  )
+end
+
+def setup_shib name, email, principal
+  Capybara.register_driver :rack_test do |app|
+    Capybara::RackTest::Driver.new(app, :headers => {
+      "Shib-inetOrgPerson-cn" => name,
+      "Shib-inetOrgPerson-mail" => email,
+      "Shib-eduPerson-eduPersonPrincipalName" => principal
+    })
+  end
+end
+
+def logout_user
+  find("a[href='#{logout_path}']").click
+end
+
 # Shorthand for I18n.t
 def t *args
   I18n.t(*args)
