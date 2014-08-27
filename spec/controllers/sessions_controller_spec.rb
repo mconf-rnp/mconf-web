@@ -45,22 +45,36 @@ describe SessionsController do
 
   describe "#create" do
 
-    context "the user's institution allows forces login via federation" do
+    context "the user's institution forces login via federation" do
       let(:institution) { FactoryGirl.create(:institution, acronym: "UFRGS", force_shib_login: true) }
       let(:user) { FactoryGirl.create(:user, institution: institution) }
-      let(:params) { { user: { login: user.username, password: user.password, remember_me: "0" } } }
       before {
         request.env["HTTP_REFERER"] = "/"
         Site.current.update_attributes(local_auth_enabled: true)
       }
       before(:each) { post :create, params }
-      it {
-        # check in the body and not in the flash message because somehow the error doesn't
-        # appear as a flash message (devise sets it in some other way?)
-        response.body.should match(I18n.t('devise.failure.force_shib_login'))
-      }
-      it { should render_template(:new) }
-      it { should_not be_signed_in }
+
+      context "when signing in using a username" do
+        let(:params) { { user: { login: user.username, password: user.password, remember_me: "0" } } }
+        it {
+          # check in the body and not in the flash message because somehow the error doesn't
+          # appear as a flash message (devise sets it in some other way?)
+          response.body.should match(I18n.t('devise.failure.force_shib_login'))
+        }
+        it { should render_template(:new) }
+        it { should_not be_signed_in }
+      end
+
+      context "when signing in using an email" do
+        let(:params) { { user: { login: user.email, password: user.password, remember_me: "0" } } }
+        it {
+          # check in the body and not in the flash message because somehow the error doesn't
+          # appear as a flash message (devise sets it in some other way?)
+          response.body.should match(I18n.t('devise.failure.force_shib_login'))
+        }
+        it { should render_template(:new) }
+        it { should_not be_signed_in }
+      end
     end
 
   end

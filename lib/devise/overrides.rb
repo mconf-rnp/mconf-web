@@ -20,12 +20,8 @@ Devise::Strategies::DatabaseAuthenticatable.class_eval do
     return fail(:local_auth_disabled) unless local_auth
 
     # only some institutions allow local login, others must use shibboleth
-    if params.has_key?(:user)
-      user = User.where(username: params[:user][:login]).first
-      if user && !user.institution.nil? && user.institution.force_shib_login?
-        return fail(:force_shib_login)
-      end
-    end
+    institution = resource.institution
+    return fail(:force_shib_login) if !institution.nil? && institution.force_shib_login?
 
     super_authenticate!
   end
