@@ -17,7 +17,7 @@ class ManageController < ApplicationController
     else
       query = current_user.institution.users
     end
-    query = query.with_disabled.joins(:profile).includes(:profile).order("profiles.full_name")
+    query = query.joins(:profile).includes(:profile).order("profiles.full_name")
     if name.present?
       query = query.where("profiles.full_name like ? OR users.username like ? OR users.email like ?", "%#{name}%", "%#{name}%", "%#{name}%")
     end
@@ -39,7 +39,7 @@ class ManageController < ApplicationController
     else
       query = current_user.institution.spaces
     end
-    query = query.with_disabled.order("name")
+    query = query.order("name")
     if name.present?
       query = query.where("name like ?", "%#{name}%")
     end

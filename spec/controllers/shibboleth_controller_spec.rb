@@ -59,7 +59,7 @@ describe ShibbolethController do
           expected = {}
           expected["Shib-inetOrgPerson-cn"] = attrs[:_full_name]
           expected["Shib-inetOrgPerson-mail"] = attrs[:email]
-          expected["Shib-eduPerson-eduPersonPrincipalName"] = attrs[:_full_name]
+          expected["Shib-eduPerson-eduPersonPrincipalName"] = principal_name
           subject.data.should eq(expected)
         }
         it { controller.should redirect_to(shibboleth_path) }
@@ -127,7 +127,6 @@ describe ShibbolethController do
       }
 
       context "logs the user in if he already has a token" do
-        before { ShibToken.create!(:identifier => user.email, :user => user) }
         before(:each) {
           ShibToken.create!(:identifier => user.email, :user => user)
           request.flash[:success] = 'message set previously by #create_association'
@@ -207,7 +206,6 @@ describe ShibbolethController do
       skip "has the before_filter :load_shib_session"
 
       context "has the before filter: ckeck_shib_always_new_account" do
-
         context "when the flag shib_always_new_account is on" do
           before {
             Site.current.update_attributes(:shib_enabled => true,
@@ -351,10 +349,6 @@ describe ShibbolethController do
 
       context "calls #associate_with_new_account" do
         let(:run_route) { post :create_association, :new_account => true }
-        before {
-          setup_shib(attrs[:_full_name], attrs[:email])
-          save_shib_to_session
-        }
         it_should_behave_like "a caller of #associate_with_new_account"
       end
     end

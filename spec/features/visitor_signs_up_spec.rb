@@ -8,7 +8,8 @@ feature 'Visitor signs up' do
 
     it { page.should have_content(Site.current.name) }
     it { page.should have_content(I18n.t('frontpage.show.register.title')) }
-    it { page.should have_content(I18n.t('frontpage.show.login.title')) }
+    # RNP's custom frontpage doesn't have this title
+    # it { page.should have_content(I18n.t('frontpage.show.login.title')) }
   end
 
   context 'send invalid register form and try to change language after' do
