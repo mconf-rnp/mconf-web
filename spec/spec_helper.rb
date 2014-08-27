@@ -56,6 +56,8 @@ RSpec.configure do |config|
   config.include ControllerMacros, :type => :controller
   config.extend Helpers::ClassMethods
 
+  config.include FeatureHelpers, :type => :feature
+
   config.after(:each) do
     if Rails.env.test?
       FileUtils.rm_rf(Dir["#{Rails.root}/spec/support/uploads"])
