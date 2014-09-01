@@ -3,7 +3,8 @@ require 'spec_helper'
 describe 'User signs in via shibboleth' do
   subject { page }
   before(:all) {
-    @attrs = FactoryGirl.attributes_for(:user, :email => "user@mconf.org")
+    @institution = FactoryGirl.create(:institution)
+    @attrs = FactoryGirl.attributes_for(:user, :email => "user@#{@institution.identifier.downcase}")
   }
 
   context "for the first time when the flag `shib_always_new_account` is set" do
@@ -73,13 +74,13 @@ describe 'User signs in via shibboleth' do
     before {
       enable_shib
       Site.current.update_attributes :shib_always_new_account => true
-      setup_shib 'a full name', 'user@mconf.org', 'user@mconf.org'
+      setup_shib 'a full name', "user@#{@institution.identifier}", "user@#{@institution.identifier}"
     }
 
     context "when he was in the frontpage" do
       before {
         visit root_url
-        click_link login_link
+        click_link t('frontpage.show.login.click_here') # federation login link
       }
 
       it { current_path.should eq(my_home_path) }
