@@ -19,6 +19,22 @@ Devise::Strategies::DatabaseAuthenticatable.class_eval do
     local_auth = Site.current.local_auth_enabled? || resource.superuser
     return fail(:local_auth_disabled) unless local_auth
 
+    # only some institutions allow local login, others must use shibboleth
+    institution = resource.institution
+    return fail(:force_shib_login) if !institution.nil? && institution.force_shib_login?
+
     super_authenticate!
+  end
+end
+
+# TODO: alternative to fix the bug found in
+# https://github.com/plataformatec/devise/issues/2976
+Devise::Models::Confirmable.class_eval do
+  #trying to fix the bug of regenerating a new confirmation_token each time an user is updated
+  def postpone_email_change_until_confirmation_and_regenerate_confirmation_token
+    @reconfirmation_required = true
+    self.unconfirmed_email = self.email
+    self.email = self.email_was
+    generate_confirmation_token unless confirmation_token
   end
 end

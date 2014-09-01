@@ -62,4 +62,19 @@ describe RegistrationsController do
     describe "if registrations are disabled in the site"
   end
 
+  context "institution is on CAFe and does not allow local registration" do
+    let(:institution) { FactoryGirl.create(:institution) }
+    let(:user) { FactoryGirl.create(:user, :institution => institution) }
+    let(:params) { { :user => {:email => user.email, :_full_name=> user.username, :username => user.username, 
+                 :institution_id => institution.id, :password => user.password, :password_confirmation => user.password} } }
+    before {
+      controller.stub(:params).and_return(params)
+      institution.update_attributes(:force_shib_login => true)
+      @request.env["devise.mapping"] = Devise.mappings[:user]
+    }
+    before(:each) { put :create }
+    it { should redirect_to(root_path) }
+    it { should set_the_flash.to(I18n.t("users.registrations.shibboleth.error.force_shib_registration"))}
+  end
+
 end

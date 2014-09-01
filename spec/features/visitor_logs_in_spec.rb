@@ -29,6 +29,16 @@ feature 'Visitor logs in' do
   end
 
   feature 'with valid credentials' do
+    # RNP's custom landing page doesn't have a login form
+    # scenario 'from the frontpage' do
+    #   visit root_path
+    #   fill_in 'user[login]', with: @user.username
+    #   find('#login-box').find('#user_password').set(@user.password)
+    #   click_button 'Login'
+
+    #   expect(current_path).to eq(my_home_path)
+    # end
+
     scenario 'from /login' do
       visit login_path
 
@@ -140,12 +150,5 @@ feature 'Visitor logs in' do
       skip
     end
 
-  end
-
-  def sign_in_with(user_email, password, visit_page=true)
-    visit new_user_session_path
-    fill_in 'user[login]', with: user_email
-    fill_in 'user[password]', with: password
-    click_button 'Login'
   end
 end

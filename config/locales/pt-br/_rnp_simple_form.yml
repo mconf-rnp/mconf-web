@@ -4,5 +4,6 @@ pt-br:
       institution:
         acronym: "Adicionar uma sigla ajuda os usuários a encontrarem a instituição correta ao se registrar."
         user_limit: "Opcional. Informe um número caso deseje limitar o número de usuários que podem fazer parte desta instituição. Deixe em branco para não limitar o número de membros."
+        force_shib_login: "Quando habilitado o usuário só poderá se logar através da federação"
         can_record_limit: "Opcional. Informe um número caso deseje limitar o número de membros que podem gravar reuniões nesta instituição. Deixe em branco para não limitar o número de membros."
         identifier: "Opcional. Identificador usado na federação. Se um usuário é identificado na federação por \"user@ins.org\", por exemplo, o identificador da instituição deve ser \"ins.org\""

@@ -58,7 +58,7 @@ class UsersController < ApplicationController
   end
 
   def update
-     # check if the institution has reached its limit for users that can record
+    # check if the institution has reached its limit for users that can record
     # but do it only if the record flag is being set, otherwise ignore it
     # also, superusers can always set the flag, even if the limit is reached
     set_can_record =

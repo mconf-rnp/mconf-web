@@ -26,7 +26,7 @@ class ShibbolethController < ApplicationController
   # The authentication is currently made with the Apache module mod_shib
   def login
     unless @shib.has_basic_info
-      logger.error "Shibboleth: couldn't basic user information from session, " +
+      logger.error "Shibboleth: couldn't find basic user information from session, " +
         "searching fields #{@shib.basic_info_fields.inspect} " +
         "in: #{@shib.get_data.inspect}"
       @attrs_required = @shib.basic_info_fields
@@ -228,12 +228,12 @@ class ShibbolethController < ApplicationController
       request.env["Shib-Authentication-Method"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-AuthnContext-Class"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-brEduPerson-brEduAffiliationType"] = "student;position;faculty"
+      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "75a988943825d2871e1cfa75473ec0@ufrgs.br"
       request.env["Shib-inetOrgPerson-cn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-sn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
       request.env["inetOrgPerson-cn"] = "Rick Astley"
       request.env["inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
-      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "rickastley@dontgiveup.br"
     end
   end
 end

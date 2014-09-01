@@ -152,13 +152,14 @@ describe ManageController do
         should respond_with(:success)
       }
 
-      context "sets @users to a list of all users, excluding disabled users and users from other institutions" do
+      context "sets @users to a list of all users, excluding users from other institutions" do
         before {
           @u1 = user
           @u2 = FactoryGirl.create(:user, :institution => institution, :disabled => false)
           @u3 = FactoryGirl.create(:user, :institution => institution, :disabled => false)
           @u4 = FactoryGirl.create(:user, :institution => institution, :disabled => true)
           @u5 = FactoryGirl.create(:user, :institution => FactoryGirl.create(:institution), :disabled => true)
+          @u6 = FactoryGirl.create(:user, :institution => FactoryGirl.create(:institution), :disabled => false)
         }
         before(:each) { get :users }
         it { assigns(:users).count.should be(3) } # our 2 plus the standard seeded user
@@ -389,6 +390,7 @@ describe ManageController do
           @s2 = FactoryGirl.create(:space, :disabled => false, :institution => institution)
           @s3 = FactoryGirl.create(:space, :disabled => true, :institution => institution)
           @s4 = FactoryGirl.create(:space, :disabled => false, :institution => FactoryGirl.create(:institution))
+          @s5 = FactoryGirl.create(:space, :disabled => true, :institution => FactoryGirl.create(:institution))
         }
         before(:each) { get :spaces }
         it { assigns(:spaces).count.should be(2) }

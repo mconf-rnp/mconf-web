@@ -96,7 +96,7 @@ class ApplicationController < ActionController::Base
     if current_user.nil?
       # anonymous users
       if room.private?
-        :password
+        :key
       else
         guest_role
       end
@@ -107,7 +107,7 @@ class ApplicationController < ActionController::Base
           :moderator
         else
           if room.private
-            :password # ask for a password if room is private
+            :key # ask for a password if room is private
           else
             guest_role
           end
@@ -125,7 +125,7 @@ class ApplicationController < ActionController::Base
           end
         else
           if room.private
-            :password
+            :key
           else
             guest_role
           end

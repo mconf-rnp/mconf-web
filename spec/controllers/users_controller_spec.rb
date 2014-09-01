@@ -672,11 +672,11 @@ describe UsersController do
         #     Site.current.update_attributes(:require_registration_approval => true)
         #   }
         #   it {
-        #     user.confirmed?.should be_false # just to make sure wasn't already confirmed
+        #     user.confirmed?.should be_falsey # just to make sure wasn't already confirmed
         #     expect {
         #       post :approve, :id => user.to_param
         #     }.not_to change{ ActionMailer::Base.deliveries }
-        #     user.confirmed?.should be_true
+        #     user.confirmed?.should be_truthy
         #   }
         # end
       end
@@ -692,13 +692,13 @@ describe UsersController do
         it { should respond_with(:redirect) }
         it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
         it { should redirect_to('/any') }
-        it("doesn't approve the user") { user.reload.approved?.should be_false }
+        it("doesn't approve the user") { user.reload.approved?.should be_falsey }
 
         # TODO: Not working yet:
         #   It's triggering an error related to delayed_job (undefined method `tag=').
         #   Uncomment this when delayed_job is removed, see #811.
         #   Search for this same comment in other files as well.
-        # it("doesn't confirm the user") { user.reload.confirmed?.should be_false }
+        # it("doesn't confirm the user") { user.reload.confirmed?.should be_falsey }
       end
 
       context "and the institution's limit was reached" do
@@ -711,8 +711,8 @@ describe UsersController do
           it { should respond_with(:redirect) }
           it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
           it { should redirect_to('/any') }
-          it("approves the user") { user.reload.approved?.should be_true }
-          it("confirms the user") { user.reload.confirmed?.should be_true }
+          it("approves the user") { user.reload.approved?.should be_truthy }
+          it("confirms the user") { user.reload.confirmed?.should be_truthy }
 
           # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
           #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
@@ -721,11 +721,11 @@ describe UsersController do
           #     Site.current.update_attributes(:require_registration_approval => true)
           #   }
           #   it {
-          #     user.confirmed?.should be_false # just to make sure wasn't already confirmed
+          #     user.confirmed?.should be_falsey # just to make sure wasn't already confirmed
           #     expect {
           #       post :approve, :id => user.to_param
           #     }.not_to change{ ActionMailer::Base.deliveries }
-          #     user.confirmed?.should be_true
+          #     user.confirmed?.should be_truthy
           #   }
           # end
         end
@@ -742,13 +742,13 @@ describe UsersController do
           it { should respond_with(:redirect) }
           it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
           it { should redirect_to('/any') }
-          it("doesn't approve the user") { user.reload.approved?.should be_false }
+          it("doesn't approve the user") { user.reload.approved?.should be_falsey }
 
           # TODO: Not working yet:
           #   It's triggering an error related to delayed_job (undefined method `tag=').
           #   Uncomment this when delayed_job is removed, see #811.
           #   Search for this same comment in other files as well.
-          # it("doesn't confirm the user") { user.reload.confirmed?.should be_false }
+          # it("doesn't confirm the user") { user.reload.confirmed?.should be_falsey }
         end
 
       end
@@ -799,4 +799,5 @@ describe UsersController do
 
     it { should_authorize an_instance_of(User), :disapprove, :via => :post, :id => user.to_param }
   end
+
 end

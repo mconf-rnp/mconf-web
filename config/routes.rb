@@ -154,8 +154,6 @@ Mconf::Application.routes.draw do
     get :webconf, :on => :collection
   end
 
-  resources :tags
-
   # The unique Site is created in db/seeds and can only be edited
   resource :site, :only => [:show, :edit, :update]
 
