@@ -51,8 +51,9 @@ pt-br:
     cancel: "Cancelar"
     create: "Criar"
     datetimepicker:
-      format: "dd/MM/yyyy hh:mm"
-      format_rails: "%d/%m/%Y %H:%M %Z"
+      format_display: "%d/%m/%Y"
+      format: "dd-MM-yyyy"
+      format_rails: "%d/%m/%Y %H:%M %z"
     deny: "Negar"
     destroy: "Remover"
     details: "Detalhes"
@@ -87,6 +88,7 @@ pt-br:
     user:
       administrator: "Administrador global"
       normal_user: "Usuário normal"
+      unapproved_user: "A espera de aprovação de administrador"
       guest: Convidado
       guest_name: "Usuário convidado (%{email})"
       removed: "<usuário removido>"
@@ -109,7 +111,7 @@ pt-br:
     attributes:
       invite:
         ends_on: "Acaba em"
-        message: "Comentários"
+        message: "Descrição"
         starts_on: "Inicia em"
         title: "Título"
         users: "Usuários"
@@ -587,9 +589,15 @@ pt-br:
     failure:
       user:
         not_approved: 'Sua conta ainda não foi aprovada por um administrador.'
+    mailer:
+      confirmation_instructions:
+        confirmation_link: "Confirme minha conta"
+        confirmation_ok: "Você pode confirmar sua conta de email através do link abaixo:"
+        confirmation_pending: "Sua conta foi criada e está esperando a aprovação de um administrador."
+        welcome: "Bem-vindo %{email}!"
     registrations:
       not_enabled: 'O registro de novas contas não está habilitado neste site.'
-      signed_up_but_not_approved: 'Seu registro foi feito com sucesso, mas você ainda precisa ser aprovado por um administrador para acessar o site'
+      signed_up_but_not_approved: 'Seu registro foi efetuado com sucesso! Você agora precisa ter sua conta aprovada por um administrador para acessar o site, por favor aguarde.'
     shared:
       links:
         login:
@@ -685,7 +693,7 @@ pt-br:
         title: "Acessar a sua conta"
         resend_confirmation_email: "Reenviar e-mail de confirmação"
       register:
-        title: "Create a new account"
+        title: "Criar uma nova conta"
   from: De
   getting_started: Começando!
   group:
@@ -1320,6 +1328,8 @@ pt-br:
       invalid_parameters: "Your request was invalid, please try again."
     info:
       title: "Seus dados obtidos pela federação"
+    login:
+      local_account_disabled: "Desculpe mas você não pode logar, sua conta está desabilitada. Por favor, entre em contato com um administrador para resolver o problema."
   show: Exibir
   show_advanced_editor: "Exibir editor avançado"
   show_list_version_arrows: "exibir versão em lista >>"
@@ -1366,7 +1376,7 @@ pt-br:
       select_at_left: "Selecione uma comunidade ao lado para ver sua descrição aqui"
       user_is_member: "Você é membro!"
     is_private: "é uma comunidade privado. Envie um pedido de adesão ao administrador desta comunidade para deixá-lo entrar"
-    is_private_html: "A comunidade %{name} é privada. Mande uma <a href=\"%{path}\">requisição</a> para o administrador da comunidade."
+    is_private_html: "A comunidade %{name} é privada. Para acessá-la, faça o login e mande uma <a href=\"%{path}\">requisição</a> para os administradores da comunidade."
     join: "Entrar na comunidade"
     join_invitation:
       clarify_registered: "Por favor, digite a senha para participar desta comunidade."
@@ -1469,7 +1479,7 @@ pt-br:
     error:
       already_invited: "Você já foi convidado para entrar nesta comunidade, por favor aceite ou rejeite o convite"
       need_join_to_access: "Você precisa participar desta comunidade para acessá-la. Envie um pedido de adesão aos administradores."
-      not_found: "A comunidade %{permalink} não existe. <br> Gostaria de buscar em <a href=\"%{path}\">todas comunidades</a>?"
+      not_found: "A comunidade \"%{permalink}\" não existe. <br> Gostaria de buscar em <a href=\"%{path}\">todas comunidades</a>?"
     index: 
       create_new_space: "Criar uma comunidade"
       list_format: 

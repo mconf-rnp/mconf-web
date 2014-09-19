@@ -85,7 +85,7 @@ gem 'premailer-rails'
 gem 'nokogiri'
 
 # event module
-gem 'mweb_events', :git => 'git@github.com:mconf/mweb_events.git', :branch => 'master'
+gem 'mweb_events', :git => 'git://github.com/mconf/mweb_events.git', :branch => 'master'
 
 # send emails in case of exceptions in production
 gem 'exception_notification', '~> 4.0.0'
@@ -135,6 +135,7 @@ end
 
 group :test do
   gem 'resque_spec'
+  gem 'database_cleaner'
 end
 
 # rails 3 compatibility

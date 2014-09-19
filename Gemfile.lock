@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: git://github.com/mconf/bigbluebutton_rails.git
-  revision: f92ddf82db47f0446de5f403377f41012917ead5
+  revision: 091fe5759709bddf69181ce3c72e9bbc71dcab3d
   branch: master
   specs:
     bigbluebutton_rails (2.0.0)
@@ -25,15 +25,8 @@ GIT
       resque (~> 1.25.1)
 
 GIT
-  remote: git://github.com/mconf/translate.git
-  revision: 849ba4469953233cd3a569cf793901d8f018cda9
-  specs:
-    translate-rails3 (0.1.1)
-      ya2yaml (~> 0.30)
-
-GIT
-  remote: git@github.com:mconf/mweb_events.git
-  revision: 39ba6ebefec5a476f3b93894292cd1e701626a64
+  remote: git://github.com/mconf/mweb_events.git
+  revision: fcea2ed4228c5434a09e9200831e3bd6b0472832
   branch: master
   specs:
     mweb_events (0.0.1)
@@ -57,10 +50,17 @@ GIT
       redcarpet
       sass-rails (>= 4.0.0)
       select2-rails
-      simple_form (~> 3.0.0)
+      simple_form (>= 3.0.0)
       therubyracer
       twitter-bootstrap-rails
       valid_email
+
+GIT
+  remote: git://github.com/mconf/translate.git
+  revision: 849ba4469953233cd3a569cf793901d8f018cda9
+  specs:
+    translate-rails3 (0.1.1)
+      ya2yaml (~> 0.30)
 
 GIT
   remote: https://github.com/Fire-Dragon-DoL/valid_email.git
@@ -162,6 +162,7 @@ GEM
       yamler (>= 0.1.0)
     css_parser (1.3.5)
       addressable
+    database_cleaner (1.3.0)
     debug_inspector (0.0.2)
     devise (3.2.4)
       bcrypt (~> 3.0)
@@ -194,7 +195,7 @@ GEM
       railties (>= 3.2, < 5.0)
     friendly_id (5.0.4)
       activerecord (>= 4.0.0)
-    geocoder (1.2.3)
+    geocoder (1.2.5)
     haml (4.0.5)
       tilt
     haml-rails (0.5.3)
@@ -432,6 +433,7 @@ DEPENDENCIES
   compass (~> 0.13.alpha)
   compass-rails (~> 1.0)
   configatron (~> 2.13.0)
+  database_cleaner
   devise (~> 3.2.4)
   devise-async
   devise-encryptable

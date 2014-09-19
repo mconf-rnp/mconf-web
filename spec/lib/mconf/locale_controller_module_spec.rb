@@ -4,10 +4,13 @@
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
-class BigbluebuttonMeetingObserver < ActiveRecord::Observer
-  observe :bigbluebutton_meeting
+require 'spec_helper'
 
-  def after_create(meeting)
-    meeting.create_activity :create, :owner => meeting.room unless meeting.errors.any?
-  end
+describe Mconf::LocaleControllerModule do
+  it "set_current_locale"
+  it "get_user_locale"
+  it "user_has_locale?"
+  it "session_has_locale?"
+  it "site_has_locale?"
+  it "locale_available?"
 end

@@ -194,6 +194,17 @@ describe ShibbolethController do
 
         end
       end
+
+      context "user has a token and his local account is disabled" do
+        before {
+          setup_shib(user.full_name, user.email)
+          ShibToken.create!(:identifier => user.email, :user => user)
+          user.disable
+        }
+        before(:each) { get :login }
+        it { should set_the_flash.to(I18n.t('shibboleth.login.local_account_disabled'))}
+        it { should redirect_to(root_path) }
+      end
     end
   end
 

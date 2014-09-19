@@ -4,12 +4,12 @@
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
-class ProfileObserver < ActiveRecord::Observer
-  observe :profile
+require 'spec_helper'
 
-  def after_update(profile)
-    if profile.user and profile.user.bigbluebutton_room
-      profile.user.bigbluebutton_room.update_attribute(:name, profile.full_name)
-    end
-  end
+describe BaseMailer do
+
+  it '#site_locale'
+  it '#default_email_time_zone'
+  it '#default_email_locale'
+
 end

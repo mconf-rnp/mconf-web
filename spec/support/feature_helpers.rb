@@ -29,6 +29,10 @@ module FeatureHelpers
     find("a[href='#{logout_path}']").click
   end
 
+  def have_image src
+    have_xpath("//img[contains(@src,\"#{src}\")]")
+  end
+
   # Shorthand for I18n.t
   def t *args
     I18n.t(*args)
@@ -44,6 +48,16 @@ module FeatureHelpers
     fill_in 'user[login]', with: user_email
     fill_in 'user[password]', with: password
     click_button 'Login'
+  end
+
+  def register_with(attrs)
+    visit register_path
+    fill_in "user[email]", with: attrs[:email]
+    fill_in "user[_full_name]", with: attrs[:_full_name]
+    fill_in "user[username]", with: attrs[:username]
+    fill_in "user[password]", with: attrs[:password]
+    fill_in "user[password_confirmation]", with: attrs[:password]
+    click_button "Register"
   end
 
   def has_success_message message=nil
@@ -64,6 +78,10 @@ module FeatureHelpers
 
   def have_notification(text)
     have_selector("#notification-flashs", :text => text)
+  end
+
+  def last_email
+    ActionMailer::Base.deliveries.last
   end
 
 end

@@ -85,7 +85,7 @@
         = f.input :superuser, :required => false if can?(:manage_superuser, @user)
         - if can?(:manage_disable, @user)
           .input
-            = link_to user_path(@user), :confirm => t('.disable_confirm'), :method => :delete do
+            = link_to user_path(@user), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
               = icon_delete(:alt => t('.disable'), :title => t('.disable'))
               = t('.disable')
 

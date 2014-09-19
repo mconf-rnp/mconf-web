@@ -51,8 +51,9 @@ en:
     cancel: "Cancel"
     create: "Create"
     datetimepicker:
-      format: "MM/dd/yyyy hh:mm"
-      format_rails: "%m/%d/%Y %H:%M %Z"
+      format_display: "%m/%d/%Y"
+      format: "MM-dd-yyyy"
+      format_rails: "%m/%d/%Y %H:%M %z"
     deny: "Deny"
     destroy: "Destroy"
     details: "Details"
@@ -87,6 +88,7 @@ en:
     user:
       administrator: "Global administrator"
       normal_user: "Normal user"
+      unapproved_user: "Waiting approval by admin"
       guest: "Guest"
       guest_name: "Guest User (%{email})"
       removed: "<user removed>"
@@ -109,7 +111,7 @@ en:
     attributes:
       invite:
         ends_on: "Ends on"
-        message: "Comments"
+        message: "Description"
         starts_on: "Starts on"
         title: "Title"
         users: "Users"
@@ -587,10 +589,16 @@ en:
   devise:
     failure:
       user:
-        not_approved: 'Your account has not been approved by an administrator yet.'
+        not_approved: "Your account has not yet been approved by an administrator."
+    mailer:
+      confirmation_instructions:
+        confirmation_link: "Confirm my account"
+        confirmation_ok: "You can confirm your account email through the link below:"
+        confirmation_pending: "Your account was created and is waiting the approval of an administrator."
+        welcome: "Welcome %{email}!"
     registrations:
-      not_enabled: 'Registration of new accounts is not enabled in this website.'
-      signed_up_but_not_approved: 'You have signed up successfully but your account has still to be approved by an administrator'
+      not_enabled: "Registration of new accounts is not enabled in this website."
+      signed_up_but_not_approved: "You have signed up successfully! You account is now waiting to be approved by an administrator, please wait."
     shared:
       links:
         login:
@@ -1316,6 +1324,8 @@ en:
       invalid_parameters: "Your request was invalid, please try again."
     info:
       title: "Your data from the federation"
+    login:
+      local_account_disabled: "Sorry but you can't sign in, your account is disabled. Please contact an adminstrator to solve the problem."
   show: Show
   show_advanced_editor: "Show advanced editor"
   show_list_version_arrows: "show list version >>"
@@ -1362,7 +1372,7 @@ en:
       select_at_left: "Select a space in the list to see it's description here"
       user_is_member: "You are a member!"
     is_private: "is a private space. Send a join request to the administrator of this space to let you in"
-    is_private_html: "%{name} is a private space. Send a <a href=\"%{path}\">join request</a> to the administrator of this space."
+    is_private_html: "%{name} is a private space. To access it, sign in and send a <a href=\"%{path}\">join request</a> to the administrators of this space."
     join: "Join this space"
     join_invitation: 
       clarify_registered: "Please introduce password in order to join this space."
@@ -1465,7 +1475,7 @@ en:
     error:
       already_invited: "You were already invited to join this space, please accept or decline the invitation"
       need_join_to_access: "You need to join this space to access it. Send a join request to the administrators."
-      not_found: "The space %{permalink} was not found. <br> Would want to search in <a href=\"%{path}\">all spaces</a>?"
+      not_found: "The space \"%{permalink}\" was not found. <br> Would you like to search for it in <a href=\"%{path}\">all spaces</a>?"
     index: 
       create_new_space: "Create a new space"
       list_format: 

@@ -31,14 +31,15 @@ module Mconf
     # config.plugins = [ :simple_captcha, :permalink_fu, :all ]
     config.plugins = [ :simple_captcha, :all ]
 
-    # Activate observers that should always be running.
-    # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
-    config.active_record.observers = :profile_observer, :bigbluebutton_meeting_observer
-
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
     config.time_zone = 'Madrid'
+
+    # Need to set it directly on I18n because we have other gems that require I18n and might
+    # be setting this first.
+    # A tip from http://stackoverflow.com/questions/20361428/rails-i18n-validation-deprecation-warning
+    I18n.config.enforce_available_locales = true
 
     # The translations are stored in config/locales/**/*.yml, in separate files for base strings,
     # gem strings and application strings (mconf.yml). The application strings should always be
