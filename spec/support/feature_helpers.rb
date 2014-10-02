@@ -57,6 +57,7 @@ module FeatureHelpers
     fill_in "user[username]", with: attrs[:username]
     fill_in "user[password]", with: attrs[:password]
     fill_in "user[password_confirmation]", with: attrs[:password]
+    fill_in "user[institution_id]", with: attrs[:institution].id if attrs[:institution].present?
     click_button "Register"
   end
 

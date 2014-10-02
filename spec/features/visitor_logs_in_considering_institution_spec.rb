@@ -5,7 +5,7 @@ feature 'Visitor logs in considering institution' do
     @user = FactoryGirl.create(:user, :username => 'user', :password => 'password')
   }
 
-  feature "can't sign in if his institution forces login via shibboleth" do
+  feature "can't sign in via local authentication if the institution forces login via shibboleth" do
     before {
       institution = FactoryGirl.create(:institution, acronym: "UFRGS", force_shib_login: true)
       @user.institution = institution

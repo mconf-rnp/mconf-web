@@ -34,7 +34,7 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def allowed_params
-    [:email, :_full_name, :username]
+    [:email, :_full_name, :username, :institution_id]
   end
 
   def check_shib_login_only

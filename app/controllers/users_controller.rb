@@ -225,7 +225,7 @@ class UsersController < ApplicationController
     allowed = [ :password, :password_confirmation, :remember_me, :current_password,
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
-
+    allowed += [:institution_id] if current_user.superuser?
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed
   end

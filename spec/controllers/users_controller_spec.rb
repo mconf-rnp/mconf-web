@@ -209,6 +209,41 @@ describe UsersController do
         end
       end
 
+      context "trying to update the institution" do
+        context "for a normal user" do
+          let!(:new_institution) { FactoryGirl.create(:institution) }
+          let!(:old_institution) { FactoryGirl.create(:institution) }
+          let(:user) { FactoryGirl.create(:user, superuser: false, institution: old_institution) }
+
+          before(:each) do
+            sign_in user
+
+            put :update, :id => user.to_param, :user => { :institution_id => new_institution.id }
+            user.reload
+          end
+
+          it { response.status.should == 302 }
+          it { response.should redirect_to edit_user_path(user) }
+          it { user.institution.should eql(old_institution) }
+        end
+
+        context "for an admin" do
+          let!(:new_institution) { FactoryGirl.create(:institution) }
+          let!(:old_institution) { FactoryGirl.create(:institution) }
+          let(:user) { FactoryGirl.create(:user, superuser: true, institution: old_institution) }
+
+          before(:each) do
+            sign_in user
+
+            put :update, :id => user.to_param, :user => { :institution_id => new_institution.id }
+            user.reload
+          end
+
+          it { response.status.should == 302 }
+          it { response.should redirect_to edit_user_path(user) }
+          it { user.institution.should eql(new_institution) }
+        end
+      end
     end
 
     context "attributes that the user can update" do

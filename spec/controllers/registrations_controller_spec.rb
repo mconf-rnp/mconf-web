@@ -50,22 +50,45 @@ describe RegistrationsController do
       FactoryGirl.attributes_for(:user).slice(:username, :_full_name, :email, :password)
     }
 
-    describe "if registrations are enabled in the site" do
+    context "if registrations are enabled in the site" do
       before(:each) {
         expect {
           post :create, :user => attributes
-        }.to change{User.count}.by(1)
+        }.to change{ User.count }.by(1)
       }
       it { should redirect_to(my_home_path) }
     end
 
-    it "if registrations are disabled in the site"
+    context "if registrations are disabled in the site" do
+      before {
+        Site.current.update_attributes(registration_enabled: false)
+      }
+      before(:each) {
+        expect {
+          post :create, :user => attributes
+        }.not_to change{ User.count }
+      }
+      it { should redirect_to(root_path) }
+      it { should set_the_flash.to(I18n.t("devise.registrations.not_enabled")) }
+    end
+
+    context "allows the user to select an institution" do
+      let(:institution) { FactoryGirl.create(:institution) }
+      before(:each) {
+        attributes.merge!({ institution_id: institution.id })
+        expect {
+          post :create, :user => attributes
+        }.to change{ User.count }.by(1)
+      }
+      it { should redirect_to(my_home_path) }
+      it { User.last.institution.should eql(institution) }
+    end
   end
 
   context "institution is on CAFe and does not allow local registration" do
     let(:institution) { FactoryGirl.create(:institution) }
     let(:user) { FactoryGirl.create(:user, :institution => institution) }
-    let(:params) { { :user => {:email => user.email, :_full_name=> user.username, :username => user.username, 
+    let(:params) { { :user => {:email => user.email, :_full_name=> user.username, :username => user.username,
                  :institution_id => institution.id, :password => user.password, :password_confirmation => user.password} } }
     before {
       controller.stub(:params).and_return(params)
