@@ -157,10 +157,22 @@ describe Institution do
   it "#to_json"
 
   describe "#full_name" do
-    context "returns the name and the acronym" do
+    context "returns the name and the acronym if there's an acronym" do
       let(:target) { FactoryGirl.create(:institution, :name => "Any Name", :acronym => "YAAC") }
       subject { target.full_name }
       it { should eql("Any Name (YAAC)") }
+    end
+
+    context "returns the name only if there acronym is nil" do
+      let(:target) { FactoryGirl.create(:institution, :name => "Any Name", :acronym => nil) }
+      subject { target.full_name }
+      it { should eql("Any Name") }
+    end
+
+    context "returns the name only if there acronym is empty" do
+      let(:target) { FactoryGirl.create(:institution, :name => "Any Name", :acronym => "") }
+      subject { target.full_name }
+      it { should eql("Any Name") }
     end
   end
 

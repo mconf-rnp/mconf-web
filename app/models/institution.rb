@@ -89,7 +89,9 @@ class Institution < ActiveRecord::Base
   end
 
   def full_name
-    "#{name} (#{acronym})"
+    n = name
+    n += " (#{acronym})" unless acronym.blank?
+    n
   end
 
   def user_role user

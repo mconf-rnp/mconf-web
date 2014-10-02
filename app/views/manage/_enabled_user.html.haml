@@ -29,4 +29,5 @@
       = user_category(user)
     - if user.institution
       %span.institution-name
+        = icon_institution
         = link_to user.institution.full_name, users_institution_path(user.institution)

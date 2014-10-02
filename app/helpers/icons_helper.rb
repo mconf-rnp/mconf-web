@@ -48,10 +48,6 @@ module IconsHelper
     icon_constructor nil, "icon-awesome icon-cogs icon-mconf-superuser", options
   end
 
-  def icon_admin_institution(options={})
-    icon_constructor nil, "icon-awesome icon-user icon-mconf-admin-institution", options
-  end
-
   def icon_guest(options={})
     icon_constructor nil, "icon-awesome icon-meh icon-mconf-guest", options
   end
@@ -253,6 +249,14 @@ module IconsHelper
 
   def icon_register(options={})
     icon_constructor nil, "icon-awesome icon-plus-sign-alt icon-mconf-register", options
+  end
+
+  def icon_admin_institution(options={})
+    icon_constructor nil, "icon-awesome icon-user icon-mconf-admin-institution", options
+  end
+
+  def icon_institution(options={})
+    icon_constructor nil, "icon-awesome fa fa-institution icon-mconf-institution", options
   end
 
   private

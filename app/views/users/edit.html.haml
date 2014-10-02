@@ -73,7 +73,7 @@
       - if can?(:manage_institution_name, @user)
         - if @user.institution
           - current_institution_id = @user.institution.id
-          - current_institution_name = "#{@user.institution.name} (#{@user.institution.acronym})"
+          - current_institution_name = @user.institution.full_name
         = f.input :institution_id, :required => false, :input_html => { :value => current_institution_id, :"data-institution-name" => current_institution_name }
 
       = f.input :can_record, :required => false if can?(:manage_can_record, @user)
