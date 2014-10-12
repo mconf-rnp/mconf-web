@@ -50,7 +50,7 @@ describe RegistrationsController do
       FactoryGirl.attributes_for(:user).slice(:username, :_full_name, :email, :password)
     }
 
-    context "if registrations are enabled in the site" do
+    describe "if registrations are enabled in the site" do
       before(:each) {
         expect {
           post :create, :user => attributes

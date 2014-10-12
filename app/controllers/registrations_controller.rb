@@ -48,4 +48,11 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  private
+
+  # Redirect users to pretty page after registered and not approved
+  def after_inactive_sign_up_path_for(resource)
+    my_approval_pending_path
+  end
+
 end

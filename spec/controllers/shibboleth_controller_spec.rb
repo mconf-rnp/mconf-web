@@ -122,31 +122,44 @@ describe ShibbolethController do
 
     context "if the user's information is ok" do
       let(:user) { FactoryGirl.create(:user) }
-      before {
-        setup_shib(user.full_name, user.email, user.email)
-      }
+      before { setup_shib(user.full_name, user.email, user.email) }
 
-      context "logs the user in if he already has a token" do
-        before(:each) {
-          ShibToken.create!(:identifier => user.email, :user => user)
-          request.flash[:success] = 'message set previously by #create_association'
-          should set_the_flash.to('message set previously by #create_association')
-          get :login
-        }
-        it { subject.current_user.should eq(user) }
-        it { should redirect_to(my_home_path) }
-        skip("persists the flash messages") {
-          # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
-          #  Testing in the application the flash is persisted, as it should.
-          should set_the_flash.to('message set previously by #create_association')
-        }
+      context "if the user already has a token" do
+        before { ShibToken.create!(:identifier => user.email, :user => user) }
+
+        context "if the site does not require admin approval, logs the user in" do
+          before(:each) {
+            request.flash[:success] = 'message set previously by #create_association'
+            should set_the_flash.to('message set previously by #create_association')
+            get :login
+          }
+          it { subject.current_user.should eq(user) }
+          it { should redirect_to(my_home_path) }
+          skip("persists the flash messages") {
+            # TODO: The flash is being set and flash.keep is called, but this test doesn't work.
+            #  Testing in the application the flash is persisted, as it should.
+            should set_the_flash.to('message set previously by #create_association')
+          }
+        end
+
+        context "if the site requires admin approval, shows the pending approval page" do
+          before(:each) {
+            Site.current.update_attributes(require_registration_approval: true)
+            user.update_attributes(approved: false)
+            request.flash[:success] = 'message'
+            get :login
+          }
+          it { subject.current_user.should be_nil }
+          it { should redirect_to(my_approval_pending_path) }
+          it { should_not set_the_flash }
+        end
       end
 
       context "and it's the user's first access" do
+
         context "but the institution is not registered" do
           let(:principal_name) { "user@invalid_institution.com" }
           before { setup_shib(user.full_name, user.email, principal_name) }
-
           context "with a request.referer" do
             before(:each) {
               request.env["HTTP_REFERER"] = "/any"
@@ -155,7 +168,6 @@ describe ShibbolethController do
             it { should redirect_to("/any") }
             it { should set_the_flash.to(I18n.t('shibboleth.create_association.institution_not_registered')) }
           end
-
           context "without a request.referer" do
             before(:each) { get :login }
             it { should redirect_to(root_path) }
@@ -191,7 +203,6 @@ describe ShibbolethController do
               it_should_behave_like "a caller of #associate_with_new_account"
             end
           end
-
         end
       end
 
@@ -217,6 +228,7 @@ describe ShibbolethController do
       skip "has the before_filter :load_shib_session"
 
       context "has the before filter: ckeck_shib_always_new_account" do
+
         context "when the flag shib_always_new_account is on" do
           before {
             Site.current.update_attributes(:shib_enabled => true,

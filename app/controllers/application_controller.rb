@@ -35,8 +35,18 @@ class ApplicationController < ActionController::Base
     rescue_from CanCan::AccessDenied, :with => :render_403
   end
 
-  def institution
-    @institution ||= Institution.find_by_permalink(params[:institution_id])
+  # Code that to DRY out permitted param filtering
+  # The controller declares allow_params_for :model_name and defines allowed_params
+  def self.allow_params_for instance_name
+    instance_name ||= controller_name.singularize.to_sym
+
+    define_method("#{instance_name}_params") do
+      unless params[instance_name].blank?
+        params[instance_name].permit(*allowed_params)
+      else
+        {}
+      end
+    end
   end
 
   # Splits a comma separated list of emails into a list of emails without trailing spaces
@@ -195,7 +205,6 @@ class ApplicationController < ActionController::Base
 
   def render_500(exception)
     @exception = exception
-    pp exception
     render_error 500
   end
 
@@ -208,12 +217,11 @@ class ApplicationController < ActionController::Base
   # From: https://github.com/plataformatec/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
   def store_location
     ignored_paths = [ "/login", "/users/login", "/users",
-                      "/register", "/users/register",
-                      "/logout",
-                      "/users/password",
-                      "/users/confirmation/new",
-                      "/secure", "/secure/info",
-                      "/secure/associate" ]
+                      "/register", "/users/signup",
+                      "/users/password", "/users/password/new",
+                      "/users/confirmation/new", "/users/confirmation",
+                      "/secure", "/secure/info", "/secure/associate",
+                      "/pending" ]
     if (!ignored_paths.include?(request.path) &&
         !request.xhr? && # don't store ajax calls
         (request.format == "text/html" || request.content_type == "text/html"))
@@ -227,4 +235,8 @@ class ApplicationController < ActionController::Base
     session[:user_return_to] = nil
   end
 
+
+  def institution
+    @institution ||= Institution.find_by_permalink(params[:institution_id])
+  end
 end
