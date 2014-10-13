@@ -119,11 +119,17 @@ class User < ActiveRecord::Base
   after_create :create_webconf_room
   after_update :update_webconf_room
 
+  after_create :set_institution
+  after_update :set_institution
+
   after_create :send_admin_approval_mail, if: :site_needs_approval?
   def send_admin_approval_mail
     if !approved?
-      admins = User.where(:superuser => true)
-
+      if self.institution
+        admins = self.institution.admins
+      else
+        admins = User.where(:superuser => true)
+      end
       admins.each do |admin|
         AdminMailer.new_user_waiting_for_approval(admin.id, self.id).deliver
       end
@@ -360,8 +366,7 @@ class User < ActiveRecord::Base
   #
   # Association with an institution
   #
-  # attr_accessible :institution, :institution_id
-  after_save :set_institution
+  #after_save :set_institution
 
   def institution_is_full?
     if institution.nil?

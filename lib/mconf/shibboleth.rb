@@ -136,6 +136,10 @@ module Mconf
         :_full_name => get_name
       }
 
+      institution_id = get_institution_identifier
+      institution = Institution.where(:identifier => institution_id).first if institution_id.present?
+      params[:institution] = institution if institution.present?
+
       unless User.find_by_email(params[:email])
         # TODO: if the user is disabled he won't be found and the create below will fail
         user = User.new(params)

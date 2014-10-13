@@ -58,7 +58,7 @@ module FeatureHelpers
     fill_in "user[username]", with: name
     fill_in "user[password]", with: attrs[:password]
     fill_in "user[password_confirmation]", with: attrs[:password]
-    fill_in "user[institution_id]", with: attrs[:institution].id if attrs[:institution].present?
+    fill_in "user[institution_id]", with: attrs[:institution_id]
     click_button I18n.t("registrations.signup_form.register")
   end
 
@@ -94,6 +94,13 @@ module FeatureHelpers
   def email_by_subject(subject)
     ActionMailer::Base.deliveries.each do |mail|
       return mail if mail.subject.match(subject)
+    end
+    nil
+  end
+
+  def email_by_subject_and_receiver(subject, receiver)
+    ActionMailer::Base.deliveries.each do |mail|
+      return mail if mail.subject.match(subject) and mail.to.include?(receiver)
     end
     nil
   end

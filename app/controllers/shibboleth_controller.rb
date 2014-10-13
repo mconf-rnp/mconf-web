@@ -174,7 +174,6 @@ class ShibbolethController < ApplicationController
           logger.info "Shibboleth: created a new account: #{token.user.inspect}"
           token.data = shib.get_data()
           token.save! # TODO: what if it fails
-          @institution.add_member!(token.user) # Institution exists and user is authenticated
           flash[:success] = t('shibboleth.create_association.account_created', :url => new_user_password_path)
         else
           token.destroy

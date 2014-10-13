@@ -719,15 +719,47 @@ describe User do
 
       context '#send_admin_approval_mail' do
         let!(:admin2) { FactoryGirl.create(:user, superuser: true, approved: true) }
-        let!(:user) { FactoryGirl.create(:user, :approved => false) }
 
-        it { AdminMailer.should have_queue_size_of_at_least(2) }
-        it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
-        it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        context "when the user has no institution" do
+          let!(:user) { FactoryGirl.create(:user, :approved => false, :institution => nil) }
+
+          it { AdminMailer.should have_queue_size_of_at_least(2) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
+
+        context "when the user has an institution with admins" do
+          let(:institution) { FactoryGirl.create(:institution) }
+          let!(:inst_admin) {
+            u = FactoryGirl.create(:user)
+            institution.add_member! u, "Admin"
+            u
+          }
+          let!(:inst_admin2) {
+            u = FactoryGirl.create(:user)
+            institution.add_member! u, "Admin"
+            u
+          }
+          let!(:user) { FactoryGirl.create(:user, :approved => false, :institution => institution) }
+
+          it { AdminMailer.should have_queue_size_of_at_least(2) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, inst_admin.id, user.id) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, inst_admin2.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
+
+        context "when the user has an institution without admins" do
+          let!(:user) { FactoryGirl.create(:user, :approved => false) }
+
+          it { AdminMailer.should have_queue_size_of(1) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
       end
 
       context '#send_user_approved_mail' do
-        before { @user = FactoryGirl.create(:user, :approved => false) }
+        before { @user = FactoryGirl.create(:user, :approved => false, :institution => nil) }
 
         context 'send when user is approved' do
           before { @user.approve! }
@@ -752,6 +784,17 @@ describe User do
           it { @user.username.should eq(new_username) }
           it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, @user.id) }
           it { AdminMailer.should_not have_queued(:new_user_approved, @user.id).in(:mailer) }
+        end
+
+        # just to be extra sure it works
+        context 'when the user has an institution' do
+          before {
+            @user = FactoryGirl.create(:user, :approved => false)
+            @user.approve!
+          }
+
+          it { AdminMailer.should have_queue_size_of_at_least(1) }
+          it { AdminMailer.should have_queued(:new_user_approved, @user.id).in(:mailer) }
         end
 
       end

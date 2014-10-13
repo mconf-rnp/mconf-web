@@ -79,11 +79,12 @@ feature 'Behaviour of the flag Site#require_registration_approval' do
         mail.should be_nil
       end
 
-      it "sends an email to all admins", with_truncation: true do
-        mail = email_by_subject t('admin_mailer.new_user_waiting_for_approval.subject')
-        mail.should_not be_nil
-        mail.to.should eql([User.where(superuser: true).first.email])
-      end
+      # Not for RNP, see `flag_require_registration_approval_considering_institutions_spec.rb`
+      # it "sends an email to all admins", with_truncation: true do
+      #   mail = email_by_subject t('admin_mailer.new_user_waiting_for_approval.subject')
+      #   mail.should_not be_nil
+      #   mail.to.should eql([User.where(superuser: true).first.email])
+      # end
 
       context "shows the pending approval page" do
         it { current_path.should eq(my_approval_pending_path) }
