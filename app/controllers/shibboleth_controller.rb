@@ -126,7 +126,7 @@ class ShibbolethController < ApplicationController
 
   def find_institution
     id = @shib.get_institution_identifier
-    @institution = Institution.where(:identifier => id).first if id.present?
+    @institution = @shib.find_institution_for_user_identifier(id) if id.present?
     logger.info "Shibboleth: loaded the institution: #{@institution.inspect}"
   end
 
@@ -241,10 +241,10 @@ class ShibbolethController < ApplicationController
       request.env["Shib-Authentication-Method"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-AuthnContext-Class"] = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       request.env["Shib-brEduPerson-brEduAffiliationType"] = "student;position;faculty"
-      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "75a988943825d2871e1cfa75473ec0@ufrgs.br"
+      request.env["Shib-eduPerson-eduPersonPrincipalName"] = "75a988943825d2871e1cfa75473ec0@sub.ufrgs.br"
       request.env["Shib-inetOrgPerson-cn"] = "Rick Astley"
       request.env["Shib-inetOrgPerson-sn"] = "Rick Astley"
-      request.env["Shib-inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
+      request.env["Shib-inetOrgPerson-mail"] = "nevergonnagiveyouup@.rick.com"
       request.env["inetOrgPerson-cn"] = "Rick Astley"
       request.env["inetOrgPerson-mail"] = "nevergonnagiveyouup@rick.com"
     end

@@ -610,6 +610,102 @@ describe Mconf::Shibboleth do
       it("expects errors on :username") { subject.errors.should have_key(:username) }
       it("expects errors on :_full_name") { subject.errors.should have_key(:_full_name) }
     end
+
+    context "sets the user's institution" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "(.*\\.)?institution\\.org") }
+      before {
+        shibboleth.should_receive(:get_email).and_return('any@email.com')
+        shibboleth.should_receive(:get_login).and_return('any-login')
+        shibboleth.should_receive(:get_name).and_return('Any Name')
+        shibboleth.should_receive(:get_institution_identifier).and_return('sub.institution.org')
+        User.should_receive(:find_by_email).and_return(nil)
+      }
+      subject { shibboleth.create_user }
+      it { subject.institution.should eql(institution) }
+    end
+  end
+
+  describe "#find_institution_for_user_identifier" do
+    let(:session) { {} }
+    let(:shibboleth) { Mconf::Shibboleth.new(session) }
+
+    context "matches using strings" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i1.com") }
+      it { subject.should eql(institution) }
+    end
+
+    context "matches using regexes" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: ".*\\.?i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i1.com") }
+      it { subject.should eql(institution) }
+    end
+
+    context "accepts multiple regexes for a single institution separated by \n" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com\n.*\\.?i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("sub.i1.com") }
+      it { subject.should eql(institution) }
+    end
+
+    context "accepts multiple regexes for a single institution separated by \r\n" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com\r\n.*\\.?i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("sub.i1.com") }
+      it { subject.should eql(institution) }
+    end
+
+    context "works with multiple institutions" do
+      let!(:institution1) { FactoryGirl.create(:institution, identifier: "i1\\.com\n.*\\.?i1\\.com") }
+      let!(:institution2) { FactoryGirl.create(:institution, identifier: "i2\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i2.com") }
+      it { subject.should eql(institution2) }
+    end
+
+    context "if there's more than one match, returns the first" do
+      let!(:institution1) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      let!(:institution2) { FactoryGirl.create(:institution, identifier: "i2\\.com") }
+      let!(:institution3) { FactoryGirl.create(:institution, identifier: "i2\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i2.com") }
+      it { subject.should eql(institution2) }
+    end
+
+    context "transform filters into exact regexes" do
+      # if wasn't exact, would match the first institution
+      let!(:institution1) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      let!(:institution2) { FactoryGirl.create(:institution, identifier: "i1\\.com\\.any") }
+      subject { shibboleth.find_institution_for_user_identifier("i1.com.any") }
+      it { subject.should eql(institution2) }
+    end
+
+    context "ignores case" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i1.COM") }
+      it { subject.should eql(institution) }
+    end
+
+    context "ignores white spaces in the front and end" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "  i1\\.com ") }
+      subject { shibboleth.find_institution_for_user_identifier("\ti1.com      ") }
+      it { subject.should eql(institution) }
+    end
+
+    context "if nothing matches, returns nil" do
+      let!(:institution1) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      let!(:institution2) { FactoryGirl.create(:institution, identifier: "i2\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("i3.com") }
+      it { subject.should be_nil }
+    end
+
+    context "returns nil if searching for a nil string" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier(nil) }
+      it { subject.should be_nil }
+    end
+
+    context "returns nil if searching for a blank string" do
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "i1\\.com") }
+      subject { shibboleth.find_institution_for_user_identifier("") }
+      it { subject.should be_nil }
+    end
   end
 
 end

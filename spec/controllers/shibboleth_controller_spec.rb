@@ -304,9 +304,9 @@ describe ShibbolethController do
     end
 
     context "if params[:new_account] is set" do
-      let(:institution) { FactoryGirl.create(:institution) }
+      let!(:institution) { FactoryGirl.create(:institution, identifier: "(.*\\.)?institution\\.org") }
       let(:attrs) { FactoryGirl.attributes_for(:user) }
-      let(:principal_name) { "#{attrs[:username]}@#{institution.identifier}" }
+      let(:principal_name) { "#{attrs[:username]}@sub.institution.org" }
       before {
         setup_shib(attrs[:_full_name], attrs[:email], principal_name)
         save_shib_to_session

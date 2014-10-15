@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140831235219) do
+ActiveRecord::Schema.define(version: 20141015190903) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -159,7 +159,7 @@ ActiveRecord::Schema.define(version: 20140831235219) do
     t.datetime "updated_at"
     t.integer  "user_limit"
     t.integer  "can_record_limit"
-    t.string   "identifier"
+    t.text     "identifier"
     t.boolean  "force_shib_login", default: false
   end
 

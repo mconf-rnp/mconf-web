@@ -24,13 +24,8 @@ module Mconf
     #   /^shib-.*$/, and /^uid$/
     # If `filters` is blank, will use the default filter /^shib-/
     def save_to_session(env_variables, filters='')
-      unless filters.blank?
-        vars = filters.clone
-        vars = vars.split(/\r?\n/).map{ |s| s.strip.downcase }
-        filter = vars.map{ |v| /^#{v}$/  }
-      else
-        filter = [/^shib-/]
-      end
+      filter = split_into_regexes(filters)
+      filter = [/^shib-/] if filter.empty?
 
       shib_data = {}
       env_variables.each do |key, value|
@@ -137,7 +132,7 @@ module Mconf
       }
 
       institution_id = get_institution_identifier
-      institution = Institution.where(:identifier => institution_id).first if institution_id.present?
+      institution = self.find_institution_for_user_identifier(institution_id) if institution_id.present?
       params[:institution] = institution if institution.present?
 
       unless User.find_by_email(params[:email])
@@ -151,7 +146,44 @@ module Mconf
       end
     end
 
+    # Gets a user's institution identifier (e.g. "institution.br") and tries to find
+    # the Institution that corresponds to it. Returns the first match or nil of no
+    # match is found.
+    def find_institution_for_user_identifier(searched)
+      return nil if searched.blank?
+
+      # get the data we need from all institutions and reject empty identifiers
+      institutions = Institution.pluck(:id, :identifier)
+        .reject{ |i| i[1].blank? }
+
+      institutions.each do |institution|
+        id = institution[0]
+        identifier = institution[1]
+
+        regexes = split_into_regexes(identifier)
+
+        # tries to match all regexes, returning the first match found
+        regexes.each do |regex|
+          return Institution.find(id) if searched.strip.match(regex)
+        end
+      end
+
+      nil
+    end
+
     private
+
+    # Splits a string `value` into several RegExps. Breaks the string at every
+    # '\n' and puts all strings (VALUE) into a regex in the format /^VALUE$/.
+    def split_into_regexes(value)
+      unless value.blank?
+        cloned = value.clone
+        cloned = cloned.split(/\r?\n/).map{ |s| s.strip.downcase }
+        cloned.map{ |v| Regexp.new("^#{v}$", "i") }
+      else
+        []
+      end
+    end
 
     def create_token(id)
       ShibToken.create!(:identifier => id)
