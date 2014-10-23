@@ -20,9 +20,6 @@ pt-br:
   institution:
     created: Instituição criada com sucesso.
     duplicate: Esta instituição é uma duplicata
-    user_registered:
-      title: "Eu me registrei em sua instituição"
-      body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
     updated: "Instituição atualizada com sucesso"
   frontpage:
     show:

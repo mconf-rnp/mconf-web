@@ -30,9 +30,6 @@ en:
   institution:
     created: Institution created successfully.
     duplicate: This institution is a duplicate
-    user_registered:
-      title: "I have registered for your institution"
-      body_html: "Your <a href=\"%{url}\">approval</a> is needed for '%{name}' to be able to log in. You can do this in the management interface."
     updated: "Instituição atualizada com sucesso"
   institutions:
     form:

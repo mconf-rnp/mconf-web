@@ -200,9 +200,6 @@ class User < ActiveRecord::Base
   after_create do |user|
     user.create_profile :full_name => user._full_name
 
-    # Send message to the institutional admin
-    PrivateSender.user_registered_notification(user, institution) if institution
-
     # Checking if we have to join a space and/or event
     invites = JoinRequest.where :email => user.email
     invites.each do |invite|
