@@ -53,7 +53,7 @@ gem 'net-ldap'
 
 # BigBlueButton integration
 gem 'bigbluebutton-api-ruby', :git => 'git://github.com/mconf/bigbluebutton-api-ruby.git', :branch => 'master'
-gem 'bigbluebutton_rails', :git => 'git://github.com/mconf/bigbluebutton_rails.git', :branch => 'tmp-fixes-rnp'
+gem 'bigbluebutton_rails', :git => 'git://github.com/mconf/bigbluebutton_rails.git', :branch => 'master'
 
 # Used on Profile to generate a vcard
 gem 'vpim' # TODO: very old, last update on 2009
@@ -91,6 +91,9 @@ gem 'exception_notification', '~> 4.0.0'
 # generate .ics
 gem 'icalendar'
 
+# More precise distance_of_time_in_words and time_ago_in_words
+gem 'dotiw'
+
 #
 # TODO: Gems to review if we can remove/update
 #
@@ -111,6 +114,7 @@ group :development do
   gem 'binding_of_caller'
   gem 'webrick', '~> 1.3.1'
   gem 'quiet_assets'
+  gem 'brakeman', :require => false
 end
 
 group :development, :test do

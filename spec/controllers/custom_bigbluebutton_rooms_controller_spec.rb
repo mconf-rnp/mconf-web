@@ -76,6 +76,73 @@ describe CustomBigbluebuttonRoomsController do
     it "loads and authorizes the room into @room"
   end
 
+  describe "#send_invitation" do
+    let!(:referer) { "/any" }
+    let!(:room) { FactoryGirl.create(:bigbluebutton_room, :owner => FactoryGirl.create(:user)) }
+    let(:users) { [FactoryGirl.create(:user)] }
+    let(:starts_on) { Time.now }
+    let(:ends_on) { Time.now + 10.day }
+    let(:title) { 'Title' }
+    let(:message) { 'Message' }
+    let(:success) { I18n.t('custom_bigbluebutton_rooms.send_invitation.success') + ' ' + users.map(&:name).join(', ')}
+    let(:error) { I18n.t('custom_bigbluebutton_rooms.send_invitation.error') + ' ' + users.map(&:name).join(', ') }
+
+    let!(:hash) { { :users => users.map(&:id).join(','),
+       :starts_on => starts_on.try(:strftime, I18n.t('_other.datetimepicker.format_rails')),
+       :ends_on => ends_on.try(:strftime, I18n.t('_other.datetimepicker.format_rails')),
+       :title => title,
+       :message => message} }
+    before {
+      request.env["HTTP_REFERER"] = referer
+      login_as(room.owner)
+      post :send_invitation, :invite => hash, :id => room.to_param
+    }
+
+    context "with correct data" do
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to success }
+    end
+
+    context "with more than one user invited" do
+      let(:users) { [FactoryGirl.create(:user), FactoryGirl.create(:user)] }
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to success }
+    end
+
+    context "missing the title" do
+      let(:title) { nil }
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_title') }
+    end
+
+    context "missing the users" do
+      let(:users) { [] }
+      it { should redirect_to(referer) }
+      skip { should set_the_flash.to error }
+    end
+
+    context "missing the message" do
+      let(:message) { nil }
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to success }
+    end
+
+    context "missing start date" do
+      let(:starts_on) { nil }
+      it { should redirect_to(referer) }
+      skip { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_date_format') }
+    end
+
+    context "missing end date" do
+      let(:ends_on) { nil }
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to success }
+    end
+
+    it { should_authorize an_instance_of(BigbluebuttonRoom), :send_invitation, :id => room.to_param }
+    it "loads and authorizes the room into @room"
+  end
+
   describe "#index" do
     context "template and layout" do
       before(:each) { login_as(FactoryGirl.create(:superuser)) }
@@ -305,6 +372,7 @@ describe CustomBigbluebuttonRoomsController do
           before {
             login_as(user)
             BigbluebuttonRoom.stub(:find_by_param) { room }
+            controller.should_receive(:check_user_limit) { true }
           }
 
           context "when a meeting is running" do
@@ -335,6 +403,7 @@ describe CustomBigbluebuttonRoomsController do
             login_as(user)
             BigbluebuttonRoom.should_receive(:find_by_param).once { room }
             controller.should_receive(:bigbluebutton_role).with(room) { :moderator }
+            controller.should_receive(:check_user_limit) { true }
             room.stub(:is_running?) { true }
             room.should_receive(:fetch_is_running?).at_least(:once) { true }
             room.should_receive(:fetch_meeting_info).once {
@@ -392,6 +461,32 @@ describe CustomBigbluebuttonRoomsController do
 
         describe "checks the maximum number of participants" do
           let!(:join_url) { "http://test.com/attendee/join" }
+
+          # important to check this because this before filter needs specific information in the room
+          context "#check_user_limit is called with the same @room that we fetched information from" do
+            let(:user) { FactoryGirl.create(:user) }
+            let(:room) { user.bigbluebutton_room }
+            before {
+              login_as(user)
+              BigbluebuttonRoom.stub(:find_by_param).and_return(room)
+              controller.should_receive(:bigbluebutton_role).with(room) { :moderator }
+              room.stub(:is_running?).and_return(true)
+              room.stub(:fetch_is_running?).and_return(true)
+              room.stub(:join_url).and_return(join_url)
+              room.should_receive(:fetch_meeting_info).once {
+                room.running = true
+                room.participant_count = 4
+              }
+
+              controller.should_receive(:check_user_limit) {
+                assigns(:room).should eql(room) # here's the real verification
+              }
+            }
+            before(:each) { send method, :join, :id => room.to_param }
+            it { should assign_to(:room).with(room) }
+            it { assigns(:room).running.should be true }
+            it { assigns(:room).participant_count.should be 4 }
+          end
 
           describe "for a user's room" do
             let(:user) { FactoryGirl.create(:user) }
