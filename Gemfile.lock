@@ -15,8 +15,8 @@ GIT
 
 GIT
   remote: git://github.com/mconf/bigbluebutton_rails.git
-  revision: f7201867c8c9715c43bb2eaf74596dcaf405329c
-  branch: master
+  revision: 34f99f22ba4e0a0dd51058d29a06690857f360ce
+  branch: tmp-fixes-rnp
   specs:
     bigbluebutton_rails (2.0.0)
       bigbluebutton-api-ruby (~> 1.3.0)
