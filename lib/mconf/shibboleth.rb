@@ -111,39 +111,33 @@ module Mconf
     # Searches for a ShibToken using data in the session and returns it. Creates a new
     # ShibToken if no token is found and returns it.
     def find_or_create_token
-      token = find_token()
-      token = create_token(get_email()) if token.nil?
+      token = find_token
+      token = create_token(get_email) if token.nil?
       token
     end
 
-    # Creates a new user using the information stored in the session. Will only create
-    # the user if there's no user already registered with the target email.
-    # Returns nil if there's already a user with the target email or the User created
-    # otherwise. The User returned might have errors if the call to `save` failed.
-    # Expects that at least the email and email will be set in the session!
+    # Creates a new user using the information stored in the session.
+    # Returns the User created after calling `save`. This might have errors if the call to
+    # `save` failed.
+    # Expects that at least the email and name will be set in the session!
     def create_user
       password = SecureRandom.hex(16)
       login = get_login
       login = login.parameterize unless login.nil?
       params = {
-        :username => login, :email => get_email,
-        :password => password, :password_confirmation => password,
-        :_full_name => get_name
+        username: login, email: get_email,
+        password: password, password_confirmation: password,
+        _full_name: get_name
       }
 
       institution_id = get_institution_identifier
       institution = self.find_institution_for_user_identifier(institution_id) if institution_id.present?
       params[:institution] = institution if institution.present?
 
-      unless User.find_by_email(params[:email])
-        # TODO: if the user is disabled he won't be found and the create below will fail
-        user = User.new(params)
-        user.skip_confirmation!
-        user.save
-        user
-      else
-        nil
-      end
+      user = User.new params
+      user.skip_confirmation!
+      user.save
+      user
     end
 
     # Gets a user's institution identifier (e.g. "institution.br") and tries to find
@@ -188,6 +182,5 @@ module Mconf
     def create_token(id)
       ShibToken.create!(:identifier => id)
     end
-
   end
 end
