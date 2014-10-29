@@ -178,7 +178,7 @@ describe 'User signs in via shibboleth' do
   end
 
   context "redirects the user properly" do
-    let!(:login_link) { t('devise.shared.links.login.federation') }
+    let!(:login_link) { t('sessions.new.sign_in_federation') }
     before {
       enable_shib
       Site.current.update_attributes :shib_always_new_account => true

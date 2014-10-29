@@ -69,6 +69,12 @@ en:
   profiles:
     form:
       no_organization: "<no organization set>"
+  sessions:
+    new:
+      cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+      federated_authentication: "Federated authentication"
+      local_authentication: "Local authentication"
+      sign_in_federation: "(click here to sign in)"
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."

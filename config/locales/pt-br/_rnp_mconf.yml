@@ -70,6 +70,12 @@ pt-br:
   profiles:
     form:
       no_organization: "<nenhuma organização atribuída>"
+  sessions:
+    new:
+      cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+      federated_authentication: "Autenticação federada"
+      local_authentication: "Autenticação local"
+      sign_in_federation: "(clique aqui para entrar)"
   shibboleth:
     create_association:
       institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."

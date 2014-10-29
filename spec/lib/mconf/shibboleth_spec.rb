@@ -604,7 +604,6 @@ describe Mconf::Shibboleth do
         shibboleth.should_receive(:get_login).and_return('any-login')
         shibboleth.should_receive(:get_name).and_return('Any Name')
         shibboleth.should_receive(:get_institution_identifier).and_return('sub.institution.org')
-        User.should_receive(:find_by_email).and_return(nil)
       }
       subject { shibboleth.create_user }
       it { subject.institution.should eql(institution) }
