@@ -11,8 +11,14 @@ class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :check_shib_login_only, :only => [:create]
   before_filter :check_registration_enabled, :only => [:new, :create]
   before_filter :configure_permitted_parameters, :only => [:create]
+  before_filter :check_institution_presence, :only => [:create]
 
   def new
+    if session[:user_tmp]
+      @user = User.new session[:user_tmp]
+      @user.errors.add(:institution_id, "can't be blank")
+      session[:user_tmp] = nil
+    end
   end
 
   def edit
@@ -20,6 +26,13 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   private
+
+  def check_institution_presence
+    if params[:user][:institution_id].blank? or !Institution.where(id: params[:user][:institution_id]).first
+      session[:user_tmp] = params[:user].slice(:_full_name, :username, :email).symbolize_keys
+      redirect_to register_path
+    end
+  end
 
   def check_registration_enabled
     unless current_site.registration_enabled?

@@ -3,9 +3,10 @@ require 'spec_helper'
 require 'support/feature_helpers'
 
 feature 'Visitor signs up' do
+  let(:institution) { FactoryGirl.create(:institution) }
 
   scenario 'with valid email and password' do
-    attrs = FactoryGirl.attributes_for(:user)
+    attrs = FactoryGirl.attributes_for(:user, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(my_home_path)
@@ -15,7 +16,7 @@ feature 'Visitor signs up' do
   end
 
   scenario 'with invalid email' do
-    attrs = FactoryGirl.attributes_for(:user, email: "invalid_email")
+    attrs = FactoryGirl.attributes_for(:user, email: "invalid_email", institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -24,7 +25,7 @@ feature 'Visitor signs up' do
   end
 
   scenario 'with blank password' do
-    attrs = FactoryGirl.attributes_for(:user, password: nil)
+    attrs = FactoryGirl.attributes_for(:user, password: nil, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -33,7 +34,16 @@ feature 'Visitor signs up' do
   end
 
   scenario 'with blank name' do
-    attrs = FactoryGirl.attributes_for(:user, _full_name: nil)
+    attrs = FactoryGirl.attributes_for(:user, _full_name: nil, institution_id: "")
+    register_with attrs
+
+    current_path.should eq(register_path)
+    has_field_with_error "user_institution_id"
+    expect(page).to have_content('Sign in')
+  end
+
+  scenario 'with blank institution' do
+    attrs = FactoryGirl.attributes_for(:user, _full_name: nil, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -43,7 +53,7 @@ feature 'Visitor signs up' do
 
   scenario 'with the email of another user' do
     another_user = FactoryGirl.create(:user)
-    attrs = FactoryGirl.attributes_for(:user, email: another_user.email)
+    attrs = FactoryGirl.attributes_for(:user, email: another_user.email, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -52,7 +62,7 @@ feature 'Visitor signs up' do
 
   scenario 'with the email of a disabled user' do
     disabled_user = FactoryGirl.create(:user, disabled: true)
-    attrs = FactoryGirl.attributes_for(:user, email: disabled_user.email)
+    attrs = FactoryGirl.attributes_for(:user, email: disabled_user.email, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -61,7 +71,7 @@ feature 'Visitor signs up' do
 
   scenario 'with the username of another user' do
     another_user = FactoryGirl.create(:user)
-    attrs = FactoryGirl.attributes_for(:user, username: another_user.username)
+    attrs = FactoryGirl.attributes_for(:user, username: another_user.username, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -70,7 +80,7 @@ feature 'Visitor signs up' do
 
   scenario 'with the username of a disabled user' do
     disabled_user = FactoryGirl.create(:user)
-    attrs = FactoryGirl.attributes_for(:user, username: disabled_user.username)
+    attrs = FactoryGirl.attributes_for(:user, username: disabled_user.username, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -79,7 +89,7 @@ feature 'Visitor signs up' do
 
   scenario "with the username equal to some space's permalink" do
     space = FactoryGirl.create(:space)
-    attrs = FactoryGirl.attributes_for(:user, username: space.permalink)
+    attrs = FactoryGirl.attributes_for(:user, username: space.permalink, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -88,7 +98,7 @@ feature 'Visitor signs up' do
 
   scenario "with the username equal to some disabled space's permalink" do
     disabled_space = FactoryGirl.create(:space, disabled: true)
-    attrs = FactoryGirl.attributes_for(:user, username: disabled_space.permalink)
+    attrs = FactoryGirl.attributes_for(:user, username: disabled_space.permalink, institution_id: institution.id)
     register_with attrs
 
     current_path.should eq(user_registration_path)
@@ -96,7 +106,7 @@ feature 'Visitor signs up' do
   end
 
   scenario "when the password confirmation doesn't match" do
-    attrs = FactoryGirl.attributes_for(:user)
+    attrs = FactoryGirl.attributes_for(:user, institution_id: institution.id)
     attrs[:password_confirmation] = "#{attrs[:password]}-2"
     register_with attrs
 
@@ -105,7 +115,7 @@ feature 'Visitor signs up' do
   end
 
   scenario "send invalid register form and try to change language after" do
-    attrs = { email: "", _full_name: "", password: "" }
+    attrs = { email: "", _full_name: "", password: "", institution_id: "" }
     register_with attrs
     click_link I18n.t('locales.en')
 

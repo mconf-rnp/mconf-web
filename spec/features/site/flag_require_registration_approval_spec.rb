@@ -4,7 +4,12 @@ require 'support/feature_helpers'
 include ActionView::Helpers::SanitizeHelper
 
 feature 'Behaviour of the flag Site#require_registration_approval' do
-  let(:attrs) { FactoryGirl.attributes_for(:user).slice(:username, :_full_name, :email, :password) }
+  let(:user) { FactoryGirl.create(:user) }
+  let!(:attrs) {
+    FactoryGirl.attributes_for(:user)
+      .slice(:username, :_full_name, :email, :password)
+      .merge!(institution_id: FactoryGirl.create(:institution).id)
+  }
 
   context "if admin approval is required" do
     before {
@@ -14,6 +19,7 @@ feature 'Behaviour of the flag Site#require_registration_approval' do
     context "registering in the website" do
       before {
         Site.current.update_attributes(events_enabled: false)
+        Institution.last.add_member! user, "Admin"
 
         with_resque do
           expect { register_with(attrs) }.to change{ User.count }.by(1)
@@ -30,10 +36,10 @@ feature 'Behaviour of the flag Site#require_registration_approval' do
         mail.body.encoded.should match(t('devise.mailer.confirmation_instructions.confirmation_pending'))
       end
 
-      it "sends an email to all admins", with_truncation: true do
+      it "sends an email to all institution admins", with_truncation: true do
         mail = email_by_subject t('admin_mailer.new_user_waiting_for_approval.subject')
         mail.should_not be_nil
-        mail.to.should eql([User.where(superuser: true).first.email])
+        mail.to.should eql([user.email])
       end
 
       context "shows the pending approval page" do

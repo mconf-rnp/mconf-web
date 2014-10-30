@@ -49,14 +49,42 @@ describe RegistrationsController do
     let(:attributes) {
       FactoryGirl.attributes_for(:user).slice(:username, :_full_name, :email, :password)
     }
+    let(:institution) { FactoryGirl.create(:institution) }
 
     describe "if registrations are enabled in the site" do
-      before(:each) {
-        expect {
-          post :create, :user => attributes
-        }.to change{ User.count }.by(1)
-      }
-      it { should redirect_to(my_home_path) }
+      describe "and user select an institution" do
+        before(:each) {
+          attributes.merge!({ institution_id: institution.id })
+          expect {
+            post :create, :user => attributes
+          }.to change{ User.count }.by(1)
+        }
+        it { should redirect_to(my_home_path) }
+        it { User.last.institution.should eql(institution) }
+      end
+
+      describe "and user do not select an institution" do
+        before(:each) {
+          expect {
+            post :create, :user => attributes
+          }.not_to change{ User.count }
+        }
+
+        it { should redirect_to(register_path) }
+        it { expect(session[:user_tmp]).to eql(attributes.except(:password)) }
+      end
+
+      describe "and user select an invalid institution" do
+        before(:each) {
+          attributes.merge!({ institution_id: "invalid_institution_id" })
+          expect {
+            post :create, :user => attributes
+          }.not_to change{ User.count }
+        }
+
+        it { should redirect_to(register_path) }
+        it { expect(session[:user_tmp]).to eql(attributes.except(:password, :institution_id)) }
+      end
     end
 
     context "if registrations are disabled in the site" do
@@ -73,7 +101,6 @@ describe RegistrationsController do
     end
 
     context "allows the user to select an institution" do
-      let(:institution) { FactoryGirl.create(:institution) }
       before(:each) {
         attributes.merge!({ institution_id: institution.id })
         expect {
