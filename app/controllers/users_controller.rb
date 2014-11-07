@@ -181,7 +181,7 @@ class UsersController < ApplicationController
   end
 
   def approve
-    if Site.current.require_registration_approval?
+    if current_site.require_registration_approval?
       ignore_full = can?(:approve_when_full, @user)
       if @user.approve!(ignore_full)
         @user.skip_confirmation_notification!
@@ -197,7 +197,7 @@ class UsersController < ApplicationController
   end
 
   def disapprove
-    if Site.current.require_registration_approval?
+    if current_site.require_registration_approval?
       @user.disapprove!
       flash[:notice] = t('users.disapprove.disapproved', :username => @user.username)
     else
@@ -218,6 +218,7 @@ class UsersController < ApplicationController
     allowed = [ :password, :password_confirmation, :remember_me, :current_password,
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
+
     allowed += [:institution_id] if current_user.superuser?
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed
