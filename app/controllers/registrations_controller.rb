@@ -12,13 +12,9 @@ class RegistrationsController < Devise::RegistrationsController
   before_filter :check_registration_enabled, :only => [:new, :create]
   before_filter :configure_permitted_parameters, :only => [:create]
   before_filter :check_institution_presence, :only => [:create]
+  before_filter :load_institution, :only => [:create]
 
   def new
-    if session[:user_tmp]
-      @user = User.new session[:user_tmp]
-      @user.errors.add(:institution_id, "can't be blank")
-      session[:user_tmp] = nil
-    end
   end
 
   def edit
@@ -28,9 +24,19 @@ class RegistrationsController < Devise::RegistrationsController
   private
 
   def check_institution_presence
-    if params[:user][:institution_id].blank? or !Institution.where(id: params[:user][:institution_id]).first
-      session[:user_tmp] = params[:user].slice(:_full_name, :username, :email).symbolize_keys
-      redirect_to register_path
+    if params[:user].blank? || params[:user][:institution_id].blank? ||
+        !Institution.find_by(id: params[:user][:institution_id])
+
+      build_resource(sign_up_params)
+      resource.valid? # to get all other possible errors
+      resource.errors.add(:institution_id, I18n.t("errors.messages.blank"))
+      render :new
+    end
+  end
+
+  def load_institution
+    unless params[:user].nil? || params[:user][:institution_id].blank?
+      @institution = Institution.find_by(id: params[:user][:institution_id])
     end
   end
 
