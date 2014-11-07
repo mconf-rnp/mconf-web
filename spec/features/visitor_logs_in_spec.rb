@@ -125,7 +125,6 @@ feature 'Visitor logs in' do
 
     scenario 'after a failed registration (/users)' do
       visit register_path
-      fill_in 'user[institution_id]', with: @user.institution.id
       click_button 'Register'
       expect(current_path).to eq("/users")
 
@@ -220,7 +219,6 @@ feature 'Visitor logs in' do
       Site.current.update_attributes(require_registration_approval: true)
 
       attrs = FactoryGirl.attributes_for(:user)
-      attrs.merge!(institution_id: FactoryGirl.create(:institution).id)
       register_with attrs
       expect(current_path).to eq(my_approval_pending_path)
 

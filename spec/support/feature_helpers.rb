@@ -53,13 +53,18 @@ module FeatureHelpers
   def register_with(attrs)
     name = attrs[:username] || (attrs[:_full_name].downcase.gsub(/\s/, '-') if attrs[:_full_name])
     password_confirmation = attrs[:password_confirmation] || attrs[:password]
+
+    # To try to minimize merge conflicts, we automatically set an institution here if none is
+    # provided. To force an empty institution, set `:institution_id` to nil.
+    institution_id = attrs.has_key?(:institution_id) ? attrs[:institution_id] : FactoryGirl.create(:institution).id
+
     visit register_path
     fill_in "user[email]", with: attrs[:email]
     fill_in "user[_full_name]", with: attrs[:_full_name]
     fill_in "user[username]", with: name
     fill_in "user[password]", with: attrs[:password]
     fill_in "user[password_confirmation]", with: password_confirmation
-    fill_in "user[institution_id]", with: attrs[:institution_id]
+    fill_in "user[institution_id]", with: institution_id
     click_button I18n.t("registrations.signup_form.register")
   end
 
