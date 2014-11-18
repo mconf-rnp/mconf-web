@@ -38,25 +38,9 @@ class PrivateSender
       m = PrivateMessage.new :title => I18n.t("permission.notification.subject.space", :username=>sender.full_name , :space=>stage.name),
       :body =>  I18n.t("permission.notification.space", :username=>sender.full_name , :space=>stage.name , :role => rol );
       m.receiver = receiver
-      m.save! 
-    end
-  end
-
-  def self.user_registered_notification(user, institution)
-    institution.admins.each do |receiver|
-      m = PrivateMessage.new(
-        :title => I18n.t("institution.user_registered.title", :locale => receiver.locale),
-        :body => I18n.t("institution.user_registered.body_html",
-          :name => user.full_name, :url => Rails.application.routes.url_helpers.manage_users_path,
-          :locale => receiver.locale
-        )
-      )
-      m.receiver = receiver
-      m.sender = user
       m.save!
     end
   end
-
 
   def self.join_request_message(jr,receiver)
     m = PrivateMessage.new :title => I18n.t("join_requests.ask_subject", :candidate => jr.candidate.name, :space => jr.group.name),

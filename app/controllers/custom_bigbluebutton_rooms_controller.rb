@@ -24,6 +24,9 @@ class CustomBigbluebuttonRoomsController < Bigbluebutton::RoomsController
   before_filter :check_redirect_to_invite, :only => [:invite_userid]
   before_filter :check_redirect_to_invite_userid, :only => [:invite]
 
+  # don't let users join if the room's limit was exceeded
+  before_filter :check_user_limit, :only => [:join]
+
   layout :determine_layout
 
   def determine_layout
@@ -67,7 +70,7 @@ class CustomBigbluebuttonRoomsController < Bigbluebutton::RoomsController
     # or if the feature to automatically set the record flag is disabled in the site
     # an extra protection, since the views that point to this route filter this as well
     ability = Abilities.ability_for(current_user)
-    if ability.can?(:record_meeting, @room) && !Site.current.webconf_auto_record
+    if ability.can?(:record_meeting, @room) && !current_site.webconf_auto_record
       begin
         @room.fetch_is_running?
       rescue BigBlueButton::BigBlueButtonException
@@ -88,8 +91,11 @@ class CustomBigbluebuttonRoomsController < Bigbluebutton::RoomsController
   def send_invitation
 
     # adjusts the dates set by the user in the datetimepicker to dates we can set in the invitation
-    unless adjust_dates_for_invitation(params)
+    if !adjust_dates_for_invitation(params)
       flash[:error] = t('custom_bigbluebutton_rooms.send_invitation.error_date_format')
+
+    elsif params[:invite][:title].blank?
+      flash[:error] = t('custom_bigbluebutton_rooms.send_invitation.error_title')
 
     else
       invitation_params = {
@@ -97,7 +103,7 @@ class CustomBigbluebuttonRoomsController < Bigbluebutton::RoomsController
         :target => @room,
         :starts_on => params[:invite][:starts_on],
         :ends_on => params[:invite][:ends_on],
-        :title => params[:invite][:title] || t('web_conference_mailer.invitation_email.event_name', :name => current_user.full_name),
+        :title => params[:invite][:title],
         :url => join_webconf_url(@room),
         :description => params[:invite][:message],
         :ready => true
@@ -155,6 +161,23 @@ class CustomBigbluebuttonRoomsController < Bigbluebutton::RoomsController
     true
   rescue
     false
+  end
+
+  # Redirects the user elsewhere if the room exceeds the user limit defined in the room.
+  # This check won't be made when the room is being created.
+  # Note: Solves the problem but it's not perfect. Has concurrency problems if users try to join
+  # simultaneously, before the webconf server has updated the number of participants to return
+  # in the API. Ideally BBB should enforce max_participants is respected.
+  def check_user_limit
+    user_limit = @room.max_participants
+
+    if user_limit.present? && @room.is_running?
+      meeting = @room.fetch_meeting_info
+      if meeting[:participantCount] >= user_limit
+        flash[:error] = t('custom_bigbluebutton_rooms.join.user_limit_exceeded')
+        redirect_to request.referer
+      end
+    end
   end
 
   # For cancan create load_and_authorize

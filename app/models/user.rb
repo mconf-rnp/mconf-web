@@ -9,6 +9,8 @@ require 'devise/encryptors/station_encryptor'
 require 'digest/sha1'
 class User < ActiveRecord::Base
 
+  # TODO: block :username from being modified after registration
+
   ## Devise setup
   # Other available devise modules are:
   # :token_authenticatable, :lockable, :timeoutable and :omniauthable
@@ -29,20 +31,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  # attr_accessible :email, :password, :password_confirmation, :remember_me, :login, :username, :approved
-  # TODO: block :username from being modified after registration
-  # attr_accessible :username, :as => :create
-
-  # TODO: improve the format matcher, check specs for some values that are allowed today
-  #   but are not really recommended (e.g. '-')
-  validates :username, :uniqueness => { :case_sensitive => false },
-                       :presence => true,
-                       :format => /\A[A-Za-z0-9\-_]*\z/,
-                       :length => { :minimum => 1 }
-
-  # The username has to be unique not only for user, but across other
-  # models as well
-  validate :username_uniqueness
+  validates :username,
+    presence: true,
+    format: /\A[A-Za-z0-9\-_]*\z/,
+    length: { minimum: 1 },
+    identifier_uniqueness: true,
+    room_param_uniqueness: true
 
   extend FriendlyId
   friendly_id :username
@@ -119,11 +113,17 @@ class User < ActiveRecord::Base
   after_create :create_webconf_room
   after_update :update_webconf_room
 
+  after_create :set_institution
+  after_update :set_institution
+
   after_create :send_admin_approval_mail, if: :site_needs_approval?
   def send_admin_approval_mail
     if !approved?
-      admins = User.where(:superuser => true)
-
+      if self.institution
+        admins = self.institution.admins
+      else
+        admins = User.where(:superuser => true)
+      end
       admins.each do |admin|
         AdminMailer.new_user_waiting_for_approval(admin.id, self.id).deliver
       end
@@ -174,9 +174,7 @@ class User < ActiveRecord::Base
 
   def update_webconf_room
     if self.username_changed?
-      params = {
-        :param => self.username
-      }
+      params = { param: self.username }
       bigbluebutton_room.update_attributes(params)
     end
   end
@@ -193,9 +191,6 @@ class User < ActiveRecord::Base
 
   after_create do |user|
     user.create_profile :full_name => user._full_name
-
-    # Send message to the institutional admin
-    PrivateSender.user_registered_notification(user, institution) if institution
 
     # Checking if we have to join a space and/or event
     invites = JoinRequest.where :email => user.email
@@ -360,8 +355,7 @@ class User < ActiveRecord::Base
   #
   # Association with an institution
   #
-  # attr_accessible :institution, :institution_id
-  after_save :set_institution
+  #after_save :set_institution
 
   def institution_is_full?
     if institution.nil?
@@ -401,12 +395,6 @@ class User < ActiveRecord::Base
     if @new_institution != institution
       institution.remove_member!(self) unless institution.nil?
       @new_institution.add_member!(self, Role.default_role.name) unless @new_institution.nil?
-    end
-  end
-
-  def username_uniqueness
-    if Space.with_disabled.find_by_permalink(self.username).present?
-      errors.add(:username, "has already been taken")
     end
   end
 

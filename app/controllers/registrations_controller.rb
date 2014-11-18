@@ -11,6 +11,8 @@ class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :check_shib_login_only, :only => [:create]
   before_filter :check_registration_enabled, :only => [:new, :create]
   before_filter :configure_permitted_parameters, :only => [:create]
+  before_filter :check_institution_presence, :only => [:create]
+  before_filter :load_institution, :only => [:create]
 
   def new
   end
@@ -20,6 +22,23 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   private
+
+  def check_institution_presence
+    if params[:user].blank? || params[:user][:institution_id].blank? ||
+        !Institution.find_by(id: params[:user][:institution_id])
+
+      build_resource(sign_up_params)
+      resource.valid? # to get all other possible errors
+      resource.errors.add(:institution_id, I18n.t("errors.messages.blank"))
+      render :new
+    end
+  end
+
+  def load_institution
+    unless params[:user].nil? || params[:user][:institution_id].blank?
+      @institution = Institution.find_by(id: params[:user][:institution_id])
+    end
+  end
 
   def check_registration_enabled
     unless current_site.registration_enabled?

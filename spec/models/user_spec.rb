@@ -99,41 +99,164 @@ describe User do
     it { should allow_value("_").for(:username) }
     it { should allow_value("abc-123_d5").for(:username) }
 
+    shared_examples "invalid user with username not unique" do
+      it { subject.should_not be_valid }
+      it {
+        subject.save.should be(false)
+        subject.errors.should have_key(:username)
+        subject.errors.messages[:username].should include(message)
+      }
+    end
+
     describe "validates uniqueness against Space#permalink" do
+      let(:message) { "has already been taken" }
+
       describe "on create" do
         context "with an enabled space" do
           let(:space) { FactoryGirl.create(:space) }
-          subject { FactoryGirl.build(:user, :username => space.permalink) }
-          it { should_not be_valid }
+          subject { FactoryGirl.build(:user, username: space.permalink) }
+          include_examples "invalid user with username not unique"
         end
 
         context "with a disabled space" do
-          let(:disabled_space) { FactoryGirl.create(:space, :disabled => true) }
-          subject { FactoryGirl.build(:user, :username => disabled_space.permalink) }
-          it { should_not be_valid }
+          let(:disabled_space) { FactoryGirl.create(:space, disabled: true) }
+          subject { FactoryGirl.build(:user, username: disabled_space.permalink) }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let!(:space) { FactoryGirl.create(:space, permalink: "My-Weird-Name") }
+          subject { FactoryGirl.build(:user, username: "mY-weiRD-NAMe") }
+          include_examples "invalid user with username not unique"
         end
       end
 
       describe "on update" do
         context "with an enabled space" do
-          let(:user) { FactoryGirl.create(:user) }
+          let(:subject) { FactoryGirl.create(:user) }
           let(:space) { FactoryGirl.create(:space) }
           before(:each) {
-            user.username = space.permalink
+            subject.username = space.permalink
           }
-          it { user.should_not be_valid }
+          include_examples "invalid user with username not unique"
         end
 
         context "with a disabled space" do
-          let(:user) { FactoryGirl.create(:user) }
+          let(:subject) { FactoryGirl.create(:user) }
           let(:disabled_space) { FactoryGirl.create(:space, :disabled => true) }
           before(:each) {
-            user.username = disabled_space.permalink
+            subject.username = disabled_space.permalink
           }
-          it { user.should_not be_valid }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let!(:space) { FactoryGirl.create(:space, permalink: "My-Weird-Name") }
+          before(:each) {
+            subject.username = "mY-weiRD-NAMe"
+          }
+          include_examples "invalid user with username not unique"
         end
       end
     end
+
+    describe "validates uniqueness against User#username" do
+      let(:message) { "has already been taken" }
+
+      describe "on create" do
+        context "with an enabled user" do
+          let(:user) { FactoryGirl.create(:user) }
+          subject { FactoryGirl.build(:user, username: user.username) }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "with a disabled user" do
+          let(:disabled_user) { FactoryGirl.create(:user, disabled: true) }
+          subject { FactoryGirl.build(:user, username: disabled_user.username) }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let!(:user) { FactoryGirl.create(:user, username: "My-Weird-Name") }
+          subject { FactoryGirl.build(:user, username: "mY-weiRD-NAMe") }
+          include_examples "invalid user with username not unique"
+        end
+      end
+
+      describe "on update" do
+        context "with an enabled space" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let(:other_user) { FactoryGirl.create(:user) }
+          before(:each) {
+            subject.username = other_user.username
+          }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "with a disabled space" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let(:disabled_user) { FactoryGirl.create(:user, :disabled => true) }
+          before(:each) {
+            subject.username = disabled_user.username
+          }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let!(:other_user) { FactoryGirl.create(:user, username: "My-Weird-Name") }
+          before(:each) {
+            subject.username = "mY-weiRD-NAMe"
+          }
+          include_examples "invalid user with username not unique"
+        end
+      end
+    end
+
+    context "validates against webconf room params" do
+      let(:message) { "has already been taken" }
+
+      describe "on create" do
+        context "with an exact match" do
+          let(:room) { FactoryGirl.create(:bigbluebutton_room) }
+          subject { FactoryGirl.build(:user, username: room.param) }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let!(:room) { FactoryGirl.create(:bigbluebutton_room, param: "My-Weird-Name") }
+          subject { FactoryGirl.build(:user, username: "mY-weiRD-NAMe") }
+          include_examples "invalid user with username not unique"
+        end
+      end
+
+      describe "on update" do
+        context "with an exact match" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let(:other_room) { FactoryGirl.create(:bigbluebutton_room) }
+          before(:each) {
+            subject.username = other_room.param
+          }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "uses case-insensitive comparisons" do
+          let(:subject) { FactoryGirl.create(:user) }
+          let!(:other_room) { FactoryGirl.create(:bigbluebutton_room, param: "My-Weird-Name") }
+          before(:each) {
+            subject.username = "mY-weiRD-NAMe"
+          }
+          include_examples "invalid user with username not unique"
+        end
+
+        context "doesn't validate against its own room" do
+          let!(:user) { FactoryGirl.create(:user) }
+          it { user.update_attributes(username: user.username).should be(true) }
+        end
+      end
+    end
+
   end
 
   describe "on update" do
@@ -718,14 +841,48 @@ describe User do
       end
 
       context '#send_admin_approval_mail' do
-        before { @user = FactoryGirl.create(:user, :approved => false) }
+        let!(:admin2) { FactoryGirl.create(:user, superuser: true, approved: true) }
 
-        it { AdminMailer.should have_queue_size_of(1) }
-        it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, @user.id) }
+        context "when the user has no institution" do
+          let!(:user) { FactoryGirl.create(:user, :approved => false, :institution => nil) }
+
+          it { AdminMailer.should have_queue_size_of_at_least(2) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
+
+        context "when the user has an institution with admins" do
+          let(:institution) { FactoryGirl.create(:institution) }
+          let!(:inst_admin) {
+            u = FactoryGirl.create(:user)
+            institution.add_member! u, "Admin"
+            u
+          }
+          let!(:inst_admin2) {
+            u = FactoryGirl.create(:user)
+            institution.add_member! u, "Admin"
+            u
+          }
+          let!(:user) { FactoryGirl.create(:user, :approved => false, :institution => institution) }
+
+          it { AdminMailer.should have_queue_size_of_at_least(2) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, inst_admin.id, user.id) }
+          it { AdminMailer.should have_queued(:new_user_waiting_for_approval, inst_admin2.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
+
+        context "when the user has an institution without admins" do
+          let!(:user) { FactoryGirl.create(:user, :approved => false) }
+
+          it { AdminMailer.should have_queue_size_of(1) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin.id, user.id) }
+          it { AdminMailer.should_not have_queued(:new_user_waiting_for_approval, admin2.id, user.id) }
+        end
       end
 
       context '#send_user_approved_mail' do
-        before { @user = FactoryGirl.create(:user, :approved => false) }
+        before { @user = FactoryGirl.create(:user, :approved => false, :institution => nil) }
 
         context 'send when user is approved' do
           before { @user.approve! }
@@ -750,6 +907,17 @@ describe User do
           it { @user.username.should eq(new_username) }
           it { AdminMailer.should have_queued(:new_user_waiting_for_approval, admin.id, @user.id) }
           it { AdminMailer.should_not have_queued(:new_user_approved, @user.id).in(:mailer) }
+        end
+
+        # just to be extra sure it works
+        context 'when the user has an institution' do
+          before {
+            @user = FactoryGirl.create(:user, :approved => false)
+            @user.approve!
+          }
+
+          it { AdminMailer.should have_queue_size_of_at_least(1) }
+          it { AdminMailer.should have_queued(:new_user_approved, @user.id).in(:mailer) }
         end
 
       end

@@ -20,9 +20,6 @@ pt-br:
   institution:
     created: Instituição criada com sucesso.
     duplicate: Esta instituição é uma duplicata
-    user_registered:
-      title: "Eu me registrei em sua instituição"
-      body_html: "A sua <a href=\"%{url}\">aprovação</a> é necessária para que '%{name}' possa se logar. Você pode fazer isto pela interface de administração."
     updated: "Instituição atualizada com sucesso"
   frontpage:
     show:
@@ -73,6 +70,12 @@ pt-br:
   profiles:
     form:
       no_organization: "<nenhuma organização atribuída>"
+  sessions:
+    new:
+      cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+      federated_authentication: "Autenticação federada"
+      local_authentication: "Autenticação local"
+      sign_in_federation: "(clique aqui para entrar)"
   shibboleth:
     create_association:
       institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."

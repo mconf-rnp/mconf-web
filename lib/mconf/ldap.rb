@@ -131,7 +131,7 @@ module Mconf
         user.skip_confirmation!
         unless user.save
           Rails.logger.error "LDAP: error while saving the user model"
-          Rails.logger.error "Errors: " + user.errors.messages.join(", ")
+          Rails.logger.error "Errors: " + user.errors.full_messages.join(", ")
           user = nil
         end
       end

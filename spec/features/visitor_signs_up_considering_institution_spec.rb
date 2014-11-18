@@ -11,7 +11,7 @@ feature 'Visitor signs up considering institution' do
         email: 'valid@example.com',
         username: 'username',
         password: 'password',
-        institution: institution
+        institution_id: institution.id
       }
       register_with attrs
     }

@@ -15,9 +15,8 @@ class mconf.SignupForm
       width: 'resolve'
       multiple: false
       initSelection: (element, callback) ->
-        params = { dataType: "json" }
-        $.ajax("#{urlInstitutions}?q=#{element.val()}", params).done (data) ->
-          callback(data?[0])
+        data = { id: element.val(), text: element.data("institution-name") }
+        callback(data)
       ajax:
         url: urlInstitutions
         dataType: "json"

@@ -26,14 +26,12 @@ class ApplicationController < ActionController::Base
   helper_method :current_site
 
   # Handle errors - error pages
-  unless Rails.application.config.consider_all_requests_local
-    rescue_from Exception, :with => :render_500
-    rescue_from ActiveRecord::RecordNotFound, :with => :render_404
-    rescue_from ActionController::RoutingError, :with => :render_404
-    rescue_from ActionController::UnknownController, :with => :render_404
-    rescue_from ::AbstractController::ActionNotFound, :with => :render_404
-    rescue_from CanCan::AccessDenied, :with => :render_403
-  end
+  rescue_from Exception, :with => :render_500
+  rescue_from ActiveRecord::RecordNotFound, :with => :render_404
+  rescue_from ActionController::RoutingError, :with => :render_404
+  rescue_from ActionController::UnknownController, :with => :render_404
+  rescue_from ::AbstractController::ActionNotFound, :with => :render_404
+  rescue_from CanCan::AccessDenied, :with => :render_403
 
   # Code that to DRY out permitted param filtering
   # The controller declares allow_params_for :model_name and defines allowed_params
@@ -160,7 +158,7 @@ class ApplicationController < ActionController::Base
     ability = Abilities.ability_for(current_user)
 
     can_record = ability.can?(:record_meeting, room)
-    if Site.current.webconf_auto_record
+    if current_site.webconf_auto_record
       # show the record button if the user has permissions to record
       { record: can_record }
     else
@@ -198,19 +196,32 @@ class ApplicationController < ActionController::Base
   end
 
   def render_404(exception)
-    # FIXME: this is never triggered, see the bottom of routes.rb
-    @exception = exception
-    render_error 404
+    unless Rails.application.config.consider_all_requests_local
+      # FIXME: this is never triggered, see the bottom of routes.rb
+      @exception = exception
+      render_error 404
+    else
+      raise exception
+    end
   end
 
   def render_500(exception)
-    @exception = exception
-    render_error 500
+    unless Rails.application.config.consider_all_requests_local
+      @exception = exception
+      ExceptionNotifier.notify_exception exception
+      render_error 500
+    else
+      raise exception
+    end
   end
 
   def render_403(exception)
-    @exception = exception
-    render_error 403
+    unless Rails.application.config.consider_all_requests_local
+      @exception = exception
+      render_error 403
+    else
+      raise exception
+    end
   end
 
   # Store last url for post-login redirect to whatever the user last visited.
