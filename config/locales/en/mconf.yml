@@ -42,6 +42,13 @@ en:
       join_html: has joined the space
       leave_html: has left the space
       deleted: a space that has since been deleted
+  admins:
+    access_forbidden: "This operation is only available to administrators"
+    new_user:
+      title: "Add User"
+    user:
+      created: "User created, confirmed and approved already"
+      error: "Error(s) while create the new user"
   _js:
     confirmation_dialog:
       cancel: "Cancel"
@@ -954,6 +961,7 @@ en:
     users:
       filter_name_or_username: "Name, username or email"
       filter_results: "Filter the results:"
+      new_user: "Add User"
     users_list:
       filter_count_with_text: "Found %{count} users for filter \"%{value}\""
       filter_count_empty: "Found %{count} users"
