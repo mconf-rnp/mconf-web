@@ -10,7 +10,7 @@ class AdminsController < ApplicationController
   end
 
   def new_user
-    authorize! :manage, User
+    authorize! :manage_user, User
     @user = User.new
     respond_to do |format|
       format.html { render layout: !request.xhr? }
@@ -19,7 +19,11 @@ class AdminsController < ApplicationController
 
   def create_user
     @user = User.new(admins_params)
-    authorize! :manage, User
+    authorize! :manage_user, User
+
+    if is_only_institution_admin?
+      @user.institution_id = current_user.institution.id
+    end
 
     if @user.save
       @user.confirm!
@@ -28,7 +32,6 @@ class AdminsController < ApplicationController
         format.html { redirect_to manage_users_path }
       end
     else
-      puts @user.errors.messages.inspect
       flash[:error] = t('admins.user.error')
       respond_to do |format|
         format.html { redirect_to manage_users_path }
@@ -37,6 +40,14 @@ class AdminsController < ApplicationController
   end
 
   private
+
+  def is_only_institution_admin?
+    if current_user.institution.admins.include?(current_user) and !current_user.superuser?
+      true
+    else
+      false
+    end
+  end
 
   def admins_params
     unless params[:user].blank?
