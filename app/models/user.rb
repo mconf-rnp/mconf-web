@@ -50,18 +50,31 @@ class User < ActiveRecord::Base
     self.new_record?
   end
 
-  # Returns a query with all the activity related to this user: activities in his spaces and
-  # web conference rooms
-  def all_activity
+  # Returns a relation with all the activity related to this user: activities in his spaces
+  # and web conference rooms.
+  # Accepts an array of keys to reject. Keys are the string that identify the recent
+  # activity, e.g. "space.leave".
+  def all_activity(reject_keys=[])
     user_room = self.bigbluebutton_room
     spaces = self.spaces
     space_rooms = spaces.map{ |s| s.bigbluebutton_room.id }
 
     t = RecentActivity.arel_table
     in_spaces = t[:owner_id].in(spaces.map(&:id)).and(t[:owner_type].eq('Space'))
+    in_spaces_as_trackable = t[:trackable_id].in(spaces.map(&:id)).and(t[:trackable_type].eq('Space'))
     in_room = t[:owner_id].in(user_room.id).and(t[:owner_type].eq('BigbluebuttonRoom'))
     in_space_rooms = t[:owner_id].in(space_rooms).and(t[:owner_type].eq('BigbluebuttonRoom'))
-    RecentActivity.where(in_spaces.or(in_room).or(in_space_rooms))
+
+    activities = RecentActivity.where(in_spaces.or(in_spaces_as_trackable).or(in_room).or(in_space_rooms))
+    for key in reject_keys
+      activities = activities.where("activities.key != ?", key)
+    end
+    activities
+  end
+
+  # All activities that are public and should be visible for this user
+  def all_public_activity
+    all_activity(["space.decline"])
   end
 
   def site_needs_approval?
@@ -85,21 +98,9 @@ class User < ActiveRecord::Base
 
   accepts_nested_attributes_for :bigbluebutton_room
 
-  # TODO: see JoinRequestsController#create L50
-  # attr_accessible :created_at, :updated_at, :activated_at, :disabled
-  # attr_accessible :captcha, :captcha_key, :authenticate_with_captcha
-  # attr_accessible :email2, :email3
-  # attr_accessible :timezone
-  # attr_accessible :expanded_post
-  # attr_accessible :notification
-  # attr_accessible :superuser
-  # attr_accessible :can_record
-  # attr_accessible :receive_digest
-
   # Full name must go to the profile, but it is provided by the user when
   # signing up so we have to cache it until the profile is created
   attr_accessor :_full_name
-  # attr_accessible :_full_name
 
   # BigbluebuttonRoom requires an identifier with 3 chars generated from :name
   # So we'll require :_full_name and :username to have length >= 3
@@ -191,15 +192,6 @@ class User < ActiveRecord::Base
 
   after_create do |user|
     user.create_profile :full_name => user._full_name
-
-    # Checking if we have to join a space and/or event
-    invites = JoinRequest.where :email => user.email
-    invites.each do |invite|
-      if invite.space?
-        space.add_member!(user)
-      end
-    end
-
   end
 
   # Builds a guest user based on the e-mail
@@ -219,10 +211,6 @@ class User < ActiveRecord::Base
 
   def other_public_spaces
     Space.public_spaces.order('name') - spaces
-  end
-
-  def user_count
-    users.size
   end
 
   def disable
@@ -296,6 +284,8 @@ class User < ActiveRecord::Base
   # on registration.
   def automatically_approve
     self.approved = true
+    self.needs_approval_notification_sent_at = Time.now
+    self.approved_notification_sent_at = Time.now
   end
 
   # Sets the user as approved

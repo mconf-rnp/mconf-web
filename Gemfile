@@ -29,7 +29,6 @@ gem 'haml'
 gem 'will_paginate'
 gem 'chronic'
 gem 'rails_autolink', '~> 1.1.0'
-gem 'whenever', :require => false
 gem 'simple_form', '~> 3.0.0'
 gem 'acts_as_tree', '~> 2.0.0'
 gem 'friendly_id'
@@ -134,6 +133,7 @@ group :development, :test do
   gem 'htmlentities'
   gem 'turn', '0.8.2', :require => false # TODO: why 0.8.2?
   gem 'simplecov', :require => false
+  gem 'fooldap'
 end
 
 group :test do

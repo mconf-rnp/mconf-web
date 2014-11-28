@@ -294,20 +294,24 @@ describe User do
   describe "on create" do
     describe "#automatically_approve_if_needed" do
       context "if #require_registration_approval is not set in the current site" do
-        before { Site.current.update_attributes(:require_registration_approval => false) }
+        before { Site.current.update_attributes(require_registration_approval: false) }
 
         context "automatically approves the user" do
-          before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
+          before(:each) { @user = FactoryGirl.create(:user, approved: false) }
           it { @user.should be_approved }
+          it { @user.needs_approval_notification_sent_at.should be_within(2.seconds).of(Time.now) }
+          it { @user.approved_notification_sent_at.should be_within(2.seconds).of(Time.now) }
         end
       end
 
       context "if #require_registration_approval is set in the current site" do
-        before { Site.current.update_attributes(:require_registration_approval => true) }
+        before { Site.current.update_attributes(require_registration_approval: true) }
 
         context "doesn't approve the user" do
-          before(:each) { @user = FactoryGirl.create(:user, :approved => false) }
+          before(:each) { @user = FactoryGirl.create(:user, approved: false, needs_approval_notification_sent_at: nil, approved_notification_sent_at: nil) }
           it { @user.should_not be_approved }
+          it { @user.needs_approval_notification_sent_at.should be_nil }
+          it { @user.approved_notification_sent_at.should be_nil }
         end
       end
     end
@@ -401,6 +405,23 @@ describe User do
       it { subject[1].should eq(@activity2) }
     end
 
+    context "returns the activities in his spaces when the space is a 'trackable'" do
+      let(:space1) { FactoryGirl.create(:space) }
+      let(:space2) { FactoryGirl.create(:space) }
+      let(:space3) { FactoryGirl.create(:space) }
+      before do
+        space1.add_member!(user, 'User')
+        space2.add_member!(user, 'Admin')
+        @activity1 = RecentActivity.create(:trackable => space1)
+        @activity2 = RecentActivity.create(:trackable => space2)
+        @activity3 = RecentActivity.create(:trackable => space3)
+      end
+      subject { user.all_activity }
+      it { subject.length.should be(2) }
+      it { subject[0].should eq(@activity1) }
+      it { subject[1].should eq(@activity2) }
+    end
+
     context "returns the activities in the rooms of his spaces" do
       let(:space1) { FactoryGirl.create(:space) }
       let(:space2) { FactoryGirl.create(:space) }
@@ -416,6 +437,33 @@ describe User do
       it { subject.length.should be(2) }
       it { subject[0].should eq(@activity1) }
       it { subject[1].should eq(@activity2) }
+    end
+
+    context "rejects keys if they are informed" do
+      let(:space) { FactoryGirl.create(:space) }
+      before do
+        space.add_member!(user, 'User')
+        @activity1 = RecentActivity.create(owner: space, key: "key1")
+        @activity2 = RecentActivity.create(owner: space, key: "key2")
+        @activity3 = RecentActivity.create(owner: space, key: "key3")
+      end
+      subject { user.all_activity(["key1", "key2"]) }
+      it { subject.length.should be(1) }
+      it { subject[0].should eq(@activity3) }
+    end
+  end
+
+  describe "#all_public_activity" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    context "ignores declined join requests" do
+      before {
+        user.should_receive(:all_activity) { |arg|
+          arg.should be_an_instance_of(Array)
+          arg.should include("space.decline")
+        }.and_return("all activity")
+      }
+      it { user.all_public_activity.should eql("all activity") }
     end
   end
 
@@ -734,9 +782,9 @@ describe User do
         FactoryGirl.create(:space, :disabled => true)]
       @user = FactoryGirl.create(:user)
 
-      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[0], :request_type => 'request')
-      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[1], :request_type => 'invite')
-      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[3], :request_type => 'request')
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[0], :request_type => JoinRequest::TYPES[:request])
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[1], :request_type => JoinRequest::TYPES[:invite])
+      FactoryGirl.create(:join_request, :candidate => @user, :group => @spaces[3], :request_type => JoinRequest::TYPES[:request])
     end
 
     # Currently makes no differentiation between invites or requests

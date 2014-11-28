@@ -5,11 +5,6 @@
 # 3 or later. See the LICENSE file.
 
 FactoryGirl.define do
-
-  # TODO: Not really unconfirmed as it should, but can't do it right now:
-  #   It's triggering an error related to delayed_job (undefined method `tag=').
-  #   Uncomment this when delayed_job is removed, see #811.
-  #   Search for this same comment in other files as well.
   factory :user_unconfirmed, :class => User do |u|
     u.username
     u.email
@@ -25,13 +20,16 @@ FactoryGirl.define do
     u.notification { User::NOTIFICATION_VIA_EMAIL }
     u.password { Forgery::Basic.password :at_least => 6, :at_most => 16 }
     u.password_confirmation { |u2| u2.password }
+    u.confirmed_at { Time.now }
+    u.needs_approval_notification_sent_at { Time.now }
+    u.approved_notification_sent_at { Time.now }
     u.association :institution
     after(:create) { |u2| u2.confirm!; u2.reload }
   end
 
   factory :user, :parent => :user_unconfirmed do |u|
-    # u.confirmed_at { Time.now }
-    # after(:create) { |u2| u2.confirm! }
+    u.confirmed_at { Time.now }
+    after(:create) { |u2| u2.confirm! }
   end
 
   factory :superuser, :class => User, :parent => :user do |u|

@@ -62,13 +62,15 @@ Mconf::Application.routes.draw do
 
   # event module
   if Mconf::Modules.mod_loaded?('events')
+    mount MwebEvents::Engine => '/'
+
     # For invitations
     resources :events, :only =>[] do
-      post :send_invitation, :controller => 'mweb_events/events'
-      get  :invite, :controller => 'mweb_events/events'
+      member do
+        post :send_invitation, :controller => 'mweb_events/events'
+        get  :invite, :controller => 'mweb_events/events'
+      end
     end
-
-    mount MwebEvents::Engine => '/'
   end
 
   # shibboleth controller
@@ -106,9 +108,14 @@ Mconf::Application.routes.draw do
 
     resources :news
 
-    resources :join_requests do
+    resources :join_requests, only: [:index, :show, :new, :create] do
       collection do
         get :invite
+      end
+
+      member do
+        post :accept
+        post :decline
       end
     end
 
@@ -185,10 +192,6 @@ Mconf::Application.routes.draw do
     end
   end
 
-  # 'Hack' to show a custom 404 page.
-  # See more at http://blog.igodigital.com/blog/notes-on-cyber-weekend-targeted-email-campaigns/custom-error-handling-in-rails-303
-  # and http://ramblinglabs.com/blog/2012/01/rails-3-1-adding-custom-404-and-500-error-pages
-  unless Rails.application.config.consider_all_requests_local
-    get '*not_found', :to => 'errors#error_404'
-  end
+  # To treat errors on pages that don't fall on any other controller
+  match ':status', to: 'errors#render_error', constraints: { status: /\d{3}/ }, via: :all
 end
