@@ -8,18 +8,26 @@
 require "digest/sha1"
 class UsersController < ApplicationController
 
-  load_and_authorize_resource :find_by => :username, :except => [:enable, :index]
-  before_filter :load_and_authorize_with_disabled, :only => [:enable]
+  load_and_authorize_resource find_by: :username, except: [:enable, :index, :new_user, :create_user]
+  before_filter :load_and_authorize_with_disabled, only: [:enable]
 
   # #index is nested in spaces
-  load_and_authorize_resource :space, :find_by => :permalink, :only => [:index]
-  load_and_authorize_resource :through => :space, :only => [:index]
-  before_filter :webconf_room!, :only => [:index]
+  load_and_authorize_resource :space, find_by: :permalink, only: [:index]
+  load_and_authorize_resource through: :space, only: [:index]
+  before_filter :webconf_room!, only: [:index]
 
   # Rescue username not found rendering a 404
-  rescue_from ActiveRecord::RecordNotFound, :with => :render_404
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
-  rescue_from CanCan::AccessDenied, :with => :handle_access_denied
+  rescue_from CanCan::AccessDenied, with: :handle_access_denied
+  rescue_from CanCan::AccessDenied, with: :handle_access_denied_admins_pages, only: [:new_use]
+
+  def handle_access_denied_admins_pages exception
+    if user_signed_in?
+      flash[:error] = t('admins.access_forbidden')
+    end
+    redirect_to root_path
+  end
 
   def handle_access_denied exception
     if @space.blank?
@@ -29,9 +37,9 @@ class UsersController < ApplicationController
     end
   end
 
-  respond_to :html, :except => [:select, :current, :fellows]
-  respond_to :js, :only => [:select, :current, :fellows]
-  respond_to :xml, :only => [:current]
+  respond_to :html, except: [:select, :current, :fellows]
+  respond_to :js, only: [:select, :current, :fellows]
+  respond_to :xml, only: [:current]
 
   def index
     @users = @space.users.sort {|x,y| x.name <=> y.name }
@@ -206,6 +214,33 @@ class UsersController < ApplicationController
     redirect_to :back
   end
 
+  # Methods to let admins create new users
+  def new_user
+    authorize! :manage, User
+    @user = User.new
+    respond_to do |format|
+      format.html { render layout: !request.xhr? }
+    end
+  end
+
+  def create_user
+    authorize! :manage, User
+    @user = User.new(user_params)
+
+    if @user.save
+      @user.confirm!
+      flash[:success] = t("admins.user.created")
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
+      end
+    else
+      flash[:error] = t('admins.user.error')
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
+      end
+    end
+  end
+
   private
 
   def load_and_authorize_with_disabled
@@ -219,6 +254,7 @@ class UsersController < ApplicationController
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
     allowed += [:institution_id] if current_user.superuser?
+    allowed += [:email, :username, :_full_name] if current_user.superuser? and (params[:action] == 'create_user')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed
   end
