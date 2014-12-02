@@ -1,11 +1,12 @@
 = render_page_title t('.title')
 
-#login-shibboleth
-  %h3= t('.federated_authentication')
-  - if current_site.shib_enabled?
-    = link_to shibboleth_path do
-      = image_tag "logos/shib_federation_big.jpg", :size => "400x68", :class => "sign-in-cafe", :alt => t('.cafe_alt')
-      %div= t('.sign_in_federation')
+- if current_site.shib_enabled?
+  #login-shibboleth
+    %h3= t('.federated_authentication')
+    - if current_site.shib_enabled?
+      = link_to shibboleth_path do
+        = image_tag "logos/shib_federation_big.jpg", :size => "400x68", :class => "sign-in-cafe", :alt => t('.cafe_alt')
+        %div= t('.sign_in_federation')
 
 #login-wrapper
   %h3= t('.local_authentication')
