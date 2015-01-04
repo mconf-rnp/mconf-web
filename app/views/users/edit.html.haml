@@ -84,10 +84,15 @@
       - unless current_user == @user
         = f.input :approved, :required => false if can?(:manage_approved, @user)
         = f.input :superuser, :required => false if can?(:manage_superuser, @user)
+        - if !@user.confirmed?
+          .input
+            = link_to confirm_user_path(@user), :data => { :confirm => t('.confirm_user_confirm') },  :method => :post do
+              = icon_confirm_user(:alt => t('.confirm_user'))
+              = t('.confirm_user')
         - if can?(:manage_disable, @user)
           .input
             = link_to user_path(@user), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
-              = icon_delete(:alt => t('.disable'), :title => t('.disable'))
+              = icon_delete(:alt => t('.disable'))
               = t('.disable')
 
   = f.button :wrapped, :cancel => edit_user_path(@user), :value => t("_other.save")

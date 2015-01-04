@@ -9,7 +9,7 @@ feature 'Visitor signs up' do
     register_with attrs
 
     current_path.should eq(my_home_path)
-    page.find("#user-notifications").should have_link('', :href => new_user_confirmation_path)
+    page.find("#user-notifications").should have_link('', href: new_user_confirmation_path)
     has_success_message(I18n.t('devise.registrations.signed_up'))
     page.should have_content('Logout')
   end
@@ -112,7 +112,7 @@ feature 'Visitor signs up' do
     current_path.should eq(register_path)
   end
 
-  # Skipping because with_js is not working properly yet
+  # TODO: Skipping because with_js is not working properly yet
   skip "generates a valid suggestion for the identifier", with_js: true do
     visit register_path
     fill_in "user[_full_name]", with: "Mr. Pink-man's #1 (5% of tries = WIN, \"haha\"): áéíôü"

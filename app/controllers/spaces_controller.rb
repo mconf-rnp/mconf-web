@@ -54,10 +54,7 @@ class SpacesController < ApplicationController
 
     respond_with @spaces do |format|
       format.html { render :index }
-      format.js {
-        json = @spaces.to_json(space_to_json_hash)
-        render :json => json, :callback => params[:callback]
-      }
+      format.json
     end
   end
 
@@ -77,10 +74,7 @@ class SpacesController < ApplicationController
 
     respond_to do |format|
       format.html { render :layout => 'spaces_show' }
-      format.js {
-        json = @space.to_json(space_to_json_hash)
-        render :json => json, :callback => params[:callback]
-      }
+      format.json
     end
   end
 
@@ -285,10 +279,6 @@ class SpacesController < ApplicationController
 
   private
 
-  def space_to_json_hash
-    { :methods => :user_count, :include => {:logo => { :only => [:height, :width], :methods => :logo_image_path } } }
-  end
-
   def load_and_authorize_with_disabled
     @space = Space.with_disabled.find_by_permalink(params[:id])
     authorize! action_name.to_sym, @space
@@ -344,7 +334,7 @@ class SpacesController < ApplicationController
   allow_params_for :space
   def allowed_params
     [ :name, :description, :logo_image, :public, :permalink, :disabled, :repository,
-      :crop_x, :crop_y, :crop_w, :crop_h, :institution_id,
+      :crop_x, :crop_y, :crop_w, :crop_h, :crop_img_w, :crop_img_h, :institution_id,
       :bigbluebutton_room_attributes =>
         [ :id, :attendee_key, :moderator_key, :default_layout,
           :welcome_msg, :presenter_share_only, :auto_start_video, :auto_start_audio ] ]
