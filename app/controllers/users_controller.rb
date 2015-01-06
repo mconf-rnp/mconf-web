@@ -8,8 +8,8 @@
 require "digest/sha1"
 class UsersController < ApplicationController
 
-  load_and_authorize_resource :find_by => :username, :except => [:enable, :index]
-  before_filter :load_and_authorize_with_disabled, :only => [:enable]
+  load_and_authorize_resource find_by: :username, except: [:enable, :index, :new, :create]
+  before_filter :load_and_authorize_with_disabled, only: [:enable]
 
   # #index is nested in spaces
   load_and_authorize_resource :space, find_by: :permalink, only: [:index]
@@ -19,14 +19,14 @@ class UsersController < ApplicationController
   # Rescue username not found rendering a 404
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
-  respond_to :html, :except => [:select, :current, :fellows]
-  respond_to :js, :only => [:select, :current, :fellows]
-  respond_to :xml, :only => [:current]
+  respond_to :html, except: [:select, :current, :fellows]
+  respond_to :js, only: [:select, :current, :fellows]
+  respond_to :xml, only: [:current]
 
   def index
     @users = @space.users.sort {|x,y| x.name <=> y.name }
     respond_to do |format|
-      format.html { render :layout => 'spaces_show' }
+      format.html { render layout: 'spaces_show' }
     end
   end
 
@@ -44,7 +44,7 @@ class UsersController < ApplicationController
       shib = Mconf::Shibboleth.new(session)
       @shib_provider = shib.get_identity_provider
     end
-    render :layout => 'no_sidebar'
+    render layout: 'no_sidebar'
   end
 
   def update
@@ -60,7 +60,7 @@ class UsersController < ApplicationController
             !(@user.institution.admins.include? current_user)
           @user.errors.add(:can_record, t('users.update.can_record_reached_limit'))
           flash[:error] = t('users.update.error')
-          render "edit", :layout => 'no_sidebar'
+          render "edit", layout: 'no_sidebar'
           return
         end
       end
@@ -85,12 +85,12 @@ class UsersController < ApplicationController
     if updated
       # User editing himself
       # Sign in the user bypassing validation in case his password changed
-      sign_in @user, :bypass => true if current_user == @user
+      sign_in @user, bypass: true if current_user == @user
 
-      flash = { :success => t("user.updated") }
-      redirect_to edit_user_path(@user), :flash => flash
+      flash = { success: t("user.updated") }
+      redirect_to edit_user_path(@user), flash: flash
     else
-      render "edit", :layout => 'no_sidebar'
+      render "edit", layout: 'no_sidebar'
     end
   end
 
@@ -101,7 +101,7 @@ class UsersController < ApplicationController
       # the same message devise users when removing a registration
       flash[:notice] = t('devise.registrations.destroyed')
     else
-      flash[:notice] = t('user.disabled', :username => @user.username)
+      flash[:notice] = t('user.disabled', username: @user.username)
     end
 
     respond_to do |format|
@@ -117,7 +117,7 @@ class UsersController < ApplicationController
 
   def enable
     unless @user.disabled?
-      flash[:notice] = t('user.error.enabled', :name => @user.username)
+      flash[:notice] = t('user.error.enabled', name: @user.username)
     else
       @user.enable
       flash[:success] = t('user.enabled')
@@ -177,7 +177,7 @@ class UsersController < ApplicationController
   def confirm
     if !@user.confirmed?
       @user.confirm!
-      flash[:notice] = t('users.confirm.confirmed', :username => @user.username)
+      flash[:notice] = t('users.confirm.confirmed', username: @user.username)
     end
     redirect_to :back
   end
@@ -188,9 +188,9 @@ class UsersController < ApplicationController
       if @user.approve!(ignore_full)
         @user.skip_confirmation_notification!
         @user.confirm!
-        flash[:notice] = t('users.approve.approved', :username => @user.username)
+        flash[:notice] = t('users.approve.approved', username: @user.username)
       else
-        flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
+        flash[:error] = t('users.approve.institution_full', name: @user.institution.name, limit: @user.institution.user_limit)
       end
     else
       flash[:error] = t('users.approve.not_enabled')
@@ -201,7 +201,7 @@ class UsersController < ApplicationController
   def disapprove
     if current_site.require_registration_approval?
       @user.disapprove!
-      flash[:notice] = t('users.disapprove.disapproved', :username => @user.username)
+      flash[:notice] = t('users.disapprove.disapproved', username: @user.username)
     else
       flash[:error] = t('users.disapprove.not_enabled')
     end
@@ -210,6 +210,7 @@ class UsersController < ApplicationController
 
   # Methods to let admins create new users
   def new
+    authorize! :manage_user, User
     @user = User.new
     respond_to do |format|
       format.html { render layout: !request.xhr? }
@@ -218,6 +219,11 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    authorize! :manage_user, User
+
+    if is_only_institution_admin?
+      @user.institution_id = current_user.institution.id
+    end
 
     if @user.save
       @user.confirm!
@@ -235,6 +241,18 @@ class UsersController < ApplicationController
 
   private
 
+  def is_only_institution_admin?
+    if current_user.institution.admins.include?(current_user) and !current_user.superuser?
+      true
+    else
+      false
+    end
+  end
+
+  def is_institution_admin?
+    current_user.institution.admins.include?(current_user)
+  end
+
   def load_and_authorize_with_disabled
     @user = User.with_disabled.where(username: params[:id]).first
     authorize! :enable, @user
@@ -246,7 +264,7 @@ class UsersController < ApplicationController
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
 
-    allowed += [:email, :username, :_full_name] if current_user.superuser? and (params[:action] == 'create')
+    allowed += [:email, :username, :_full_name] if (current_user.superuser? or is_institution_admin?) and (params[:action] == 'create')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed += [:institution_id] if current_user.superuser?
     allowed

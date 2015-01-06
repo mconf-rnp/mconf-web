@@ -1006,44 +1006,108 @@ describe UsersController do
   end
 
   describe "#create"  do
-    let(:superuser) { FactoryGirl.create(:superuser) }
-    before(:each) { sign_in(superuser) }
+    describe "as a global admin" do
+      let(:superuser) { FactoryGirl.create(:superuser) }
+      before(:each) { sign_in(superuser) }
 
-    describe "with valid attributes" do
-      let(:user) { FactoryGirl.build(:user) }
-      before(:each) {
-        expect {
-          post :create, user: {
-            email: user.email, _full_name: "Maria Test", username: "maria-test",
-            password: "test123", password_confirmation: "test123"
-          }
-        }.to change(User, :count).by(1)
-      }
+      describe "creates a new user with valid attributes" do
+        let(:user) { FactoryGirl.build(:user) }
+        before(:each) {
+          expect {
+            post :create, user: {
+              email: user.email, _full_name: "Maria Test", username: "maria-test", 
+              password: "test123", password_confirmation: "test123"
+            }
+          }.to change(User, :count).by(1)
+        }
 
-      it { should set_the_flash.to(I18n.t('users.create.success')) }
-      it { should redirect_to manage_users_path }
-      it { User.last.confirmed?.should be true }
-      it { User.last.approved?.should be true }
+        it { should set_the_flash.to(I18n.t('users.create.success')) }
+        it { should redirect_to manage_users_path }
+        it { User.last.confirmed?.should be true }
+        it { User.last.approved?.should be true }
+      end
+
+      describe "creates a new user with invalid attributes" do
+        before(:each) {
+          expect {
+            post :create, user: {
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test", 
+              password: "test123", password_confirmation: "test1234"
+            }
+          }.not_to change(User, :count)
+        }
+
+        it {
+          msg = assigns(:user).errors.full_messages.join(", ")
+          should set_the_flash.to(I18n.t('users.create.error', errors: msg))
+        }
+        it { should redirect_to manage_users_path }
+      end
     end
 
-    describe "with invalid attributes" do
-      before(:each) {
-        expect {
-          post :create, user: {
-            email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
-            password: "test123",
-            password_confirmation: "test1234" # here's what makes it invalid
-          }
-        }.not_to change(User, :count)
+    describe "as a institution admin" do
+      let(:institution) { FactoryGirl.create(:institution) }
+      let(:institution_admin) { FactoryGirl.create(:user) }
+      before(:each) { 
+        institution.add_member!(institution_admin, "Admin")
+        sign_in(institution_admin)
       }
 
-      it {
-        msg = assigns(:user).errors.full_messages.join(", ")
-        should set_the_flash.to(I18n.t('users.create.error', errors: msg))
-      }
-      it { should redirect_to manage_users_path }
+      describe "creates a new user with valid attributes" do
+        let(:user) { FactoryGirl.build(:user) }
+        before(:each) {
+          expect {
+            post :create, user: {
+              email: user.email, _full_name: "Maria Test", username: "maria-test", 
+              password: "test123", password_confirmation: "test123"
+            }
+          }.to change(User, :count).by(1)
+        }
+
+        it { should set_the_flash.to(I18n.t('users.create.success')) }
+        it { should redirect_to manage_users_path }
+        it { User.last.confirmed?.should be true }
+        it { User.last.approved?.should be true }
+        it { User.last.institution.should eql(institution) }
+      end
+
+      describe "creates a new user with valid attributes and a institution" do
+        let(:other_institution) { FactoryGirl.create(:institution) }
+        let(:user) { FactoryGirl.build(:user) }
+        before(:each) {
+          expect {
+            post :create, user: {
+              email: user.email, _full_name: "Maria Test", username: "maria-test", 
+              password: "test123", password_confirmation: "test123", institution_id: other_institution.id
+            }
+          }.to change(User, :count).by(1)
+        }
+
+        it { should set_the_flash.to(I18n.t('users.create.success')) }
+        it { should redirect_to manage_users_path }
+        it { User.last.confirmed?.should be true }
+        it { User.last.approved?.should be true }
+        it { User.last.institution.should_not eql(other_institution) }
+        it { User.last.institution.should eql(institution) }
+      end
+
+      describe "creates a new user with invalid attributes" do
+        before(:each) {
+          expect {
+            post :create, user: {
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test", 
+              password: "test123", password_confirmation: "test1234"
+            }
+          }.not_to change(User, :count)
+        }
+
+        it {
+          msg = assigns(:user).errors.full_messages.join(", ")
+          should set_the_flash.to(I18n.t('users.create.error', errors: msg))
+        }
+        it { should redirect_to manage_users_path }
+      end
     end
-
   end
-
+  
 end
