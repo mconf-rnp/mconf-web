@@ -37,18 +37,11 @@ en:
       reply_html: replied to %{name} in the space
       deleted: a message that has since been deleted
     space:
+      accept_html: has joined the space
       create_html: created a new space
-      update_html: updated info on space
-      join_html: has joined the space
-      leave_html: has left the space
       deleted: a space that has since been deleted
-  admins:
-    access_forbidden: "This operation is only available to administrators"
-    new_user:
-      title: "Add User"
-    user:
-      created: "User created, confirmed and approved already"
-      error: "Error(s) while create the new user"
+      leave_html: has left the space
+      update_html: updated info on space
   _js:
     confirmation_dialog:
       cancel: "Cancel"
@@ -62,6 +55,7 @@ en:
       format_display: "%m/%d/%Y"
       format: "MM-dd-yyyy"
       format_rails: "%m/%d/%Y %H:%M %z"
+    decline: "Decline"
     deny: "Deny"
     destroy: "Destroy"
     details: "Details"
@@ -397,9 +391,9 @@ en:
       bbb: "Invite users to your BBB room"
       button: "Invite Users"
       hint: "Type to start searching"
-      msg: "Has invited you to participate in a webconference, follow this link: <a href=\' URL \'> URL </a>"
+      msg: "Has invited you to participate in a webconference, follow this link: <a href='URL'> URL </a>"
       msg_clean: "Has invited you to participate in a webconference, follow this link: URL"
-      msg_sender: "Invitation sent. Link to your room: <a href=\' URL \'> URL </a>"
+      msg_sender: "Invitation sent. Link to your room: <a href='URL'> URL </a>"
     me: "me"
     name: 
       one: "Name"
@@ -436,6 +430,9 @@ en:
     other: Comments
     show_all: "Show all comments"
   configurations: Configurations
+  confirmations:
+    check_already_confirmed:
+      already_confirmed: "You have already confirmed you account"
   contact_information: "Contact information"
   country: Country
   create: Create
@@ -535,8 +532,9 @@ en:
         room_meetingid: "Meeting ID"
         room_name: "Room name"
     send_invitation:
+      blank_users: "No user selected, no invitation was sent"
       error: "Invitation failed to be sent to:"
-      error_date_format: "The dates you informed are not in a valid format, please try again"
+      error_date_format: "The dates you informed are invalid, please try again"
       error_title: "It is mandatory to include a title for your invitation, please try again"
       success: "Invitation successfully sent to:"
     show:
@@ -549,6 +547,7 @@ en:
     index:
       list_of_recordings: "List of all recordings available"
     recording_links:
+      direct_link: "Direct link"
       playback_links: "Playbacks available"
     recordings:
       table:
@@ -798,6 +797,8 @@ en:
   join: Join
   join_cam: Participate
   join_requests:
+    accept:
+      accepted: "Join request accepted"
     create:
       already_invited: "The following users already have an invitation pending: %{users}"
       already_a_member: "%{name} is already a member"
@@ -806,17 +807,19 @@ en:
       error: "Something went wrong when processing your request, please try again. (details: %{errors})"
       sent: "Your invitation was successfully sent to: %{users}"
       user_not_found: "User not found: %{id}"
-    destroy:
-      success: "Join request successfully cancelled"
+    decline:
+      declined: "Join request declined"
+      invitation_destroyed: "Invitation successfully cancelled"
+      request_destroyed: "Join request successfully cancelled"
     index:
       accept: "Accept join request by %{user}?"
       accept_as: "as"
       deny: "Cancel join request by %{user}?"
-      not_pending:
-        other: "There are no pending join requests"
+      no_pending_invitations: "There are no pending invitations"
+      no_pending_requests: "There are no pending join requests"
       or: "or"
-      pending:
-        other: "Pending join requests"
+      pending_invitations_title: "Pending invitations"
+      pending_requests_title: "Pending join requests"
       user_message: "Message"
     invitation:
       cancel: "Cancel invitation to %{user}?"
@@ -834,21 +837,30 @@ en:
       already_invited: "You already have an invitation to join this space! Go to the space's home page to see it"
       already_requested: "You already requested to join this space! Please wait for an administrator to accept it."
       message_title: "Send a join request to the administrators of the space"
+    request:
+      decline_confirmation: "Are you sure you want to decline this join request?"
     show:
-      accept: "Yes, I want to join!"
+      accept: "Accept"
       already_accepted: "... but you're already a member of this space."
-      comment_invitation: "This is the comment written by %{name}:"
-      comment_request: "This request was already sent to the admins of the space, please wait for a response. This is the comment you wrote:"
-      decline: "No, not now"
-      decline_confirmation: "Are you sure you want to decline the invitation to join this space?"
-      remove: "Cancel this request"
-      remove_confirmation: "Are you sure you want to cancel the request to join this space?"
-      title_invitation: "You were invited to join the space \"%{name}\" on %{date}"
-      title_request: "You sent a join request to the space \"%{name}\" on %{date}"
-    update:
-      accepted: "Join request accepted"
-      updated: "Join request status updated"
-      declined: "Join request declined"
+      cancel_invite: "Cancel this invitation"
+      cancel_invite_confirmation: "Are you sure you want to cancel this invitation?"
+      cancel_request: "Cancel this request"
+      cancel_request_confirmation: "Are you sure you want to cancel the request to join this space?"
+      decline: "Decline"
+      decline_invite_confirmation: "Are you sure you want to decline the invitation to join this space?"
+      decline_request_confirmation: "Are you sure you want to decline the request to join this space?"
+      is_candidate:
+        comment_invitation: "This is the comment written by %{name}:"
+        comment_request: "This request was already sent to the admins of the space, please wait for a response. This is the comment you wrote:"
+        title_invitation: "You were invited by \"%{introducer}\" on %{date} to join the space \"%{space}\""
+        title_request: "You requested to join the space \"%{space}\" on %{date}"
+      is_introducer:
+        comment_invitation: "This is the comment you wrote:"
+        title_invitation: "You invited \"%{candidate}\" on %{date} to join the space \"%{space}\""
+      is_other:
+        comment_request: "This is the comment written by \"%{name}\":"
+        title_invitation: "\"%{introducer}\" invited \"%{candidate}\" on %{date} to join the space \"%{space}\""
+        title_request: "\"%{candidate}\" requested on %{date} to join the space \"%{space}\""
   keywords: "Keywords (*)"
   language: Language
   last_week: "Last week"
@@ -907,6 +919,7 @@ en:
     crop:
       crop_it: "Crop it!"
       preview: "Preview"
+      aspect_ratio: Fixed aspect ratio
   logout: Logout
   manage:
     disabled_space:
@@ -922,6 +935,8 @@ en:
     enabled_user:
       approve: "Approve: allow this user to access the website"
       approve_confirm: "Are you sure you want to allow this user to access the website?"
+      confirm: "Confirm this user"
+      confirm_confirm: "Are you sure you want to confirm this user?"
       disable: "Disable user"
       disable_confirm: "Are you sure you want to disable this user?"
       disapprove: "Disapprove: block user from accessing the website"
@@ -961,7 +976,7 @@ en:
     users:
       filter_name_or_username: "Name, username or email"
       filter_results: "Filter the results:"
-      new_user: "Add User"
+      new_user: "Create user"
     users_list:
       filter_count_with_text: "Found %{count} users for filter \"%{value}\""
       filter_count_empty: "Found %{count} users"
@@ -1007,7 +1022,7 @@ en:
       events:
         other: "Other"
         today: "Today"
-      not_confirmed: "Your account is not activated yet. Please, check your email to activate it. (Did not receive an email? <a href=\"%{url}\">Click here</a>.)"
+      not_confirmed: "Your account is not activated yet, please check your email to activate it. In case you didn't receive an email, <a href=\"%{url}\">click here</a> to request a new one."
       pending_join_requests:
         one: "%{count} pending join request"
         other: "%{count} pending join requests"
@@ -1360,6 +1375,8 @@ en:
     label: "Insert here the text from the image"
     message: 
       user: "is incorrect"
+  site:
+    updated: "Site configurations updated"
   size: Size
   skype: Skype
   space: 
@@ -1756,6 +1773,11 @@ en:
     approve:
       approved: "The user %{username} was approved to access the website!"
       not_enabled: "Approval of registrations is not enabled in this website"
+    create:
+      error: "Errors creating the user: %{errors}"
+      success: "User created successfully"
+    confirm:
+      confirmed: "The user %{username} was confirmed"
     detailed_user:
       from: "From:"
     disapprove:
@@ -1768,6 +1790,8 @@ en:
       cancel_account: "Cancel account?"
       change_password: "Change password"
       click_to_edit_profile: "Click here to edit your profile"
+      confirm_user: "Confirm this user's account"
+      confirm_user_confirm: "Are you sure you want to confirm this user's account?"
       did_not_find_info: "Didn't find the information you were looking for?"
       disable: "Disable this user's account"
       disable_confirm: "Are you sure you want to disable this user's account?"
@@ -1778,7 +1802,7 @@ en:
       ldap:
         title: "You are signed in using LDAP!"
       management_options: "Management options"
-      not_confirmed: "Your account is not activated yet. Please, check your email to activate it. (Did not receive an email? <a href=\"%{url}\">Click here</a>.)"
+      not_confirmed: "Your account is not activated yet, please check your email to activate it. In case you didn't receive an email, <a href=\"%{url}\">click here</a> to request a new one."
       notification:
         by_email: "By email"
         by_private_message: "By private message"
@@ -1793,6 +1817,13 @@ en:
         weekly: "Every week"
       title: "Edit your account"
       yes_cancel_account: "Yes, cancel my account"
+    errors:
+      access_forbidden: "This operation is only available to administrators"
+    new:
+      create:
+        success: "User created. This user is already confirmed and can access the website at any time."
+        error: "Error(s) while create the new user"
+      title: "Create user"
   username: Username
   uploader:
     button: Upload new file

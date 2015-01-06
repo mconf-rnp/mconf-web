@@ -287,22 +287,80 @@ describe UsersController do
 
       context "trying to update password" do
         context "when local authentication is enabled" do
-          before { Site.current.update_attributes(local_auth_enabled: true)}
-          before(:each) do
-            @user = FactoryGirl.create(:user, :password => "foobar", :password_confirmation => "foobar")
-            sign_in @user
+          let(:admin) { FactoryGirl.create(:superuser) }
+          before { Site.current.update_attributes(local_auth_enabled: true) }
 
-            @old_encrypted = @user.encrypted_password
-            @new_pass = "newpass"
+          context "and is a user editing his own password" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, :password => "foobar", :password_confirmation => "foobar")
+              sign_in @user
 
-            put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass, :current_password => "foobar" }
-            @user = User.find_by_username(@user.username)
+              @old_encrypted = @user.encrypted_password
+              @new_pass = "newpass"
+
+              put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass, :current_password => "foobar" }
+              @user.reload
+            end
+
+            it { response.status.should == 302 }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { response.should redirect_to edit_user_path(@user) }
+            it { @user.encrypted_password.should_not == @old_encrypted }
           end
 
-          it { response.status.should == 302 }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { response.should redirect_to edit_user_path(@user) }
-          it { @user.encrypted_password.should_not == @old_encrypted }
+          context "and is a user editing his own password and no current password is informed" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, :password => "foobar", :password_confirmation => "foobar")
+              sign_in @user
+
+              @old_encrypted = @user.encrypted_password
+              @new_pass = "newpass"
+
+              put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass }
+              @user.reload
+            end
+
+            it { response.status.should == 200 }
+            it { should render_template(:edit) }
+            it { @user.encrypted_password.should == @old_encrypted }
+          end
+
+          context "and is a admin editing a user password" do
+            before(:each) do
+              @user = FactoryGirl.create(:user)
+              sign_in admin
+
+              @old_encrypted = @user.encrypted_password
+              @new_pass = "newpass"
+
+              put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass }
+              @user.reload
+            end
+
+            it { response.status.should == 302 }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { response.should redirect_to edit_user_path(@user) }
+            it { @user.encrypted_password.should_not == @old_encrypted }
+          end
+
+          context "and is a admin editing his own password" do
+            let(:admin) { FactoryGirl.create(:superuser, :email => "valid@mconf.org") }
+            before(:each) do
+              @user = admin
+              sign_in admin
+
+              @old_encrypted = @user.encrypted_password
+              @new_pass = "newpass"
+
+              put :update, :id => @user.to_param, :user => { :password => @new_pass, :password_confirmation => @new_pass }
+              @user.reload
+            end
+
+            it { response.status.should == 302 }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { response.should redirect_to edit_user_path(@user) }
+            it { @user.encrypted_password.should_not == @old_encrypted }
+          end
         end
 
         context "when local authentication is disabled" do
@@ -324,7 +382,6 @@ describe UsersController do
           it { @user.encrypted_password.should == @old_encrypted }
         end
       end
-
     end
 
     describe "setting :can_record" do
@@ -746,8 +803,25 @@ describe UsersController do
     end
   end
 
+  describe "#confirm" do
+    let(:user) { FactoryGirl.create(:unconfirmed_user) }
+    before {
+      request.env["HTTP_REFERER"] = "/any"
+      login_as(FactoryGirl.create(:superuser))
+    }
+
+    context "the action #confirm confirms the user" do
+      before(:each) {
+        post :confirm, :id => user.to_param
+      }
+      it { should respond_with(:redirect) }
+      it { should redirect_to('/any') }
+      it ("confirms the user") { user.reload.confirmed?.should be(true) }
+    end
+  end
+
   describe "#approve" do
-    let(:user) { FactoryGirl.create(:user_unconfirmed, :approved => false) }
+    let(:user) { FactoryGirl.create(:unconfirmed_user, :approved => false) }
     before {
       request.env["HTTP_REFERER"] = "/any"
       login_as(FactoryGirl.create(:superuser))
@@ -765,23 +839,22 @@ describe UsersController do
         it { should respond_with(:redirect) }
         it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
         it { should redirect_to('/any') }
-        it("approves the user") { user.reload.approved?.should be_truthy }
-        it("confirms the user") { user.reload.confirmed?.should be_truthy }
+        it("approves the user") { user.reload.approved?.should be(true) }
+        it("confirms the user") { user.reload.confirmed?.should be(true) }
 
-        # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
-        #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
-        # context "skips the confirmation email" do
-        #   before(:each) {
-        #     Site.current.update_attributes(:require_registration_approval => true)
-        #   }
-        #   it {
-        #     user.confirmed?.should be_falsey # just to make sure wasn't already confirmed
-        #     expect {
-        #       post :approve, :id => user.to_param
-        #     }.not_to change{ ActionMailer::Base.deliveries }
-        #     user.confirmed?.should be_truthy
-        #   }
-        # end
+        context "skips the confirmation email" do
+          let(:user) { FactoryGirl.create(:unconfirmed_user) }
+          before(:each) {
+            Site.current.update_attributes(:require_registration_approval => true)
+          }
+          it {
+            user.confirmed?.should be(false) # just to make sure wasn't already confirmed
+            expect {
+              post :approve, :id => user.to_param
+              user.reload.confirmed?.should be(true)
+            }.not_to change{ ActionMailer::Base.deliveries }
+          }
+        end
       end
 
       context "but the user's approval fails" do
@@ -796,12 +869,7 @@ describe UsersController do
         it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
         it { should redirect_to('/any') }
         it("doesn't approve the user") { user.reload.approved?.should be_falsey }
-
-        # TODO: Not working yet:
-        #   It's triggering an error related to delayed_job (undefined method `tag=').
-        #   Uncomment this when delayed_job is removed, see #811.
-        #   Search for this same comment in other files as well.
-        # it("doesn't confirm the user") { user.reload.confirmed?.should be_falsey }
+        it("doesn't confirm the user") { user.reload.confirmed?.should be(false) }
       end
 
       context "and the institution's limit was reached" do
@@ -817,20 +885,19 @@ describe UsersController do
           it("approves the user") { user.reload.approved?.should be_truthy }
           it("confirms the user") { user.reload.confirmed?.should be_truthy }
 
-          # TODO: To test this we need to create an unconfirmed server with FactoryGirl, but it's triggering
-          #   an error related to delayed_job. Test this when delayed_job is removed, see #811.
-          # context "skips the confirmation email" do
-          #   before(:each) {
-          #     Site.current.update_attributes(:require_registration_approval => true)
-          #   }
-          #   it {
-          #     user.confirmed?.should be_falsey # just to make sure wasn't already confirmed
-          #     expect {
-          #       post :approve, :id => user.to_param
-          #     }.not_to change{ ActionMailer::Base.deliveries }
-          #     user.confirmed?.should be_truthy
-          #   }
-          # end
+          context "skips the confirmation email" do
+            let(:user) { FactoryGirl.create(:unconfirmed_user) }
+            before(:each) {
+              Site.current.update_attributes(:require_registration_approval => true)
+            }
+            it {
+              user.confirmed?.should be(false) # just to make sure wasn't already confirmed
+              expect {
+                post :approve, :id => user.to_param
+                user.reload.confirmed?.should be(true)
+              }.not_to change{ ActionMailer::Base.deliveries }
+            }
+          end
         end
 
         context "and the current user cannot approve users" do
@@ -846,12 +913,7 @@ describe UsersController do
           it { should set_the_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
           it { should redirect_to('/any') }
           it("doesn't approve the user") { user.reload.approved?.should be_falsey }
-
-          # TODO: Not working yet:
-          #   It's triggering an error related to delayed_job (undefined method `tag=').
-          #   Uncomment this when delayed_job is removed, see #811.
-          #   Search for this same comment in other files as well.
-          # it("doesn't confirm the user") { user.reload.confirmed?.should be_falsey }
+          it("doesn't confirm the user") { user.reload.confirmed?.should be(false) }
         end
 
       end
@@ -901,6 +963,87 @@ describe UsersController do
     end
 
     it { should_authorize an_instance_of(User), :disapprove, :via => :post, :id => user.to_param }
+  end
+
+  describe "#new" do
+    context "logged as a superuser" do
+      let(:superuser) { FactoryGirl.create(:superuser) }
+      before(:each) { sign_in(superuser) }
+
+      context "template and view" do
+        before(:each) { get :new }
+        it { should render_with_layout("application") }
+        it { should render_template("users/new") }
+      end
+
+      context "template and view via xhr" do
+        before(:each) { xhr :get, :new }
+        it { should_not render_with_layout() }
+        it { should render_template("users/new") }
+      end
+
+      it "assigns @user" do
+        get :new
+        should assign_to(:user).with(instance_of(User))
+      end
+    end
+
+    context "logged as a regular user" do
+      let(:user) { FactoryGirl.create(:user) }
+      before(:each) {
+        sign_in(user)
+      }
+      it {
+        expect { get :new }.to raise_error(CanCan::AccessDenied)
+      }
+    end
+
+    context "a anonymous user" do
+      it {
+        expect { get :new }.to raise_error(CanCan::AccessDenied)
+      }
+    end
+  end
+
+  describe "#create"  do
+    let(:superuser) { FactoryGirl.create(:superuser) }
+    before(:each) { sign_in(superuser) }
+
+    describe "with valid attributes" do
+      let(:user) { FactoryGirl.build(:user) }
+      before(:each) {
+        expect {
+          post :create, user: {
+            email: user.email, _full_name: "Maria Test", username: "maria-test",
+            password: "test123", password_confirmation: "test123"
+          }
+        }.to change(User, :count).by(1)
+      }
+
+      it { should set_the_flash.to(I18n.t('users.create.success')) }
+      it { should redirect_to manage_users_path }
+      it { User.last.confirmed?.should be true }
+      it { User.last.approved?.should be true }
+    end
+
+    describe "with invalid attributes" do
+      before(:each) {
+        expect {
+          post :create, user: {
+            email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+            password: "test123",
+            password_confirmation: "test1234" # here's what makes it invalid
+          }
+        }.not_to change(User, :count)
+      }
+
+      it {
+        msg = assigns(:user).errors.full_messages.join(", ")
+        should set_the_flash.to(I18n.t('users.create.error', errors: msg))
+      }
+      it { should redirect_to manage_users_path }
+    end
+
   end
 
 end

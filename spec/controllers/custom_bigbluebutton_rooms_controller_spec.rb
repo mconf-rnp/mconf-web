@@ -95,48 +95,106 @@ describe CustomBigbluebuttonRoomsController do
     before {
       request.env["HTTP_REFERER"] = referer
       login_as(room.owner)
-      post :send_invitation, :invite => hash, :id => room.to_param
     }
 
     context "with correct data" do
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.to change { Invitation.count }.by(1)
+      }
+      context "with the right type set" do
+        it { Invitation.last.class.should be(WebConferenceInvitation) }
+      end
       it { should redirect_to(referer) }
       it { should set_the_flash.to success }
     end
 
     context "with more than one user invited" do
       let(:users) { [FactoryGirl.create(:user), FactoryGirl.create(:user)] }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.to change { Invitation.count }.by(users.length)
+      }
+
+      context "with the right type set" do
+        it { Invitation.last.class.should be(WebConferenceInvitation) }
+      end
+
       it { should redirect_to(referer) }
       it { should set_the_flash.to success }
     end
 
+    context "missing users" do
+      before {
+        hash.delete(:users)
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.not_to change { Invitation.count }
+      }
+      it { should redirect_to(referer) }
+      it { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.blank_users') }
+    end
+
     context "missing the title" do
       let(:title) { nil }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.not_to change { Invitation.count }
+      }
       it { should redirect_to(referer) }
       it { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_title') }
     end
 
     context "missing the users" do
       let(:users) { [] }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.not_to change { Invitation.count }
+      }
       it { should redirect_to(referer) }
       skip { should set_the_flash.to error }
     end
 
     context "missing the message" do
       let(:message) { nil }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.to change { Invitation.count }.by(1)
+      }
+
+      context "with the right type set" do
+        it { Invitation.last.class.should be(WebConferenceInvitation) }
+      end
+
       it { should redirect_to(referer) }
       it { should set_the_flash.to success }
     end
 
     context "missing start date" do
       let(:starts_on) { nil }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.not_to change { Invitation.count }
+      }
       it { should redirect_to(referer) }
-      skip { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_date_format') }
+      it { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_date_format') }
     end
 
     context "missing end date" do
       let(:ends_on) { nil }
+      before {
+        expect {
+          post :send_invitation, :invite => hash, :id => room.to_param
+        }.not_to change { Invitation.count }
+      }
       it { should redirect_to(referer) }
-      it { should set_the_flash.to success }
+      it { should set_the_flash.to I18n.t('custom_bigbluebutton_rooms.send_invitation.error_date_format') }
     end
 
     it { should_authorize an_instance_of(BigbluebuttonRoom), :send_invitation, :id => room.to_param }
@@ -371,7 +429,7 @@ describe CustomBigbluebuttonRoomsController do
           let(:room) { user.bigbluebutton_room }
           before {
             login_as(user)
-            BigbluebuttonRoom.stub(:find_by_param) { room }
+            BigbluebuttonRoom.stub(:find_by!) { room }
             controller.should_receive(:check_user_limit) { true }
           }
 
@@ -401,7 +459,7 @@ describe CustomBigbluebuttonRoomsController do
           let(:room) { user.bigbluebutton_room }
           before {
             login_as(user)
-            BigbluebuttonRoom.should_receive(:find_by_param).once { room }
+            BigbluebuttonRoom.should_receive(:find_by!).once { room }
             controller.should_receive(:bigbluebutton_role).with(room) { :moderator }
             controller.should_receive(:check_user_limit) { true }
             room.stub(:is_running?) { true }
@@ -426,7 +484,7 @@ describe CustomBigbluebuttonRoomsController do
             before :each do
               login_as(user)
               request.env["HTTP_REFERER"] = "/any"
-              BigbluebuttonRoom.stub(:find_by_param) { room }
+              BigbluebuttonRoom.stub(:find_by!) { room }
 
               # to guide the behavior of #join, copied from the tests in BigbluebuttonRails
               room.should_receive(:fetch_is_running?).at_least(:once).and_return(false)
@@ -446,7 +504,7 @@ describe CustomBigbluebuttonRoomsController do
               another_user = FactoryGirl.create(:user)
               login_as(another_user)
               request.env["HTTP_REFERER"] = "/any"
-              BigbluebuttonRoom.stub(:find_by_param) { room }
+              BigbluebuttonRoom.stub(:find_by!) { room }
               BigbluebuttonRoom.any_instance.stub(:fetch_is_running?) { false }
 
               # to guide the behavior of #join, copied from the tests in BigbluebuttonRails
@@ -468,7 +526,7 @@ describe CustomBigbluebuttonRoomsController do
             let(:room) { user.bigbluebutton_room }
             before {
               login_as(user)
-              BigbluebuttonRoom.stub(:find_by_param).and_return(room)
+              BigbluebuttonRoom.stub(:find_by!).and_return(room)
               controller.should_receive(:bigbluebutton_role).with(room) { :moderator }
               room.stub(:is_running?).and_return(true)
               room.stub(:fetch_is_running?).and_return(true)
@@ -496,7 +554,7 @@ describe CustomBigbluebuttonRoomsController do
 
             before do
               request.env["HTTP_REFERER"] = referer
-              BigbluebuttonRoom.stub(:find_by_param) { room }
+              BigbluebuttonRoom.stub(:find_by!) { room }
             end
 
             context "doesn't check the limit when creating the room" do
@@ -576,7 +634,7 @@ describe CustomBigbluebuttonRoomsController do
 
             before do
               request.env["HTTP_REFERER"] = referer
-              BigbluebuttonRoom.stub(:find_by_param) { room }
+              BigbluebuttonRoom.stub(:find_by!) { room }
               space.add_member!(user, 'Admin')
             end
 
@@ -664,7 +722,7 @@ describe CustomBigbluebuttonRoomsController do
       let(:room) { user.bigbluebutton_room }
       before {
         login_as(user)
-        BigbluebuttonRoom.stub(:find_by_param) { room }
+        BigbluebuttonRoom.stub(:find_by!) { room }
       }
 
       context "when a meeting is running" do
@@ -693,7 +751,7 @@ describe CustomBigbluebuttonRoomsController do
       let(:room) { user.bigbluebutton_room }
       before {
         login_as(user)
-        BigbluebuttonRoom.should_receive(:find_by_param).once { room }
+        BigbluebuttonRoom.should_receive(:find_by!).once { room }
         room.stub(:is_running?) { true }
         room.should_receive(:fetch_is_running?).at_least(:once) { true }
         room.should_receive(:fetch_meeting_info).once {

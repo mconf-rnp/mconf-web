@@ -120,4 +120,34 @@ module FeatureHelpers
     nil
   end
 
+  def should_be_404_page
+    page.should have_title(t('error.e404.title'))
+    page.should have_content(t('error.e404.title'))
+    page.should have_content(t('error.e404.description', :url => page.current_path))
+    page.status_code.should == 404
+  end
+
+  def should_be_403_page(title=nil, msg=nil)
+    if title.present?
+      page.should have_content(title)
+    else
+      page.should have_content(t('error.e403.title'))
+    end
+    if msg.present?
+      page.should have_content(msg)
+    else
+      page.should have_content(t('error.e403.description'))
+    end
+    page.status_code.should == 403
+  end
+
+  # Use it as:
+  # expect { register_with(attrs) }.to send_email
+  def send_email(count=nil)
+    if count.present?
+      change{ ActionMailer::Base.deliveries.length }.by(1)
+    else
+      change{ ActionMailer::Base.deliveries.length }
+    end
+  end
 end

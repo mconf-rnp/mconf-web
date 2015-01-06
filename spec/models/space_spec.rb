@@ -247,6 +247,7 @@ describe Space do
   it { should respond_to(:invitations_role_id) }
   it { should respond_to(:"invitations_role_id=") }
 
+  it { should respond_to(:logo_image) }
   it { should respond_to(:crop_x) }
   it { should respond_to(:"crop_x=") }
   it { should respond_to(:crop_y) }
@@ -255,7 +256,10 @@ describe Space do
   it { should respond_to(:"crop_w=") }
   it { should respond_to(:crop_h) }
   it { should respond_to(:"crop_h=") }
-  it { should respond_to(:logo_image) }
+  it { should respond_to(:crop_img_w) }
+  it { should respond_to(:"crop_img_w=") }
+  it { should respond_to(:crop_img_h) }
+  it { should respond_to(:"crop_img_h=") }
 
   describe "default_scope :disabled => false" do
     before {
@@ -289,7 +293,7 @@ describe Space do
 
   describe ".logo_image" do
     let!(:logo) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, '/spec/fixtures/files/test-logo.png'))) }
-    let!(:crop_params) { {:crop_x => 0, :crop_y => 0, :crop_w => 10, :crop_h => 10} }
+    let!(:crop_params) { { :crop_x => 0, :crop_y => 0, :crop_w => 10, :crop_h => 10, :crop_img_w => 350, :crop_img_h => 350 } }
 
     context "uploader properties" do
       let(:space) { Space.new }
@@ -297,9 +301,9 @@ describe Space do
 
       it { space.logo_image.filename.should_not be_present }
       it { space.logo_image.extension_white_list.should eq(["jpg", "jpeg", "png", "svg", "tif", "gif"]) }
-      it { space.logo_image.versions.count.should eq(5) }
+      it { space.logo_image.versions.count.should eq(7) }
       it { space.logo_image.store_dir.should eq("#{store_dir}/#{space.id}") }
-      it { space.logo_image.versions.map{|v| v[0]}.should eq([:large, :logo32, :logo84x64, :logo128, :logo168x128]) }
+      it { space.logo_image.versions.map{|v| v[0]}.should eq([:large, :logo32, :logo128, :logo300, :logo84x64, :logo168x128, :logo336x256]) }
     end
 
     context "crop_logo" do
@@ -588,9 +592,9 @@ describe Space do
   describe "join requests" do
     before {
       @jr = [
-        FactoryGirl.create(:join_request, :group => space, :request_type => 'request'),
-        FactoryGirl.create(:join_request, :group => space, :request_type => 'request'),
-        FactoryGirl.create(:join_request, :group => space, :request_type => 'invite')
+        FactoryGirl.create(:join_request, :group => space, :request_type => JoinRequest::TYPES[:request]),
+        FactoryGirl.create(:join_request, :group => space, :request_type => JoinRequest::TYPES[:request]),
+        FactoryGirl.create(:join_request, :group => space, :request_type => JoinRequest::TYPES[:invite])
       ]
       @invitations = [@jr[2]]
       @requests = [@jr[0], @jr[1]]
@@ -671,7 +675,8 @@ describe Space do
 
   describe "abilities", :abilities => true do
     set_custom_ability_actions([:leave, :enable, :webconference, :select, :disable, :update_logo,
-      :user_permissions, :edit_recording, :webconference_options, :recordings])
+      :user_permissions, :edit_recording, :webconference_options, :recordings,
+      :index_join_requests, :index_news])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -733,8 +738,14 @@ describe Space do
         context "he is a member of" do
           context "with the role 'Admin'" do
             before { target.add_member!(user, "Admin") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave, :edit,
-              :update, :update_logo, :disable, :user_permissions, :edit_recording, :webconference_options]) }
+            it {
+              list = [
+                :read, :webconference, :recordings, :create, :select, :leave, :edit,
+                :update, :update_logo, :disable, :user_permissions, :edit_recording,
+                :webconference_options, :index_join_requests, :index_news
+              ]
+              should_not be_able_to_do_anything_to(target).except(list)
+            }
           end
 
           context "with the role 'User'" do
@@ -766,8 +777,14 @@ describe Space do
         context "he is a member of" do
           context "with the role 'Admin'" do
             before { target.add_member!(user, "Admin") }
-            it { should_not be_able_to_do_anything_to(target).except([:read, :webconference, :recordings, :create, :select, :leave, :edit,
-              :update, :update_logo, :disable, :user_permissions, :edit_recording, :webconference_options]) }
+            it {
+              list = [
+                :read, :webconference, :recordings, :create, :select, :leave, :edit,
+                :update, :update_logo, :disable, :user_permissions, :edit_recording,
+                :webconference_options, :index_join_requests, :index_news
+              ]
+              should_not be_able_to_do_anything_to(target).except(list)
+            }
           end
 
           context "with the role 'User'" do

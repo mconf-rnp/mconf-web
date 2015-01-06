@@ -45,6 +45,10 @@ body.sessions.new, body.sessions.create {
       padding: 0;
       ul {
         list-style: disc;
+        li {
+          float: right;
+          clear: both;
+        }
       }
     }
 

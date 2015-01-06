@@ -12,22 +12,12 @@ class UsersController < ApplicationController
   before_filter :load_and_authorize_with_disabled, :only => [:enable]
 
   # #index is nested in spaces
-  load_and_authorize_resource :space, :find_by => :permalink, :only => [:index]
-  load_and_authorize_resource :through => :space, :only => [:index]
-  before_filter :webconf_room!, :only => [:index]
+  load_and_authorize_resource :space, find_by: :permalink, only: [:index]
+  load_and_authorize_resource through: :space, only: [:index]
+  before_filter :webconf_room!, only: [:index]
 
   # Rescue username not found rendering a 404
-  rescue_from ActiveRecord::RecordNotFound, :with => :render_404
-
-  rescue_from CanCan::AccessDenied, :with => :handle_access_denied
-
-  def handle_access_denied exception
-    if @space.blank?
-      redirect_to register_path
-    else
-      render_403(exception)
-    end
-  end
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
   respond_to :html, :except => [:select, :current, :fellows]
   respond_to :js, :only => [:select, :current, :fellows]
@@ -42,7 +32,7 @@ class UsersController < ApplicationController
 
   def show
     @user_spaces = @user.spaces
-    @recent_activities = @user.all_activity.order('updated_at DESC').page(params[:page])
+    @recent_activities = RecentActivity.user_public_activity(@user).order('updated_at DESC').page(params[:page])
     @profile = @user.profile!
     respond_to do |format|
       format.html { render 'profiles/show' }
@@ -82,8 +72,11 @@ class UsersController < ApplicationController
         !params[:user].nil? && params[:user].has_key?(:password) &&
         !params[:user][:password].empty?
     end
-    updated = if password_changed
+    updated = if password_changed and !current_user.superuser?
                 @user.update_with_password(user_params)
+              elsif password_changed and current_user.superuser?
+                params[:user].delete(:current_password) unless params[:user].nil?
+                @user.update_attributes(user_params)
               else
                 params[:user].delete(:current_password) unless params[:user].nil?
                 @user.update_without_password(user_params)
@@ -180,6 +173,15 @@ class UsersController < ApplicationController
     end
   end
 
+  # Confirms a user's account
+  def confirm
+    if !@user.confirmed?
+      @user.confirm!
+      flash[:notice] = t('users.confirm.confirmed', :username => @user.username)
+    end
+    redirect_to :back
+  end
+
   def approve
     if current_site.require_registration_approval?
       ignore_full = can?(:approve_when_full, @user)
@@ -206,6 +208,31 @@ class UsersController < ApplicationController
     redirect_to :back
   end
 
+  # Methods to let admins create new users
+  def new
+    @user = User.new
+    respond_to do |format|
+      format.html { render layout: !request.xhr? }
+    end
+  end
+
+  def create
+    @user = User.new(user_params)
+
+    if @user.save
+      @user.confirm!
+      flash[:success] = t("users.create.success")
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
+      end
+    else
+      flash[:error] = t('users.create.error', errors: @user.errors.full_messages.join(", "))
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
+      end
+    end
+  end
+
   private
 
   def load_and_authorize_with_disabled
@@ -219,8 +246,9 @@ class UsersController < ApplicationController
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
 
-    allowed += [:institution_id] if current_user.superuser?
+    allowed += [:email, :username, :_full_name] if current_user.superuser? and (params[:action] == 'create')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
+    allowed += [:institution_id] if current_user.superuser?
     allowed
   end
 

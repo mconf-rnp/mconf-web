@@ -177,10 +177,13 @@ a .icon-awesome {
  color: $green;
 }
 
+.icon-mconf-confirm-user {
+  color: $green;
+}
+
 .icon-mconf-admin-institution {
   color: lighten($red, 20);
 }
-
 .icon-mconf-event {}
 .icon-mconf-home {}
 .icon-mconf-logout {}
@@ -206,6 +209,3 @@ a .icon-awesome {
 .icon-mconf-profile {}
 .icon-mconf-options {}
 .icon-mconf-join-request {}
-.icon-mconf-login {}
-.icon-mconf-register {}
-.icon-mconf-institution {}

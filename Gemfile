@@ -29,7 +29,6 @@ gem 'haml'
 gem 'will_paginate'
 gem 'chronic'
 gem 'rails_autolink', '~> 1.1.0'
-gem 'whenever', :require => false
 gem 'simple_form', '~> 3.0.0'
 gem 'acts_as_tree', '~> 2.0.0'
 gem 'friendly_id'
@@ -56,11 +55,12 @@ gem 'bigbluebutton-api-ruby', :git => 'git://github.com/mconf/bigbluebutton-api-
 gem 'bigbluebutton_rails', :git => 'git://github.com/mconf/bigbluebutton_rails.git', :branch => 'master'
 
 # Used on Profile to generate a vcard
-gem 'vpim' # TODO: very old, last update on 2009
+gem 'vpim', :git => 'https://github.com/sam-github/vpim.git'
 
 # for logos + attachments
 gem 'carrierwave', '~> 0.10.0'
 gem 'rmagick'
+gem 'mini_magick'
 
 # global configurations
 # TODO: update to the stable version when out
@@ -134,6 +134,7 @@ group :development, :test do
   gem 'htmlentities'
   gem 'turn', '0.8.2', :require => false # TODO: why 0.8.2?
   gem 'simplecov', :require => false
+  gem 'fooldap'
 end
 
 group :test do

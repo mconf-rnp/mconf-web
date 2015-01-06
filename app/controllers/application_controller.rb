@@ -28,7 +28,6 @@ class ApplicationController < ActionController::Base
   # Handle errors - error pages
   rescue_from Exception, :with => :render_500
   rescue_from ActiveRecord::RecordNotFound, :with => :render_404
-  rescue_from ActionController::RoutingError, :with => :render_404
   rescue_from ActionController::UnknownController, :with => :render_404
   rescue_from ::AbstractController::ActionNotFound, :with => :render_404
   rescue_from CanCan::AccessDenied, :with => :render_403
@@ -191,15 +190,15 @@ class ApplicationController < ActionController::Base
     Time.zone = Mconf::Timezone.user_time_zone(current_user)
   end
 
-  def render_error number
+  def render_error_page number
     render :template => "/errors/error_#{number}", :status => number, :layout => "error"
   end
 
   def render_404(exception)
+    @route ||= request.path
     unless Rails.application.config.consider_all_requests_local
-      # FIXME: this is never triggered, see the bottom of routes.rb
       @exception = exception
-      render_error 404
+      render_error_page 404
     else
       raise exception
     end
@@ -209,7 +208,7 @@ class ApplicationController < ActionController::Base
     unless Rails.application.config.consider_all_requests_local
       @exception = exception
       ExceptionNotifier.notify_exception exception
-      render_error 500
+      render_error_page 500
     else
       raise exception
     end
@@ -218,7 +217,7 @@ class ApplicationController < ActionController::Base
   def render_403(exception)
     unless Rails.application.config.consider_all_requests_local
       @exception = exception
-      render_error 403
+      render_error_page 403
     else
       raise exception
     end
@@ -228,7 +227,8 @@ class ApplicationController < ActionController::Base
   # From: https://github.com/plataformatec/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
   def store_location
     ignored_paths = [ "/login", "/users/login", "/users",
-                      "/register", "/users/signup",
+                      "/register", "/users/registration",
+                      "/users/registration/signup", "/users/registration/cancel",
                       "/users/password", "/users/password/new",
                       "/users/confirmation/new", "/users/confirmation",
                       "/secure", "/secure/info", "/secure/associate",
@@ -245,7 +245,6 @@ class ApplicationController < ActionController::Base
   def clear_stored_location
     session[:user_return_to] = nil
   end
-
 
   def institution
     @institution ||= Institution.find_by_permalink(params[:institution_id])
