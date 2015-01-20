@@ -15,13 +15,12 @@ module Abilities
       super_register(user)
 
       # Things an institutional admin can make in the users from his institution
-      # * Use the :edit, :update, and :destroy actions
-      # * Approve and confirm
-      # * Manage users (generic, doesn't specify yet which attributes)
-      # * Change their attribute `:can_record`
-      # * Change their attribute `:approved`
-      can [:edit, :update, :destroy, :approve, :manage_user,
-           :manage_can_record, :manage_approved, :confirm], User do |target|
+      # * Update the user's info
+      # * Approve (and change their attribute `:approved`) and confirm
+      # * Give permission to record (change the attribute `:can_record`)
+      # * Manage users (generic, doesn't specify which attributes)
+      can [:edit, :update, :approve, :manage_user,
+           :give_recording_rights, :confirm], User do |target|
         !target.institution.nil? && target.institution.admins.include?(user)
       end
 

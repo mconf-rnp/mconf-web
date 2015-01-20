@@ -881,8 +881,10 @@ describe User do
 
   # TODO: :index is nested into spaces, how to test it here?
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([ :fellows, :current, :select, :approve, :enable, :disable, :confirm,
-      :manage_user, :manage_can_record, :manage_approved ])
+    set_custom_ability_actions([
+      :fellows, :current, :select, :approve, :enable, :confirm,
+      :manage_user, :give_recording_rights
+    ])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -934,8 +936,8 @@ describe User do
       before { target.institution.add_member!(user, 'Admin') }
 
       it {
-        allowed = [:read, :edit, :update, :destroy, :fellows, :current, :select,
-                   :approve, :manage_user, :manage_can_record, :manage_approved, :confirm]
+        allowed = [:read, :edit, :update, :fellows, :current, :select,
+                   :approve, :manage_user, :give_recording_rights, :confirm]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }
 

@@ -4,15 +4,16 @@
 
   %ul.management-links
 
-    = link_to (edit_user_path(user)) do
-      = icon_edit(:alt => t('.edit'), :title => t('.edit'))
+    - if can?(:edit, user)
+      = link_to edit_user_path(user) do
+        = icon_edit(:alt => t('.edit'), :title => t('.edit'))
 
-    - if !user.confirmed?
+    - if !user.confirmed? && can?(:confirm, user)
       = link_to confirm_user_path(user), :data => { :confirm => t('.confirm_confirm') },  :method => :post do
         = icon_confirm_user(:alt => t('.confirm'), :title => t('.confirm'))
 
     - unless user.superuser  # prevent admins from disabling and unapproving themselves
-      - if current_site.require_registration_approval?
+      - if current_site.require_registration_approval? && can?(:approve, user)
         - if user.approved?
           = link_to disapprove_user_path(user), :method => :post, :data => { :confirm => t('.disapprove_confirm') } do
             = icon_disapprove(:alt => t('.disapprove'), :title => t('.disapprove'))
@@ -20,8 +21,9 @@
           = link_to approve_user_path(user), :method => :post, :data => { :confirm => t('.approve_confirm') } do
             = icon_approve(:alt => t('.approve'), :title => t('.approve'))
 
-      = link_to user_path(user), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
-        = icon_delete(:alt => t('.disable'), :title => t('.disable'))
+      - if can?(:destroy, user)
+        = link_to user_path(user), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
+          = icon_delete(:alt => t('.disable'), :title => t('.disable'))
 
   .thread-title
     = link_to user_path(user), :class => 'user-name' do
