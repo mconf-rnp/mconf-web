@@ -6,7 +6,7 @@
       .thread-text
         = simple_form_for :permission, :url => permission_path(permission), :html => { :method => :put } do |f|
           = select :permission, :role_id, Institution.roles.map { |r| [ t("space.performances.#{r.name.downcase}"), r.id ] }, :selected => permission.role_id
-          = f.submit t('_other.update'), :class => "btn btn-small"
+          = f.submit t('_other.update'), :class => "btn btn-mini"
       .thread-title
         = link_to(sanitize(user.name),user_path(user),:class=>"unified_user")
         .user-email

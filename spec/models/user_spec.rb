@@ -935,7 +935,7 @@ describe User do
 
       it {
         allowed = [:read, :edit, :update, :destroy, :fellows, :current, :select,
-                   :approve, :manage_user, :manage_can_record, :manage_approved]
+                   :approve, :manage_user, :manage_can_record, :manage_approved, :confirm]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }
 

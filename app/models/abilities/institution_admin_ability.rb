@@ -16,12 +16,12 @@ module Abilities
 
       # Things an institutional admin can make in the users from his institution
       # * Use the :edit, :update, and :destroy actions
-      # * Approve users
+      # * Approve and confirm
       # * Manage users (generic, doesn't specify yet which attributes)
       # * Change their attribute `:can_record`
       # * Change their attribute `:approved`
       can [:edit, :update, :destroy, :approve, :manage_user,
-           :manage_can_record, :manage_approved], User do |target|
+           :manage_can_record, :manage_approved, :confirm], User do |target|
         !target.institution.nil? && target.institution.admins.include?(user)
       end
 
