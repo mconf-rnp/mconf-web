@@ -266,6 +266,7 @@ class User < ActiveRecord::Base
     if institution_is_full? && !ignore_full
       false
     else
+      skip_confirmation! if !confirmed?
       self.update_attributes(:approved => true)
     end
   end
@@ -273,16 +274,6 @@ class User < ActiveRecord::Base
   # Sets the user as not approved
   def disapprove!
     self.update_attributes(:approved => false)
-  end
-
-  # Whether the user should be notified via email
-  def notify_via_email?
-    self.notification == User::NOTIFICATION_VIA_EMAIL
-  end
-
-  # Whether the user should be notified via private message
-  def notify_via_private_message?
-    self.notification == User::NOTIFICATION_VIA_PM
   end
 
   # Overrides a method from devise, see:

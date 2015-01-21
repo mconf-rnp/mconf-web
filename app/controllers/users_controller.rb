@@ -186,8 +186,6 @@ class UsersController < ApplicationController
     if current_site.require_registration_approval?
       ignore_full = can?(:approve_when_full, @user)
       if @user.approve!(ignore_full)
-        @user.skip_confirmation_notification!
-        @user.confirm!
         flash[:notice] = t('users.approve.approved', :username => @user.username)
       else
         flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
@@ -256,8 +254,7 @@ class UsersController < ApplicationController
   allow_params_for :user
   def allowed_params
     allowed = [ :password, :password_confirmation, :remember_me, :current_password,
-      :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
-      :expanded_post ]
+      :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :expanded_post ]
 
     allowed += [:email, :username, :_full_name] if (current_user.superuser? or is_institution_admin?) and (params[:action] == 'create')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
