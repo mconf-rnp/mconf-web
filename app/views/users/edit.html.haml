@@ -71,25 +71,25 @@
   - if user_signed_in? && can?(:manage_user, @user)
     #management-options.alert.alert-gray
       %h3= t('.management_options')
-      - if can?(:manage_institution_name, @user)
+      - if can?(:change_institution, @user)
         - if @user.institution
           - current_institution_id = @user.institution.id
           - current_institution_name = @user.institution.full_name
         = f.input :institution_id, :required => false, :input_html => { :value => current_institution_id, :"data-institution-name" => current_institution_name }
 
-      = f.input :can_record, :required => false if can?(:manage_can_record, @user)
+      = f.input :can_record, :required => false if can?(:give_recording_rights, @user)
 
       -# prevent admins from mistakenly removing themselves from being admins or blocking
       -# access to their account
       - unless current_user == @user
-        = f.input :approved, :required => false if can?(:manage_approved, @user)
-        = f.input :superuser, :required => false if can?(:manage_superuser, @user)
-        - if !@user.confirmed?
+        = f.input :approved, :required => false if can?(:approve, @user)
+        = f.input :superuser, :required => false if can?(:make_superuser, @user)
+        - if !@user.confirmed? && can?(:confirm, @user)
           .input
             = link_to confirm_user_path(@user), :data => { :confirm => t('.confirm_user_confirm') },  :method => :post do
               = icon_confirm_user(:alt => t('.confirm_user'))
               = t('.confirm_user')
-        - if can?(:manage_disable, @user)
+        - if can?(:destroy, @user)
           .input
             = link_to user_path(@user), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
               = icon_delete(:alt => t('.disable'))
