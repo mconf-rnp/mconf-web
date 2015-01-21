@@ -937,13 +937,17 @@ describe User do
 
       it {
         allowed = [:read, :edit, :update, :fellows, :current, :select,
-                   :approve, :manage_user, :give_recording_rights, :confirm]
+                   :approve, :manage_user, :give_recording_rights, :confirm,
+                   :new, :create]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }
 
       context "and the target user is disabled" do
         before { target.disable() }
-        it { should_not be_able_to_do_anything_to(target) }
+        it {
+          allowed = [:new, :create]
+          should_not be_able_to_do_anything_to(target).except(allowed)
+        }
       end
     end
 

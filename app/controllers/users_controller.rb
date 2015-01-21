@@ -210,7 +210,6 @@ class UsersController < ApplicationController
 
   # Methods to let admins create new users
   def new
-    authorize! :manage_user, User
     @user = User.new
     respond_to do |format|
       format.html { render layout: !request.xhr? }
@@ -219,14 +218,14 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    authorize! :manage_user, User
 
-    if is_only_institution_admin?
-      @user.institution_id = current_user.institution.id
-    end
+    # When an institutional admin is creating a user, the user created will always belong
+    # to his institution
+    @user.institution = current_user.institution if is_institution_admin?
 
     if @user.save
       @user.confirm!
+      @user.approve!
       flash[:success] = t("users.create.success")
       respond_to do |format|
         format.html { redirect_to manage_users_path }
@@ -241,16 +240,12 @@ class UsersController < ApplicationController
 
   private
 
-  def is_only_institution_admin?
-    if current_user.institution.admins.include?(current_user) and !current_user.superuser?
-      true
-    else
-      false
-    end
-  end
-
+  # Whether the current user is an institutional admin or not. Returns false if the user is
+  # a global admin or a normal user.
   def is_institution_admin?
-    current_user.institution.admins.include?(current_user)
+    current_user.institution.present? &&
+      current_user.institution.admins.include?(current_user) &&
+      !current_user.superuser?
   end
 
   def load_and_authorize_with_disabled
