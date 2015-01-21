@@ -11,7 +11,7 @@
         = f.input :_full_name, required: true
         = f.input :username, required: true
         - if current_user.superuser?
-          = f.input :institution_id, required: true
+          = f.input :institution_id, required: true, input_html: { class: "institution-select", data: { :"institution-select-placeholder" => I18n.t('users.registrations.signup_form.institution_hint') } }
         = f.input :password, required: true
         = f.input :password_confirmation, required: true
 

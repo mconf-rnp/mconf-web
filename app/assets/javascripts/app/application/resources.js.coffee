@@ -26,6 +26,7 @@ class mconf.Resources
     mconf.ConfirmationDialog.bind()
     mconf.ResourceFilter.bind()
     mconf.DateTimeInput.bind()
+    mconf.InstitutionSelect.bind()
     for method in temporaryBinds
       method.call()
 
