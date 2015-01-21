@@ -17,7 +17,7 @@ module Abilities
     if user and user.superuser?
       SuperUserAbility.new(user)
     elsif user and !user.anonymous?
-      if !user.institution.nil? && user.institution.admins.include?(user)
+      if user.institution.present? && user.institution.admins.include?(user)
         InstitutionAdminAbility.new(user)
       else
         MemberAbilityRNP.new(user)

@@ -219,8 +219,13 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
 
+    # When an institutional admin is creating a user, the user created will always belong
+    # to his institution
+    @user.institution = current_user.institution if is_institution_admin?
+
     if @user.save
       @user.confirm!
+      @user.approve!
       flash[:success] = t("users.create.success")
       respond_to do |format|
         format.html { redirect_to manage_users_path }
@@ -235,6 +240,14 @@ class UsersController < ApplicationController
 
   private
 
+  # Whether the current user is an institutional admin or not. Returns false if the user is
+  # a global admin or a normal user.
+  def is_institution_admin?
+    current_user.institution.present? &&
+      current_user.institution.admins.include?(current_user) &&
+      !current_user.superuser?
+  end
+
   def load_and_authorize_with_disabled
     @user = User.with_disabled.where(username: params[:id]).first
     authorize! :enable, @user
@@ -246,7 +259,7 @@ class UsersController < ApplicationController
       :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :notification,
       :expanded_post ]
 
-    allowed += [:email, :username, :_full_name] if current_user.superuser? and (params[:action] == 'create')
+    allowed += [:email, :username, :_full_name] if (current_user.superuser? or is_institution_admin?) and (params[:action] == 'create')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed += [:institution_id] if current_user.superuser?
     allowed

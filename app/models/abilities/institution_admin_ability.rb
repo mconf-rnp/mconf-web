@@ -19,10 +19,12 @@ module Abilities
       # * Approve (and change their attribute `:approved`) and confirm
       # * Give permission to record (change the attribute `:can_record`)
       # * Manage users (generic, doesn't specify which attributes)
+      # * Register new users
       can [:edit, :update, :approve, :manage_user,
            :give_recording_rights, :confirm], User do |target|
-        !target.institution.nil? && target.institution.admins.include?(user)
+        target.institution.present? && target.institution.admins.include?(user)
       end
+      can [:new, :create], User
 
       # Institutional admins can access the manage lists of spaces and users in their institution
       can [:users, :spaces], :manage do
