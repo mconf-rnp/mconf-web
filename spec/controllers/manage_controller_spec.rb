@@ -5,7 +5,13 @@ describe ManageController do
   describe "#users" do
     before { User.destroy_all } # exclude seeded user(s)
 
-    it { should_authorize :manage, :users }
+    it "should require authentication"
+
+    context "authorizes" do
+      let(:user) { FactoryGirl.create(:superuser) }
+      before(:each) { sign_in(user) }
+      it { should_authorize :manage, :spaces }
+    end
 
     describe "if the current user is a superuser" do
       let(:user) { FactoryGirl.create(:superuser) }
@@ -278,7 +284,13 @@ describe ManageController do
 
   describe "#spaces" do
 
-    it { should_authorize :manage, :spaces }
+    it "should require authentication"
+
+    context "authorizes" do
+      let(:user) { FactoryGirl.create(:superuser) }
+      before(:each) { sign_in(user) }
+      it { should_authorize :manage, :spaces }
+    end
 
     describe "if the current user is a superuser" do
       let(:user) { FactoryGirl.create(:superuser) }
@@ -471,6 +483,10 @@ describe ManageController do
   end
 
   describe "#spam" do
+    let(:user) { FactoryGirl.create(:superuser) }
+
+    before { sign_in(user) }
+
     it "is successful"
     it "sets @spam_events to all events marked as spam"
     it "sets @spam_posts to all posts marked as spam"
