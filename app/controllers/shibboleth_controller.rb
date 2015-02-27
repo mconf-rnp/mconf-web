@@ -84,20 +84,19 @@ class ShibbolethController < ApplicationController
   # a new user account (created here as well).
   def create_association
 
+    # Associate the shib user with an existing user account
+    if params[:existent_account]
+      associate_with_existent_account(@shib)
+
     # if institution provided via shibboleth is not registered the user can't log in
-    if @institution.nil?
-      inst_str = "#{@shib.get_institution_identifier}, #{@institution.inspect}"
-      logger.info "Shibboleth: trying to create association for user but his institution (#{inst_str}) is not registered, won't be able to"
+    elsif @institution.nil?
+      logger.info "Shibboleth: trying to create association for user but his institution (#{@shib.get_institution_identifier}) is not registered, won't be able to"
       flash[:error] = t('shibboleth.create_association.institution_not_registered')
 
     # The federated user has no account yet, create one based on the info returned by
     # shibboleth
     elsif params[:new_account]
       associate_with_new_account(@shib)
-
-    # Associate the shib user with an existing user account
-    elsif params[:existent_account]
-      associate_with_existent_account(@shib)
 
     # invalid request
     else
