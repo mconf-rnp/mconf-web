@@ -185,6 +185,7 @@ class UsersController < ApplicationController
     if current_site.require_registration_approval?
       ignore_full = can?(:approve_when_full, @user)
       if @user.approve!(ignore_full)
+        @user.create_approval_notification(current_user)
         flash[:notice] = t('users.approve.approved', :username => @user.username)
       else
         flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)

@@ -29,7 +29,7 @@ describe ManageController do
           @u3 = FactoryGirl.create(:user, :disabled => true)
         }
         before(:each) { get :users }
-        it { assigns(:users).count.should be(3) } # our 3 plus the standard seeded user
+        it { assigns(:users).count.should be(3) }
         it { assigns(:users).should include(@u1) }
         it { assigns(:users).should include(@u2) }
         it { assigns(:users).should include(@u3) }
@@ -52,7 +52,7 @@ describe ManageController do
           @u4 = FactoryGirl.create(:user, :_full_name => 'Be user')
         }
         before(:each) { get :users }
-        it { assigns(:users).size.should be(4) }
+        it { assigns(:users).count.should be(4) }
         it { assigns(:users)[0].should eql(@u3) }
         it { assigns(:users)[1].should eql(@u4) }
         it { assigns(:users)[2].should eql(@u2) }
@@ -127,6 +127,7 @@ describe ManageController do
         #   it { assigns(:users).should include(@u2) }
         #   it { assigns(:users).should include(@u3) }
         # end
+
       end
 
       context "removes partial from params" do
@@ -283,7 +284,6 @@ describe ManageController do
   end
 
   describe "#spaces" do
-
     it "should require authentication"
 
     context "authorizes" do
@@ -308,7 +308,7 @@ describe ManageController do
           @s3 = FactoryGirl.create(:space, :disabled => true)
         }
         before(:each) { get :spaces }
-        it { assigns(:spaces).size.should be(3) }
+        it { assigns(:spaces).count.should be(3) }
         it { assigns(:spaces).should include(@s1) }
         it { assigns(:spaces).should include(@s2) }
         it { assigns(:spaces).should include(@s3) }
@@ -322,7 +322,7 @@ describe ManageController do
           @s4 = FactoryGirl.create(:space, :name => 'Be space')
         }
         before(:each) { get :spaces }
-        it { assigns(:spaces).size.should be(4) }
+        it { assigns(:spaces).count.should be(4) }
         it { assigns(:spaces)[0].should eql(@s3) }
         it { assigns(:spaces)[1].should eql(@s4) }
         it { assigns(:spaces)[2].should eql(@s2) }

@@ -14,6 +14,7 @@
           = f.input :institution_id, required: true, input_html: { class: "institution-select", data: { :"institution-select-placeholder" => I18n.t('users.registrations.signup_form.institution_hint') } }
         = f.input :password, required: true
         = f.input :password_confirmation, required: true
+        = f.input :can_record, as: :boolean
 
     .modal-footer
       = f.button :wrapped, cancel_modal: true, value: t('_other.create'), class: "btn btn-primary"
