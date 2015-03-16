@@ -27,8 +27,8 @@ pt-br:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
         click_here: "(clique aqui para entrar)"
       other:
-        local_account_text: "Acessar usando uma conta local"
-        local_account_title: "Quer acessar utilizando uma conta local?"
+        local_account_text: "Clique aqui para acesso não federado"
+        local_account_title: "Sua instituição não está na federação CAFe?"
         register_text: "Criar uma nova conta"
         register_title: "Sua instituição ainda não é membro da CAFe?"
         title: "Outras opções"
