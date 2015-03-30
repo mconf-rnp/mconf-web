@@ -323,12 +323,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  protected
-
-  def init
-    @created_by = nil
-  end
-
   #
   # Association with an institution
   #
@@ -360,7 +354,11 @@ class User < ActiveRecord::Base
     @new_institution_id = id
   end
 
-  private
+  protected
+
+  def init
+    @created_by = nil
+  end
 
   # Remove the user from his institution (if any) and add him to the institution
   # `new_institution` (if any, otherwise the user will be without an institution set).
