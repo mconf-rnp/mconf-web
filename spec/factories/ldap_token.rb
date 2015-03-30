@@ -4,14 +4,12 @@
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
-# Override the simple_captcha save method. We don't need to validate the simple_captcha
-# text when testing
-module SimpleCaptcha
-  module ModelHelpers
-    module InstanceMethods
-      def save_with_captcha
-        save
-      end
+FactoryGirl.define do
+  factory :ldap_token do
+    association :user, factory: :user
+    data "MyText"
+    after(:build) do |obj|
+      obj.identifier = obj.user.email
     end
   end
 end

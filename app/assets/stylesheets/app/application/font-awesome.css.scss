@@ -181,9 +181,18 @@ a .icon-awesome {
   color: $green;
 }
 
+.icon-mconf-participant-confirmed {
+  color: $green;
+}
+
+.icon-mconf-participant-not-confirmed {
+  color: $red;
+}
+
 .icon-mconf-admin-institution {
   color: lighten($red, 20);
 }
+
 .icon-mconf-event {}
 .icon-mconf-home {}
 .icon-mconf-logout {}

@@ -1,13 +1,9 @@
 .thread.thread-user.thread-no-hover.user-wrapper.user-simple{:class => "#{cycle("thread-even" , "thread-odd")}"}
   - user = User.build_guest(:email => participant.email)
   .logo-in-thread
-    = raw link_logo_image(user, :size => '32', :title => user.name, :url => main_app.user_path(user), :class => 'logo logo-user')
+    = empty_logo_image(:user, :size => '32', :class => 'logo logo-user')
 
   %ul.management-links
-
-    - if can? :update, @event
-      = link_to ('#') do
-        = icon_message(:alt => t('mweb_events.participants.index.message'), :title => t('mweb_events.participants.index.message'))
 
     - if can? :destroy, @participant
       = link_to event_participant_path(@event, participant), :data => { :confirm => t('mweb_events.participants.index.disable_confirm') }, :method => :delete do
@@ -15,7 +11,16 @@
 
   .user-text
     = link_to '#', :class => 'user-name' do
-      = "(#{highlight(user.username, params[:q])}, #{highlight(user.email, params[:q])})".html_safe
+      = "#{user.username} (#{user.email})".html_safe
 
     %span.user-category
       = user_category(user)
+
+    - if participant.email_confirmed?
+      %p
+        = icon_participant_confirmed
+        = t('.confirmed')
+    - else
+      %p
+        = icon_participant_not_confirmed
+        = t('.not_confirmed')

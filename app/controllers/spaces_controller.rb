@@ -29,23 +29,26 @@ class SpacesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :handle_record_not_found
 
   # Create recent activity
-  after_filter :only => [:create, :update, :leave] do
-    @space.new_activity params[:action], current_user unless @space.errors.any? || @space.is_cropping?
+  after_filter :only => [:create, :update, :update_logo, :leave] do
+    @space.new_activity(params[:action], current_user) unless @space.errors.any?
   end
 
   def index
-    if params[:view].nil? or params[:view] != "list"
-      params[:view] = "thumbnails"
-    end
-    spaces = Space.order('name ASC')
-    @spaces = spaces.paginate(:page => params[:page], :per_page => 18)
+    params[:view] = 'thumbnails' if params[:view].nil? || params[:view] != 'list'
+    params[:order] = 'relevance' if params[:order].nil? || params[:order] != 'abc'
 
+    spaces = Space.all
     @user_spaces = user_signed_in? ? current_user.spaces : Space.none
-    @user_spaces = @user_spaces.paginate(:page => params[:page], :per_page => 18)
 
-    if @space
-       session[:current_tab] = "Spaces"
+    @spaces = params[:my_spaces] ? @user_spaces : spaces
+    if params[:order] == 'abc'
+      @spaces = @spaces.order('name ASC').paginate(:page => params[:page], :per_page => 18)
+    else
+      @spaces = @spaces.order_by_activity.paginate(:page => params[:page], :per_page => 18)
     end
+
+    session[:current_tab] = "Spaces" if @space
+
     if params[:manage]
       session[:current_tab] = "Manage"
       session[:current_sub_tab] = "Spaces"

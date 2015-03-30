@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150309160007) do
+ActiveRecord::Schema.define(version: 20150318204721) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -144,6 +144,13 @@ ActiveRecord::Schema.define(version: 20150309160007) do
   add_index "bigbluebutton_rooms", ["meetingid"], name: "index_bigbluebutton_rooms_on_meetingid", unique: true, using: :btree
   add_index "bigbluebutton_rooms", ["server_id"], name: "index_bigbluebutton_rooms_on_server_id", using: :btree
 
+  create_table "bigbluebutton_server_configs", force: true do |t|
+    t.integer  "server_id"
+    t.text     "available_layouts"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "bigbluebutton_servers", force: true do |t|
     t.string   "name"
     t.string   "url"
@@ -256,6 +263,15 @@ ActiveRecord::Schema.define(version: 20150309160007) do
     t.datetime "updated_at"
   end
 
+  create_table "participant_confirmations", force: true do |t|
+    t.string   "token"
+    t.integer  "participant_id"
+    t.datetime "confirmed_at"
+    t.datetime "email_sent_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "permissions", force: true do |t|
     t.integer  "user_id",      null: false
     t.integer  "subject_id",   null: false
@@ -327,15 +343,6 @@ ActiveRecord::Schema.define(version: 20150309160007) do
 
   add_index "shib_tokens", ["identifier"], name: "index_shib_tokens_on_identifier", unique: true, using: :btree
   add_index "shib_tokens", ["user_id"], name: "index_shib_tokens_on_user_id", unique: true, using: :btree
-
-  create_table "simple_captcha_data", force: true do |t|
-    t.string   "key",        limit: 40
-    t.string   "value",      limit: 6
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "simple_captcha_data", ["key"], name: "idx_key", using: :btree
 
   create_table "sites", force: true do |t|
     t.string   "name"

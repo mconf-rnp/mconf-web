@@ -3,7 +3,7 @@ en:
   activities:
     attachment:
       create_html: uploaded the attachment %{name} in the space
-      delete_html: removed the attachment %{name} from the space
+      destroy_html: removed the attachment %{name} from the space
       update_html: updated the attachment %{name} in the space
       deleted: that has since been deleted
     bigbluebutton_meeting:
@@ -273,7 +273,7 @@ en:
     not_selected: "No document selected"
     one: Attachment
     other: Attachments
-    repository_disabled: This space's document repository is not enabled.
+    repository_disabled: "This space's document repository is not enabled."
     selected: 
       none: "No files selected"
       one: " file selected"
@@ -586,6 +586,9 @@ en:
     rooms:
       list_of_rooms: "List of all rooms for the server '%{server}'"
     show:
+      available_layouts: "Available layouts"
+      configurations: "Server configurations"
+      configurations_tip: "These configurations are automatically fetched from the server and cannot be modified here. They are fetched periodically (every ~3h) by a background process and also whenever the URL, salt or version of the server change."
       fetch_recordings_title: "Fetch recordings with parameters"
       fetch_recordings_btn: "Fetch recordings"
       publish_recordings_title: "Publish recordings"
@@ -612,12 +615,6 @@ en:
     failure:
       user:
         not_approved: "Your account has not yet been approved by an administrator."
-    mailer:
-      confirmation_instructions:
-        confirmation_link: "Confirm my account"
-        confirmation_ok: "You can confirm your account email through the link below:"
-        confirmation_pending: "Your account was created and is waiting the approval of an administrator."
-        welcome: "Welcome %{email}!"
     registrations:
       not_enabled: "Registration of new accounts is not enabled in this website."
       signed_up_but_not_approved: ""
@@ -879,7 +876,7 @@ en:
       manage: "Manage"
       register: "Register"
     footer:
-      copyright: "© 2010-2014 %{site}."
+      copyright: "© 2010-%{year} %{site}."
       current_version: "Current version"
       find_us: "Find more about Mconf"
       github: GitHub
@@ -899,7 +896,7 @@ en:
         help_us: "Want this site in your language? Click to see how to help us translate it!"
       wiki: "Wiki"
     footer_simple:
-      copyright: "© 2010-2014 %{site}."
+      copyright: "© 2010-%{year} %{site}."
       translate:
         change: "Switch language"
     spaces_page_title:
@@ -961,6 +958,9 @@ en:
     destroy_space:
       destroy: Delete space
       destroy_confirm: Are you sure you want to delete this space and all content associated with it? Unlike disabling the space this operation is irreversible!
+    destroy_user:
+      destroy: Delete user
+      destroy_confirm: Are you sure you want to delete this user and all content associated with it? Unlike disabling the user this operation is irreversible!
     spaces_list:
       filter_count_with_text: "Found %{count} spaces for filter \"%{value}\""
       filter_count_empty: "Found %{count} spaces"
@@ -1105,6 +1105,9 @@ en:
   past: Past
   people: people
   per_page: "per page"
+  participant_confirmation:
+    confirmed: "The registration for %{email} has been confirmed"
+    cancelled: "Your registration in this event has been cancelled"
   permission:
     notification:
       default: "%{username} has change your role in %{stage} to %{role}. "
@@ -1377,10 +1380,6 @@ en:
   show_advanced_editor: "Show advanced editor"
   show_list_version_arrows: "show list version >>"
   show_question: Show?
-  simple_captcha: 
-    label: "Insert here the text from the image"
-    message: 
-      user: "is incorrect"
   site:
     updated: "Site configurations updated"
   size: Size
@@ -1418,6 +1417,11 @@ en:
       filters: 
         all: "All spaces"
         my_spaces: "My spaces"
+      order:
+        alphabetic: "Name"
+        order_by: "Order by"
+        relevance: "Relevance"
+        relevance_tip: "Shows the spaces with the most recent activities at the top"
       select_at_left: "Select a space in the list to see it's description here"
       user_is_member: "You are a member!"
     is_private: "is a private space. Send a join request to the administrator of this space to let you in"
@@ -1731,6 +1735,7 @@ en:
     category: Category
     confirm_password: "Confirm password"
     delete_from_space: "Delete user from space"
+    deleted: "User deleted"
     disable: "Disable user"
     disabled: "User %{username} disabled"
     email_used_to_create_account: "Enter the email address you used to create your account"

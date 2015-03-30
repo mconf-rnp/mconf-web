@@ -104,7 +104,7 @@ module IconsHelper
   end
 
   def icon_delete(options={})
-    icon_constructor nil, "icon-awesome icon-remove-sign icon-mconf-delete", options
+    icon_constructor nil, "icon-awesome icon-trash icon-mconf-delete", options
   end
 
   def icon_disable(options={})
@@ -245,6 +245,14 @@ module IconsHelper
 
   def icon_leave_space(options={})
     icon_constructor nil, "icon-awesome icon-signout icon-mconf-leave-space", options
+  end
+
+  def icon_participant_confirmed(options={})
+    icon_constructor nil, "icon-awesome icon-ok icon-mconf-participant-confirmed", options
+  end
+
+  def icon_participant_not_confirmed(options={})
+    icon_constructor nil, "icon-awesome icon-remove icon-mconf-participant-not-confirmed", options
   end
 
   def icon_login(options={})

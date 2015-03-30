@@ -3,7 +3,7 @@ pt-br:
   activities:
     attachment:
       create_html: enviou o arquivo %{name} na comunidade
-      delete_html: removou o arquivo %{name} na comunidade
+      destroy_html: removou o arquivo %{name} na comunidade
       update_html: atualizou o arquivo %{name} na comunidade
       deleted: que não existe mais
     bigbluebutton_meeting:
@@ -585,6 +585,9 @@ pt-br:
     rooms:
       list_of_rooms: "Lista de todas as salas do servidor '%{server}'"
     show:
+      available_layouts: "Layouts disponíveis"
+      configurations: "Configurações do servidor"
+      configurations_tip: "Estas configurações são automaticamente buscadas do servidor e não podem ser modificadas aqui. Elas são buscadas periodicamente (a cada ~3h) por um processo em background e também quando a URL, chave ou versão do servidor são modificados."
       fetch_recordings_title: "Atualizar gravações usando parâmetros"
       fetch_recordings_btn: "Atualizar gravações"
       publish_recordings_title: "Publicar gravações"
@@ -611,12 +614,6 @@ pt-br:
     failure:
       user:
         not_approved: 'Sua conta ainda não foi aprovada por um administrador.'
-    mailer:
-      confirmation_instructions:
-        confirmation_link: "Confirme minha conta"
-        confirmation_ok: "Você pode confirmar sua conta de email através do link abaixo:"
-        confirmation_pending: "Sua conta foi criada e está esperando a aprovação de um administrador."
-        welcome: "Bem-vindo %{email}!"
     registrations:
       not_enabled: 'O registro de novas contas não está habilitado neste site.'
       signed_up_but_not_approved: ''
@@ -878,7 +875,7 @@ pt-br:
       manage: "Gerenciar"
       register: "Registre-se"
     footer:
-      copyright: "© 2010-2014 %{site}."
+      copyright: "© 2010-%{year} %{site}."
       current_version: "Versão atual"
       find_us: "Mais sobre o Mconf em"
       github: GitHub
@@ -898,7 +895,7 @@ pt-br:
         help_us: "Quer este site na sua linguagem? Clique para saber como nos ajudar a traduzi-lo!"
       wiki: "Wiki"
     footer_simple:
-      copyright: "© 2010-2014 %{site}."
+      copyright: "© 2010-%{year} %{site}."
       translate:
         change: "Mudar a linguagem"
     spaces_page_title:
@@ -960,6 +957,9 @@ pt-br:
     destroy_space:
       destroy: Remover comunidade
       destroy_confirm: Tem certeza que deseja remover essa comunidade e todo conteúdo relacionado a ela? Diferente de desabilitar a comunidade essa operação é irreversível!
+    destroy_space:
+      destroy: Remover usuário
+      destroy_confirm: Tem certeza que deseja remover esse usuário e todo conteúdo relacionado a ele? Diferente de desabilitar o usuário essa operação é irreversível!
     spaces_list:
       filter_count_with_text: "%{count} comunidades encontradas para o filtro \"%{value}\""
       filter_count_empty: "%{count} comunidades encontradas"
@@ -1104,6 +1104,9 @@ pt-br:
   past: Passado
   people: pessoas
   per_page: "por página"
+  participant_confirmation:
+    confirmed: "A inscrição para %{email} foi confirmada"
+    cancelled: "A inscrição sua inscrição no evento foi cancelada"
   permission:
     notification:
       default: "%{username} mudou sua função em %{stage} para %{role}."
@@ -1381,10 +1384,6 @@ pt-br:
   show_advanced_editor: "Exibir editor avançado"
   show_list_version_arrows: "exibir versão em lista >>"
   show_question: Exibir?
-  simple_captcha:
-    label: "Insira aqui o texto da imagem"
-    message: 
-      user: "é incorreta"
   site:
     updated: "Configurações do site atualizadas"
   size: Tamanho
@@ -1422,6 +1421,11 @@ pt-br:
       filters: 
         all: "Todas"
         my_spaces: "Minhas comunidades"
+      order:
+        alphabetic: "Nome"
+        order_by: "Ordenar por"
+        relevance: "Relevância"
+        relevance_tip: "Mostra as comunidades com mais atividades recentes no topo da lista"
       select_at_left: "Selecione uma comunidade ao lado para ver sua descrição aqui"
       user_is_member: "Você é membro!"
     is_private: "é uma comunidade privado. Envie um pedido de adesão ao administrador desta comunidade para deixá-lo entrar"
@@ -1735,6 +1739,7 @@ pt-br:
     category: Categoria
     confirm_password: "Confirmar senha"
     delete_from_space: "Excluir usuário da comunidade"
+    deleted: "Usuário deletado"
     disable: "Desabilitar usuário"
     disabled: "Usuário %{username} desabilitado"
     email_used_to_create_account: "Digite o endereço de e-mail que você usou para criar a sua conta"
