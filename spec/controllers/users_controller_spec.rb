@@ -558,7 +558,10 @@ describe UsersController do
 
       it('removes the profile') { expect { subject }.to change(Profile, :count).by(-1) }
       it('removes the room') { expect { subject }.to change(BigbluebuttonRoom, :count).by(-1) }
-      it('removes the permissions') { expect { subject }.to change(Permission, :count).by(-1) }
+      it('removes the permissions') {
+        # the user is member of a space and an institution, remove both
+        expect { subject }.to change(Permission, :count).by(-2)
+      }
 
       context 'removes the posts' do
         let!(:post) { FactoryGirl.create(:post, author: user, space: space) }
