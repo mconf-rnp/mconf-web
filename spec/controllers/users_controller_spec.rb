@@ -563,11 +563,6 @@ describe UsersController do
         expect { subject }.to change(Permission, :count).by(-2)
       }
 
-      context 'removes the posts' do
-        let!(:post) { FactoryGirl.create(:post, author: user, space: space) }
-        it { expect { subject }.to change(Post, :count).by(-1) }
-      end
-
       context 'removes the LDAP Token' do
         let!(:ldap_token) { FactoryGirl.create(:ldap_token, user: user) }
         it { expect { subject }.to change(LdapToken, :count).by(-1) }
@@ -588,6 +583,11 @@ describe UsersController do
       context "doesn't remove the invitations the user sent" do
         let!(:join_request_invite) { FactoryGirl.create(:join_request_invite, introducer: user) }
         it { expect { subject }.not_to change(JoinRequest, :count) }
+      end
+
+      context "doesn't remove the posts" do
+        let!(:post) { FactoryGirl.create(:post, author: user, space: space) }
+        it { expect { subject }.not_to change(Post, :count) }
       end
     end
 

@@ -870,6 +870,21 @@ describe Space do
 
   end
 
+  describe "#enabled?" do
+    let(:space) { FactoryGirl.create(:space) }
+
+    context "if the space is not disabled" do
+      it { space.enabled?.should be(true) }
+      it { space.disabled?.should be(false) }
+    end
+
+    context "if the space is disabled" do
+      before { space.disable }
+      it { space.enabled?.should be(false) }
+      it { space.disabled?.should be(true) }
+    end
+  end
+
   describe "#institution=" do
     let(:old_institution) { FactoryGirl.create(:institution) }
     let(:space) { FactoryGirl.create(:space, :institution => old_institution) }
