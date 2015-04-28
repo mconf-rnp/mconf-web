@@ -1236,6 +1236,83 @@ describe UsersController do
           it { User.last.can_record.should be true }
         end
       end
+
+      describe "a new user in an institution" do
+        let(:institution) { FactoryGirl.create(:institution) }
+        let(:user) { FactoryGirl.build(:user) }
+
+        describe "if it has free slots" do
+          before {
+            institution.update_attributes(user_limit: 2)
+            institution.update_attributes(can_record_limit: 2)
+
+            expect {
+              post :create, user: {
+                email: user.email, _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { institution.users.count.should eql(1) }
+        end
+
+        describe "if it has free slots and the slots for recording are full" do
+          before {
+            FactoryGirl.create(:user, institution: institution, can_record: true)
+            institution.update_attributes(user_limit: 2)
+            institution.update_attributes(can_record_limit: 1)
+
+            expect {
+              post :create, user: {
+                email: user.email, _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id, can_record: true
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { User.last.can_record.should be true }
+          it { institution.users.count.should eql(2) }
+          it { institution.users.where(can_record: true).count.should eql(2) }
+        end
+
+        describe "if it was full and the slots for recording are full" do
+          before {
+            FactoryGirl.create(:user, institution: institution, can_record: true)
+            institution.update_attributes(user_limit: 1)
+            institution.update_attributes(can_record_limit: 1)
+
+            expect {
+              post :create, user: {
+                email: user.email, _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id, can_record: true
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { User.last.can_record.should be true }
+          it { institution.users.count.should eql(2) }
+          it { institution.users.where(can_record: true).count.should eql(2) }
+        end
+      end
     end
 
     describe "as a institution admin" do
