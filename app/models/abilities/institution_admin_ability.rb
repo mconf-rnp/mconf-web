@@ -24,7 +24,9 @@ module Abilities
            :give_recording_rights, :confirm], User do |target|
         target.institution.present? && target.institution.admins.include?(user)
       end
-      can [:new, :create], User
+      can [:new, :create], User do
+        !user.institution.full?
+      end
 
       # Institutional admins can access the manage lists of spaces and users in their institution
       can [:users, :spaces], :manage do
