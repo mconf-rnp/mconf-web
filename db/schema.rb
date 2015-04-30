@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150318204721) do
+ActiveRecord::Schema.define(version: 20150416210956) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -22,8 +22,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.text     "parameters"
     t.integer  "recipient_id"
     t.string   "recipient_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.boolean  "notified"
   end
 
@@ -51,8 +51,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.datetime "start_time"
     t.boolean  "running",      default: false
     t.boolean  "recorded",     default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.integer  "creator_id"
     t.string   "creator_name"
   end
@@ -107,8 +107,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
   create_table "bigbluebutton_room_options", force: true do |t|
     t.integer  "room_id"
     t.string   "default_layout"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
     t.boolean  "presenter_share_only"
     t.boolean  "auto_start_video"
     t.boolean  "auto_start_audio"
@@ -169,8 +169,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.string   "name"
     t.string   "acronym"
     t.string   "permalink"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.integer  "user_limit"
     t.integer  "can_record_limit"
     t.text     "identifier"
@@ -208,8 +208,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.integer  "role_id"
     t.string   "email"
     t.boolean  "accepted"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
     t.datetime "processed_at"
     t.string   "secret_token"
   end
@@ -218,8 +218,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.integer  "user_id"
     t.string   "identifier"
     t.text     "data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_index "ldap_tokens", ["identifier"], name: "index_ldap_tokens_on_identifier", unique: true, using: :btree
@@ -240,8 +240,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.float    "latitude",        limit: 24
     t.float    "longitude",       limit: 24
     t.string   "permalink"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   add_index "mweb_events_events", ["permalink"], name: "index_mweb_events_events_on_permalink", using: :btree
@@ -251,8 +251,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.string   "owner_type"
     t.integer  "event_id"
     t.string   "email"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "news", force: true do |t|
@@ -277,8 +277,8 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.integer  "subject_id",   null: false
     t.string   "subject_type", null: false
     t.integer  "role_id",      null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "posts", force: true do |t|
@@ -371,12 +371,12 @@ ActiveRecord::Schema.define(version: 20150318204721) do
     t.string   "smtp_domain"
     t.string   "smtp_auth_type"
     t.string   "smtp_sender"
-    t.boolean  "chat_enabled",                   default: false
-    t.string   "xmpp_server"
     t.text     "shib_env_variables"
     t.string   "shib_login_field"
     t.string   "timezone",                       default: "UTC"
     t.string   "external_help"
+    t.boolean  "chat_enabled",                   default: false
+    t.string   "xmpp_server"
     t.boolean  "webconf_auto_record",            default: false
     t.boolean  "ldap_enabled"
     t.string   "ldap_host"

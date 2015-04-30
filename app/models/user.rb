@@ -104,12 +104,29 @@ class User < ActiveRecord::Base
 
   before_create :automatically_approve, unless: :site_needs_approval?
 
+  before_destroy :before_disable_and_destroy, prepend: true
+
   default_scope { where(disabled: false) }
 
   # constants for the receive_digest attribute
   RECEIVE_DIGEST_NEVER = 0
   RECEIVE_DIGEST_DAILY = 1
   RECEIVE_DIGEST_WEEKLY = 2
+
+  def self.search_by_terms(words)
+    query = with_disabled.joins(:profile).includes(:profile).order("profiles.full_name")
+
+    words ||= []
+    query_strs = []
+    query_params = []
+
+    words.each do |word|
+      query_strs << "profiles.full_name LIKE ? OR users.username LIKE ? OR users.email LIKE ?"
+      query_params += ["%#{word}%", "%#{word}%", "%#{word}%"]
+    end
+
+    query.where(query_strs.join(' OR '), *query_params.flatten)
+  end
 
   def ability
     @ability ||= Abilities.ability_for(self)
@@ -153,7 +170,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  delegate :full_name, :logo, :organization, :city, :country, :logo_image, :logo_image_url, :to => :profile!
+  delegate :full_name, :logo, :organization, :city, :country, :logo_image, :logo_image_url, :to => :profile
   alias_attribute :name, :full_name
   alias_attribute :title, :full_name
   alias_attribute :permalink, :username
@@ -163,8 +180,9 @@ class User < ActiveRecord::Base
     [ self.city.presence, self.country.presence ].compact.join(', ')
   end
 
-  after_create do |user|
-    user.create_profile :full_name => user._full_name
+  after_create :create_user_profile
+  def create_user_profile
+    create_profile({full_name: self._full_name})
   end
 
   # Builds a guest user based on the e-mail
@@ -187,23 +205,8 @@ class User < ActiveRecord::Base
   end
 
   def disable
-    # All the spaces the user is an admin of
-    admin_in = self.permissions
-      .where(subject_type: 'Space', role_id: Role.find_by_name('Admin'))
-      .map(&:subject)
-    admin_in.compact! # remove nil (disabled) spaces
-
+    before_disable_and_destroy
     update_attribute(:disabled, true)
-
-    # Some associations are removed even if the user is only
-    # being disabled and not completely removed.
-    permissions.each(&:destroy)
-    join_requests.each(&:destroy)
-
-    # Disable spaces if this user was the last admin
-    admin_in.each do |space|
-      space.disable if space.admins.empty?
-    end
   end
 
   def enable
@@ -359,6 +362,24 @@ class User < ActiveRecord::Base
   end
 
   protected
+
+  def before_disable_and_destroy
+    # All the spaces the user is an admin of
+    admin_in = self.permissions
+      .where(subject_type: 'Space', role_id: Role.find_by_name('Admin'))
+      .map(&:subject)
+    admin_in.compact! # remove nil (disabled) spaces
+
+    # Some associations are removed even if the user is only
+    # being disabled and not completely removed.
+    permissions.each(&:destroy)
+    join_requests.each(&:destroy)
+
+    # Disable spaces if this user was the last admin
+    admin_in.each do |space|
+      space.disable if space.admins.empty?
+    end
+  end
 
   def init
     @created_by = nil

@@ -10,21 +10,30 @@ class ManageController < ApplicationController
   authorize_resource :class => false
 
   def users
-    name = params[:q]
-    partial = params.delete(:partial) # otherwise the pagination links in the view will include this param
+    words = params[:q].try(:split, /\s+/)
+    query = User.search_by_terms(words)
 
-    if current_user.superuser?
-      query = User.with_disabled
-    else
-      query = current_user.institution.users
+    # institutional admins search only inside their institution
+    if !current_user.superuser?
+      query = query.where(institution: current_user.institution)
     end
-    query = query.joins(:profile).includes(:profile).order("profiles.full_name")
-    if name.present?
-      query = query.where("profiles.full_name like ? OR users.username like ? OR users.email like ?", "%#{name}%", "%#{name}%", "%#{name}%")
+
+    # start applying filters
+    [:disabled, :approved, :can_record].each do |filter|
+      if !params[filter].nil?
+        val = (params[filter] == 'true') ? true : [false, nil]
+        query = query.where(filter => val)
+      end
     end
+
+    if params[:admin].present?
+      val = (params[:admin] == 'true') ? true : [false, nil]
+      query = query.where(superuser: val)
+    end
+
     @users = query.paginate(:page => params[:page], :per_page => 20)
 
-    if partial
+    if request.xhr?
       render :partial => 'users_list', :layout => false
     else
       render :layout => 'no_sidebar'
@@ -46,7 +55,7 @@ class ManageController < ApplicationController
     end
     @spaces = query.paginate(:page => params[:page], :per_page => 20)
 
-    if partial
+    if request.xhr?
       render :partial => 'spaces_list', :layout => false, :locals => { :spaces => @spaces }
     else
       render :layout => 'no_sidebar'

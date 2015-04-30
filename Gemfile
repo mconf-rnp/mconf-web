@@ -1,23 +1,18 @@
 source 'https://rubygems.org'
 
 gem 'rails', '~> 4.1.4'
+gem 'sass-rails', '~> 4.0.3'
+gem 'coffee-rails', '~> 4.0.0'
+gem 'uglifier', '>= 1.0.3'
+gem 'jquery-rails', '~> 3.1.1'
+gem 'yui-compressor'
+gem 'compass-rails', '~> 1.0'
+gem 'handlebars_assets'
+gem 'select2-rails'
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails', '~> 4.0.3'
-  gem 'coffee-rails', '~> 4.0.0'
-  gem 'uglifier', '>= 1.0.3'
-  gem 'jquery-rails', '~> 3.1.1'
-  gem 'yui-compressor'
-  gem 'compass-rails', '~> 1.0'
-  gem 'handlebars_assets'
-
-  # TODO: remove when compass-rails is updated
-  # This compass is here so we can have css3/animation
-  gem 'compass', '~> 0.13.alpha'
-  gem 'select2-rails'
-end
+# TODO: remove when compass-rails is updated to support animations
+# This compass is here so we can have css3/animation
+gem 'compass', '~> 0.13.alpha'
 
 gem 'mysql2', '~> 0.3.0'
 gem 'rake'
@@ -26,7 +21,7 @@ gem 'haml'
 gem 'will_paginate'
 gem 'chronic'
 gem 'rails_autolink', '~> 1.1.0'
-gem 'simple_form', '~> 3.0.0'
+gem 'simple_form', '~> 3.1.0'
 gem 'acts_as_tree', '~> 2.0.0'
 gem 'friendly_id'
 gem 'i18n-js', :git => "https://github.com/fnando/i18n-js.git"
@@ -131,10 +126,11 @@ group :development, :test do
   gem 'launchy'
   gem 'shoulda-matchers', '~> 2.6.1', :require => false
   gem 'shoulda-kept-assign-to'
-  gem 'htmlentities'
+  gem 'htmlentities', '~> 4.3.3'
   gem 'turn', '0.8.2', :require => false # TODO: why 0.8.2?
   gem 'simplecov', :require => false
   gem 'fooldap'
+  gem 'spring'
 end
 
 group :test do
