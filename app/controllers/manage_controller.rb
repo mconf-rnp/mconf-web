@@ -11,7 +11,7 @@ class ManageController < ApplicationController
 
   def users
     words = params[:q].try(:split, /\s+/)
-    query = User.search_by_terms(words)
+    query = User.with_disabled.search_by_terms(words)
 
     # institutional admins search only inside their institution
     if !current_user.superuser?
