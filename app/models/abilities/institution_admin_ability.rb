@@ -22,7 +22,8 @@ module Abilities
       # * Register new users
       can [:edit, :update, :approve, :manage_user,
            :give_recording_rights, :confirm], User do |target|
-        target.institution.present? && target.institution.admins.include?(user)
+        target.institution.present? && !target.disabled &&
+          target.institution.admins.include?(user)
       end
       can [:new, :create], User
 
