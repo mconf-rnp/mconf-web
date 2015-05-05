@@ -392,7 +392,11 @@ describe User do
       let(:space) { FactoryGirl.create(:space) }
       before { space.add_member!(user) }
 
-      it { expect { user.destroy }.to change(Permission, :count).by(-1) }
+      it {
+        expect { user.destroy }.to change{
+          Permission.where(user: user, subject: space).count
+        }.by(-1)
+      }
     end
 
     context 'removes the join requests' do
@@ -1129,7 +1133,7 @@ describe User do
   # TODO: :index is nested into spaces, how to test it here?
   describe "abilities", :abilities => true do
     set_custom_ability_actions([
-      :fellows, :current, :select, :approve, :enable, :confirm,
+      :fellows, :current, :select, :approve, :enable, :disable, :confirm,
       :manage_user, :give_recording_rights
     ])
 
