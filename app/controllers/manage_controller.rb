@@ -40,7 +40,8 @@ class ManageController < ApplicationController
     end
 
     if params[:institutions].present?
-      ids = params[:institutions].split(',')
+      permalinks = params[:institutions].split(',')
+      ids = Institution.where(permalink: permalinks).ids
       users = Permission.where(subject_type: 'Institution', subject_id: ids).pluck(:user_id)
       query = query.where(id: users)
     end

@@ -85,7 +85,7 @@ class Institution < ActiveRecord::Base
   end
 
   def to_json
-    { :text => full_name, :id => id}
+    { text: full_name, id: id, permalink: permalink}
   end
 
   def full_name
