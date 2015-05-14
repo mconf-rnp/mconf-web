@@ -39,6 +39,12 @@ class ManageController < ApplicationController
       query = query.where(id: admins)
     end
 
+    if params[:institutions].present?
+      ids = params[:institutions].split(',')
+      users = Permission.where(subject_type: 'Institution', subject_id: ids).pluck(:user_id)
+      query = query.where(id: users)
+    end
+
     @users = query.paginate(:page => params[:page], :per_page => 20)
 
     if request.xhr?

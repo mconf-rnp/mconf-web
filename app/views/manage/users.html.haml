@@ -12,6 +12,10 @@
         = check_box_tag :users_filter_institutional_admin_true, true, params[:institutional_admin] == 'true', 'data-attr-filter': 'institutional_admin', class: 'resource-filter-field checkbox'
         %label{ for: "users_filter_institutional_admin_true" }= t(".institutional_admin_true")
 
+      .institution-filter
+        %label= t('.institution')
+        = text_field_tag :institutions_filter, '', class: 'string'
+
       - ['admin', 'approved', 'disabled', 'can_record'].each do |field|
         .search-filter-option
           = check_box_tag :"users_filter_#{field}_true", true, params[field] == 'true', 'data-attr-filter': field, class: 'resource-filter-field checkbox'
