@@ -220,6 +220,40 @@ describe ManageController do
           end
         end
 
+        context "params[:institutions]" do
+          let(:institution2) { FactoryGirl.create(:institution) }
+          let(:institutions) { institutions_array.map(&:permalink).join(',') }
+          context 'ones is present' do
+            let(:institutions_array) { [institution] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
+
+          context 'two are present but only finds one user' do
+            let(:institutions_array) { [institution, institution2] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
+
+          context 'one is present and finds no user' do
+            let(:institutions_array) { [institution2] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(0) }
+          end
+
+          context 'inexistent institution' do
+            let(:params) { {institutions: 'inexistent-institution'} }
+            it { assigns(:users).count.should be(0) }
+          end
+
+          context '2 inexistent institutions' do
+            let(:params) { {institutions: 'inexistent-institution,inexistent-institutions2'} }
+            it { assigns(:users).count.should be(0) }
+          end
+        end
+
         context "mixed params" do
           let(:params) { {admin: 'false', approved: 'true', q: 'el re'} }
 
