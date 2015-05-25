@@ -1133,11 +1133,10 @@ describe UsersController do
       before { sign_in(superuser) }
 
       describe "creates a new user with valid attributes" do
-        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123"
             }
           }.to change(User, :count).by(1)
@@ -1155,11 +1154,10 @@ describe UsersController do
       end
 
       describe "creates a new user with valid attributes and with the ability to record meetings" do
-        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123", can_record: true
             }
           }.to change(User, :count).by(1)
@@ -1196,11 +1194,10 @@ describe UsersController do
         }
 
         describe "creates a new user with valid attributes" do
-          let(:user) { FactoryGirl.build(:user) }
           before {
             expect {
               post :create, user: {
-                email: user.email, _full_name: "Maria Test", username: "maria-test",
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
                 password: "test123", password_confirmation: "test123"
               }
             }.to change(User, :count).by(1)
@@ -1219,11 +1216,10 @@ describe UsersController do
         end
 
         describe "creates a new user with valid attributes and with the ability to record meetings" do
-          let(:user) { FactoryGirl.build(:user) }
           before {
             expect {
               post :create, user: {
-                email: user.email, _full_name: "Maria Test", username: "maria-test",
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
                 password: "test123", password_confirmation: "test123", can_record: true
               }
             }.to change(User, :count).by(1)
@@ -1234,6 +1230,82 @@ describe UsersController do
           it { User.last.confirmed?.should be true }
           it { User.last.approved?.should be true }
           it { User.last.can_record.should be true }
+        end
+      end
+
+      describe "a new user in an institution" do
+        let(:institution) { FactoryGirl.create(:institution) }
+
+        describe "if it has free slots" do
+          before {
+            institution.update_attributes(user_limit: 2)
+            institution.update_attributes(can_record_limit: 2)
+
+            expect {
+              post :create, user: {
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { institution.users.count.should eql(1) }
+        end
+
+        describe "if it has free slots and the slots for recording are full" do
+          before {
+            FactoryGirl.create(:user, institution: institution, can_record: true)
+            institution.update_attributes(user_limit: 2)
+            institution.update_attributes(can_record_limit: 1)
+
+            expect {
+              post :create, user: {
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id, can_record: true
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { User.last.can_record.should be true }
+          it { institution.users.count.should eql(2) }
+          it { institution.users.where(can_record: true).count.should eql(2) }
+        end
+
+        describe "if it was full and the slots for recording are full" do
+          before {
+            FactoryGirl.create(:user, institution: institution, can_record: true)
+            institution.update_attributes(user_limit: 1)
+            institution.update_attributes(can_record_limit: 1)
+
+            expect {
+              post :create, user: {
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123",
+                institution_id: institution.id, can_record: true
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { should set_the_flash.to(I18n.t('users.create.success')) }
+          it { should redirect_to manage_users_path }
+          it { User.last.confirmed?.should be true }
+          it { User.last.approved?.should be true }
+          it { User.last.institution.should eql(institution) }
+          it { User.last.can_record.should be true }
+          it { institution.users.count.should eql(2) }
+          it { institution.users.where(can_record: true).count.should eql(2) }
         end
       end
     end
@@ -1247,11 +1319,10 @@ describe UsersController do
       }
 
       describe "creates a new user with valid attributes" do
-        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123"
             }
           }.to change(User, :count).by(1)
@@ -1283,11 +1354,10 @@ describe UsersController do
 
       describe "uses always the intitutional admin's institution" do
         let(:other_institution) { FactoryGirl.create(:institution) }
-        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123", institution_id: other_institution.id
             }
           }.to change(User, :count).by(1)
@@ -1297,20 +1367,98 @@ describe UsersController do
         it { User.last.institution.should eql(institution) }
       end
 
-      # we need this to make sure the users are approved when needed
-      describe "when the site requires registration approval" do
-        let(:user) { FactoryGirl.build(:user) }
+      describe "if institution has free slots" do
         before {
-          Site.current.update_attributes(require_registration_approval: true)
+          institution.update_attributes(user_limit: 2)
+          institution.update_attributes(can_record_limit: 2)
+
           expect {
             post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123"
             }
           }.to change(User, :count).by(1)
         }
 
-        it { User.last.approved?.should be true }
+        it { should set_the_flash.to(I18n.t('users.create.success')) }
+        it { should redirect_to manage_users_path }
+        it { User.last.confirmed?.should be true }
+        it { User.last.institution.should eql(institution) }
+        it { institution.users.count.should eql(2) }
+      end
+
+      describe "if institution has free slots and the slots for recording are full" do
+        before {
+          FactoryGirl.create(:user, institution: institution, can_record: true)
+          institution.update_attributes(user_limit: 3)
+          institution.update_attributes(can_record_limit: 1)
+
+          expect {
+            post :create, user: {
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+              password: "test123", password_confirmation: "test123", can_record: true
+            }
+          }.to change(User, :count).by(1)
+        }
+
+        it { should set_the_flash.to(I18n.t('manage.users.create_without_record')) }
+        it { should redirect_to manage_users_path }
+        it { User.last.confirmed?.should be true }
+        it { User.last.institution.should eql(institution) }
+        it { User.last.can_record.should be false }
+        it { institution.users.count.should eql(3) }
+        it { institution.users.where(can_record: true).count.should eql(1) }
+      end
+
+      describe "if it was full and the slots for recording are full" do
+        before {
+          FactoryGirl.create(:user, institution: institution, can_record: true)
+          institution.update_attributes(user_limit: 2)
+          institution.update_attributes(can_record_limit: 1)
+        }
+
+        it {
+          expect {
+            post :create, user: {
+              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+              password: "test123", password_confirmation: "test123", can_record: true
+            }
+          }.to raise_error(CanCan::AccessDenied)
+        }
+      end
+
+      # we need this to make sure the users are approved when needed
+      describe "when the site requires registration approval" do
+        describe "and the institution has free slots" do
+          before {
+            institution.update_attributes(user_limit: 3)
+            Site.current.update_attributes(require_registration_approval: true)
+            expect {
+              post :create, user: {
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123"
+              }
+            }.to change(User, :count).by(1)
+          }
+
+          it { User.last.approved?.should be true }
+        end
+
+        describe "and the institution are full" do
+          before {
+            institution.update_attributes(user_limit: 1)
+            Site.current.update_attributes(require_registration_approval: true)
+          }
+
+          it {
+            expect {
+              post :create, user: {
+                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                password: "test123", password_confirmation: "test123"
+              }
+            }.to raise_error(CanCan::AccessDenied)
+          }
+        end
       end
     end
   end

@@ -67,6 +67,8 @@ pt-br:
     menu:
       institutions: Instituições
       my_institution: "Minha instituição"
+    users:
+      create_without_record: "Usuário criado com sucesso, mas as vagas para gravação estão cheias. Portanto, este usuário foi criado sem a capacidade de gravar reuniões."
   profiles:
     form:
       no_organization: "<nenhuma organização atribuída>"
