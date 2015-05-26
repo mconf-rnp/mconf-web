@@ -68,7 +68,7 @@ pt-br:
       institutions: Instituições
       my_institution: "Minha instituição"
     users:
-      create_without_record: "Usuário criado com sucesso, mas as vagas para gravação estão cheias. Portanto, este usuário foi criado sem a capacidade de gravar reuniões."
+      create_without_record: "Usuário criado com sucesso, porém não existiam mais vagas para gravação, portanto este usuário não poderá gravar reuniões."
   profiles:
     form:
       no_organization: "<nenhuma organização atribuída>"
@@ -104,5 +104,5 @@ pt-br:
       signup_form:
         institution_hint: Escolha uma ou digite para buscar.
     update:
-      can_record_reached_limit: "A isntituição deste usuário chegou no limite de usuários que podem gravar reuniões"
+      can_record_reached_limit: "A instituição deste usuário chegou no limite de usuários que podem gravar reuniões"
       error:  "Houve um erro atualizando o usuário"

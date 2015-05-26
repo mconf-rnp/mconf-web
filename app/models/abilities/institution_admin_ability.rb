@@ -26,7 +26,7 @@ module Abilities
           target.institution.admins.include?(user)
       end
       can [:new, :create], User do
-        !user.institution.full?
+        user.institution.present? && !user.institution.full?
       end
 
       # Institutional admins can access the manage lists of spaces and users in their institution

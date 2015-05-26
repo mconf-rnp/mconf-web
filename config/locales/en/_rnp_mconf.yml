@@ -67,7 +67,7 @@ en:
       institutions: Institutions
       my_institution: "My Institution"
     users:
-      create_without_record: "User created successfully, but the slots for record are full. Therefore, this user was created without the ability of record meetings."
+      create_without_record: "User created successfully, but there were no more free recording slots, so this user will not be able to record meetings."
   profiles:
     form:
       no_organization: "<no organization set>"

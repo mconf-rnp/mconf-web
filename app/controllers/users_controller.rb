@@ -234,17 +234,19 @@ class UsersController < ApplicationController
     # to his institution
     if is_institution_admin?
       @user.institution = current_user.institution
+
+      # Disable recording if there are no more free slots in this institution
       if current_user.institution.can_record_full?
         @user.can_record = false
-        msg = t('manage.users.create_without_record')
+        flash[:warn] = t('manage.users.create_without_record')
       end
     end
 
     if @user.save
       @user.confirm!
-      ignore_full = can?(:approve_when_full, @user)
-      @user.approve!(ignore_full)
-      flash[:success] = msg.nil? ? t("users.create.success") : msg
+      @user.approve!(can?(:approve_when_full, @user))
+
+      flash[:success] = t("users.create.success")
       respond_to do |format|
         format.html { redirect_to manage_users_path }
       end
