@@ -13,7 +13,10 @@ class InstitutionsController < ApplicationController
   end
 
   def show
-    render :layout => 'no_sidebar'
+    respond_to do |format|
+      format.html { render layout: 'no_sidebar' }
+      format.json { render json: @institution.to_json }
+    end
   end
 
   def create

@@ -9,6 +9,15 @@
       = text_field_tag :users_filter_text, params[:q], placeholder: t('.filter_name_or_username'), 'data-load-url' =>  manage_users_path, :'data-target' => '#users-list', :'data-filter' => '#filter-total', class: 'resource-filter'
 
     .search-filters
+      .search-filter-option
+        = check_box_tag :users_filter_institutional_admin_true, true, params[:institutional_admin] == 'true', 'data-attr-filter': 'institutional_admin', class: 'resource-filter-field checkbox'
+        %label{ for: "users_filter_institutional_admin_true" }= t(".institutional_admin_true")
+
+      - unless is_institutional_admin(current_user)
+        .institution-filter
+          %label= t('.institution')
+          = text_field_tag :institutions, '', class: 'string'
+
       - ['admin', 'approved', 'disabled', 'can_record'].each do |field|
         .search-filter-option
           = check_box_tag :"users_filter_#{field}_true", true, params[field] == 'true', 'data-attr-filter': field, class: 'resource-filter-field checkbox'

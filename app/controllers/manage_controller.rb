@@ -32,6 +32,20 @@ class ManageController < ApplicationController
       query = query.where(superuser: val)
     end
 
+    if params[:institutional_admin].present?
+      val = (params[:institutional_admin] == 'true') ? true : [false, nil]
+      admin_role = Role.where(name: 'Admin').first
+      admins = Permission.where(subject_type: 'Institution', role_id: admin_role.id).pluck(:user_id)
+      query = query.where(id: admins)
+    end
+
+    if params[:institutions].present?
+      permalinks = params[:institutions].split(',')
+      ids = Institution.where(permalink: permalinks).ids
+      users = Permission.where(subject_type: 'Institution', subject_id: ids).pluck(:user_id)
+      query = query.where(id: users)
+    end
+
     @users = query.paginate(:page => params[:page], :per_page => 20)
 
     if request.xhr?

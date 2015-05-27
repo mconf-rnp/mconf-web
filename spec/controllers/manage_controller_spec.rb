@@ -126,9 +126,10 @@ describe ManageController do
 
       end
 
-      context "use params [:admin, :approved, :disabled, :can_record] to filter the results" do
+      context "use params [:admin, :approved, :disabled, :can_record, :institutional_admin] to filter the results" do
+        let(:institution) { FactoryGirl.create(:institution) }
         let!(:users) {[
-          FactoryGirl.create(:user, username: 'el-magron'),
+          FactoryGirl.create(:user, username: 'el-magron', institution: institution),
           FactoryGirl.create(:superuser, username: 'el-admin'),
           FactoryGirl.create(:user, username: 'el-debilitado', disabled: true),
           FactoryGirl.create(:user, username: 'reprovado'),
@@ -136,6 +137,8 @@ describe ManageController do
           User.first # the original admin user
         ]}
         before {
+          Permission.where(user_id: users[0].id, subject: institution).first
+            .update_attributes(role: Role.where(name: 'Admin').first)
           users[3].disapprove!
           get :users, params
         }
@@ -200,6 +203,54 @@ describe ManageController do
             let(:params) { {can_record: 'false'} }
             it { assigns(:users).count.should be(5) }
             it { assigns(:users).should include(users[0], users[1], users[2], users[3], users[5]) }
+          end
+        end
+
+        context "params[:institutional_admin]" do
+          context 'is true' do
+            let(:params) { {institutional_admin: 'true'} }
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
+
+          context 'is false or not present' do
+            let(:params) { {} }
+            it { assigns(:users).count.should be(6) }
+            it { assigns(:users).should include(users[0], users[1], users[2], users[3], users[4], users[5]) }
+          end
+        end
+
+        context "params[:institutions]" do
+          let(:institution2) { FactoryGirl.create(:institution) }
+          let(:institutions) { institutions_array.map(&:permalink).join(',') }
+          context 'ones is present' do
+            let(:institutions_array) { [institution] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
+
+          context 'two are present but only finds one user' do
+            let(:institutions_array) { [institution, institution2] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
+
+          context 'one is present and finds no user' do
+            let(:institutions_array) { [institution2] }
+            let(:params) { {institutions: institutions} }
+            it { assigns(:users).count.should be(0) }
+          end
+
+          context 'inexistent institution' do
+            let(:params) { {institutions: 'inexistent-institution'} }
+            it { assigns(:users).count.should be(0) }
+          end
+
+          context '2 inexistent institutions' do
+            let(:params) { {institutions: 'inexistent-institution,inexistent-institutions2'} }
+            it { assigns(:users).count.should be(0) }
           end
         end
 
