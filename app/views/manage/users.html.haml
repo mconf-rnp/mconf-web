@@ -8,22 +8,21 @@
       = link_to t('.new_user'), new_user_path, class: "open-modal btn btn-primary btn-new-user #{'disabled' if disabled}", disabled: disabled
       = text_field_tag :users_filter_text, params[:q], placeholder: t('.filter_name_or_username'), 'data-load-url' =>  manage_users_path, :'data-target' => '#users-list', :'data-filter' => '#filter-total', class: 'resource-filter'
 
-    .search-filters
-      .search-filter-option
-        = check_box_tag :users_filter_institutional_admin_true, true, params[:institutional_admin] == 'true', 'data-attr-filter': 'institutional_admin', class: 'resource-filter-field checkbox'
-        %label{ for: "users_filter_institutional_admin_true" }= t(".institutional_admin_true")
-
-      - unless is_institutional_admin(current_user)
+    .search-institution
+      - unless current_user.institution_admin?
         .institution-filter
-          %label= t('.institution')
-          = text_field_tag :institutions, '', class: 'string'
+          = text_field_tag :institutions, '', placeholder: t('.filter_institution'), class: 'string'
 
+    .search-filters
       - ['admin', 'approved', 'disabled', 'can_record'].each do |field|
         .search-filter-option
           = check_box_tag :"users_filter_#{field}_true", true, params[field] == 'true', 'data-attr-filter': field, class: 'resource-filter-field checkbox'
           %label{ for: "users_filter_#{field}_true" }= t(".#{field}_true")
           = check_box_tag :"users_filter_#{field}_false", false, params[field] == 'false', 'data-attr-filter': field, class: 'resource-filter-field checkbox'
           %label{ for: "users_filter_#{field}_false" }= t(".#{field}_false")
+          - if field == 'admin'
+            = check_box_tag :users_filter_institutional_admin_true, true, params[:institutional_admin] == 'true', 'data-attr-filter': 'institutional_admin', class: 'resource-filter-field checkbox'
+            %label{ for: "users_filter_institutional_admin_true" }= t(".institutional_admin_true")
 
   #users-list
     = render partial: 'users_list', locals: { :users => @users }

@@ -361,6 +361,12 @@ class User < ActiveRecord::Base
     @new_institution_id = id
   end
 
+  def institution_admin?
+    role = Role.where(name: 'Admin').first
+    self.institution.present? &&
+      Permission.where(subject_type: 'Institution', role_id: role.id, user_id: self.id).present?
+  end
+
   protected
 
   def before_disable_and_destroy

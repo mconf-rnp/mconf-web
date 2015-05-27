@@ -11,7 +11,7 @@ $ ->
 
     $('#institutions').select2
       minimumInputLength: 1
-      width: '408'
+      width: '715'
       multiple: true
       tags: true
       tokenSeparators: [",",";"]

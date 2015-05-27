@@ -989,9 +989,9 @@ en:
       disabled_true: Disabled
       disabled_false: Enabled
       can_record_true: Can record
-      can_record_false: Can't record
-      institutional_admin_true: Institution Admin
-      institution: Members of the institution(s)
+      can_record_false: "Can't record"
+      filter_institution: Members of the institution(s)
+      institutional_admin_true: Institution admin
     users_list:
       filter_count_with_text: "Found %{count} users for filter \"%{value}\""
       filter_count_empty: "Found %{count} users"

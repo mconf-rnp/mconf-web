@@ -5,8 +5,9 @@ body.manage.users {
 
   .page-tabs {
 
-    .search-words {
+    .search-words, .search-institution {
       text-align: left;
+      margin-bottom: 8px;
 
       label {
         margin: 3px 7px;
@@ -14,12 +15,16 @@ body.manage.users {
 
       input {
         margin: 0 5px;
-        width: 75%;
+        width: 700px;
+      }
+
+      .select2-container {
+        margin-left: 4px;
       }
     }
 
     .search-filters {
-      margin-top: 10px;
+      @include mconf-clearfix;
 
       .search-filter-option {
         float: left;
@@ -69,14 +74,6 @@ body.manage.users {
 
   .institution-name {
     display: block;
-  }
-
-  .institution-filter {
-    label {
-      display:inline-block;
-    }
-
-    padding-bottom: 20px;
   }
 
 }
