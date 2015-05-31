@@ -148,6 +148,7 @@ module Mconf
       else
         username = ldap_user["uid"].try(:first)
       end
+      username.gsub!(/@[^@]+$/, '') unless username.nil? # use only the first part if this is an email
       if ldap_user[ldap_configs.ldap_email_field].present?
         email = ldap_user[ldap_configs.ldap_email_field].try(:first)
       else
