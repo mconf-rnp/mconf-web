@@ -285,11 +285,12 @@ describe Devise::Strategies::LdapAuthenticatable do
       let(:configs) {
         u = Object.new
         u.stub(:ldap_username_field).and_return("username")
+        u.stub(:ldap_email_field).and_return("mail")
         u.stub(:ldap_filter).and_return("(&(objectclass=user)(objectcategory=person))")
         u
       }
       let(:expected) {
-        Net::LDAP::Filter.construct("(&(&(objectclass=user)(objectcategory=person))(username=user-login))")
+        Net::LDAP::Filter.construct("(&(&(objectclass=user)(objectcategory=person))(|(mail=user-login)(username=user-login)))")
       }
       before { target.stub(:params).and_return(params) }
       it { target.ldap_filter(configs).should eq(expected) }
@@ -300,11 +301,12 @@ describe Devise::Strategies::LdapAuthenticatable do
       let(:configs) {
         u = Object.new
         u.stub(:ldap_username_field).and_return("username")
+        u.stub(:ldap_email_field).and_return("mail")
         u.stub(:ldap_filter).and_return(nil)
         u
       }
       let(:expected) {
-        Net::LDAP::Filter.construct("(username=user-login)")
+        Net::LDAP::Filter.construct("(|(mail=user-login)(username=user-login))")
       }
       before { target.stub(:params).and_return(params) }
       it { target.ldap_filter(configs).should eq(expected) }
@@ -315,11 +317,12 @@ describe Devise::Strategies::LdapAuthenticatable do
       let(:configs) {
         u = Object.new
         u.stub(:ldap_username_field).and_return("username")
+        u.stub(:ldap_email_field).and_return("mail")
         u.stub(:ldap_filter).and_return("anything weird and invalid")
         u
       }
       let(:expected) {
-        Net::LDAP::Filter.construct("(username=user-login)")
+        Net::LDAP::Filter.construct("(|(mail=user-login)(username=user-login))")
       }
       before { target.stub(:params).and_return(params) }
       it { target.ldap_filter(configs).should eq(expected) }
@@ -330,11 +333,12 @@ describe Devise::Strategies::LdapAuthenticatable do
       let(:configs) {
         u = Object.new
         u.stub(:ldap_username_field).and_return("username")
+        u.stub(:ldap_email_field).and_return("mail")
         u.stub(:ldap_filter).and_return("")
         u
       }
       let(:expected) {
-        Net::LDAP::Filter.construct("(username=user-login)")
+        Net::LDAP::Filter.construct("(|(mail=user-login)(username=user-login))")
       }
       before { target.stub(:params).and_return(params) }
       it { target.ldap_filter(configs).should eq(expected) }
