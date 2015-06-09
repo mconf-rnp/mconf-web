@@ -474,6 +474,49 @@ describe ShibbolethController do
         end
 
       end
+
+      context "if the user exists, don't mess with his institution" do
+        let(:user) { FactoryGirl.create(:user, password: '12345', email: 'foo@bar.com', institution: nil) }
+        let(:original_institution) { FactoryGirl.create(:institution, identifier: 'qux.com') }
+        let(:new_institution) { FactoryGirl.create(:institution, identifier: 'bar.com') }
+        before {
+          setup_shib(user.full_name, user.email, "#{user.username}@bar.com")
+          save_shib_to_session
+        }
+
+        context "when she has no institution" do
+          before(:each) {
+            expect {
+              post :create_association, :existent_account => true, :user => { :login => user.username, :password => '12345' }
+            }.to change{ ShibToken.count }.by(1)
+            user.reload
+          }
+
+          it { user.institution.should eq(nil) }
+        end
+
+        context "when she already has an institution" do
+          before(:each) {
+            user.institution = original_institution
+            user.save
+            expect {
+              post :create_association, :existent_account => true, :user => { :login => user.username, :password => '12345' }
+            }.to change{ ShibToken.count }.by(1)
+            user.reload
+          }
+
+          it { user.institution.should eq(original_institution) }
+        end
+
+        context "when he has no institution" do
+
+        end
+
+        # it("sets the user in the token") { subject.user.should eq(user) }
+        # it("sets the data in the token") { subject.data.should eq(@shib.get_data()) }
+        # it("confirms the account if it's unconfirmed") { subject.user.confirmed?.should be(true) }
+      end
+
     end
 
   end
