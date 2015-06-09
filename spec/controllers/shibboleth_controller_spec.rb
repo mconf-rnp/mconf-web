@@ -507,14 +507,6 @@ describe ShibbolethController do
 
           it { user.institution.should eq(original_institution) }
         end
-
-        context "when he has no institution" do
-
-        end
-
-        # it("sets the user in the token") { subject.user.should eq(user) }
-        # it("sets the data in the token") { subject.data.should eq(@shib.get_data()) }
-        # it("confirms the account if it's unconfirmed") { subject.user.confirmed?.should be(true) }
       end
 
     end
