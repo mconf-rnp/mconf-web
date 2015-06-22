@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150416210956) do
+ActiveRecord::Schema.define(version: 20150618183338) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -406,10 +406,11 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.datetime "updated_at"
     t.text     "description"
     t.string   "permalink"
-    t.boolean  "disabled",       default: false
-    t.boolean  "repository",     default: false
+    t.boolean  "disabled",    default: false
+    t.boolean  "repository",  default: false
     t.string   "logo_image"
     t.integer  "institution_id"
+    t.boolean  "approved",    default: true
   end
 
   create_table "users", force: true do |t|

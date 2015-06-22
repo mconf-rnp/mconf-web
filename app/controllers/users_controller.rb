@@ -8,6 +8,8 @@
 require "digest/sha1"
 
 class UsersController < ApplicationController
+  include Mconf::ApprovalControllerModule # for approve and disapprove
+
   load_and_authorize_resource :find_by => :username, :except => [:enable, :index, :destroy]
   before_filter :load_and_authorize_with_disabled, :only => [:enable, :destroy]
 
@@ -193,26 +195,16 @@ class UsersController < ApplicationController
   end
 
   def approve
-    if current_site.require_registration_approval?
+    if require_approval?
       ignore_full = can?(:approve_when_full, @user)
       if @user.approve!(ignore_full)
         @user.create_approval_notification(current_user)
-        flash[:notice] = t('users.approve.approved', :username => @user.username)
+        flash[:notice] = t('users.approve.approved', :name => @user.name)
       else
         flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
       end
     else
       flash[:error] = t('users.approve.not_enabled')
-    end
-    redirect_to :back
-  end
-
-  def disapprove
-    if current_site.require_registration_approval?
-      @user.disapprove!
-      flash[:notice] = t('users.disapprove.disapproved', :username => @user.username)
-    else
-      flash[:error] = t('users.disapprove.not_enabled')
     end
     redirect_to :back
   end
@@ -271,6 +263,10 @@ class UsersController < ApplicationController
   def load_and_authorize_with_disabled
     @user = User.with_disabled.where(username: params[:id]).first
     authorize! action_name.to_sym, @user
+  end
+
+  def require_approval?
+    current_site.require_registration_approval?
   end
 
   allow_params_for :user
