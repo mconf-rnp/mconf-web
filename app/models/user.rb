@@ -7,8 +7,11 @@
 
 require 'devise/encryptors/station_encryptor'
 require 'digest/sha1'
+require './lib/mconf/approval_module'
+
 class User < ActiveRecord::Base
   include PublicActivity::Common
+  include Mconf::ApprovalModule
 
   # TODO: block :username from being modified after registration
 
@@ -81,7 +84,7 @@ class User < ActiveRecord::Base
   after_create :set_institution
   after_update :set_institution
 
-  after_create :send_admin_approval_mail, if: :site_needs_approval?
+  after_create :send_admin_approval_mail, if: :require_approval?
   def send_admin_approval_mail
     if !approved?
       if self.institution
@@ -101,8 +104,6 @@ class User < ActiveRecord::Base
       AdminMailer.new_user_approved(self.id).deliver
     end
   end
-
-  before_create :automatically_approve, unless: :site_needs_approval?
 
   before_destroy :before_disable_and_destroy, prepend: true
 
@@ -151,7 +152,7 @@ class User < ActiveRecord::Base
     self.new_record?
   end
 
-  def site_needs_approval?
+  def needs_approval?
     Site.current.require_registration_approval
   end
 
@@ -261,12 +262,6 @@ class User < ActiveRecord::Base
     PrivateMessage.inbox(self).select{|msg| !msg.checked}
   end
 
-  # Automatically approves the user if the current site is not requiring approval
-  # on registration.
-  def automatically_approve
-    self.approved = true
-  end
-
   # Sets the user as approved
   def approve!(ignore_full = false)
     if institution_is_full? && !ignore_full
@@ -275,16 +270,6 @@ class User < ActiveRecord::Base
       skip_confirmation! unless confirmed?
       update_attributes(approved: true)
     end
-  end
-
-  # Starts the process of sending a notification to the user that was approved.
-  def create_approval_notification(approved_by)
-    create_activity 'approved', owner: approved_by
-  end
-
-  # Sets the user as not approved
-  def disapprove!
-    update_attributes(approved: false)
   end
 
   # Overrides a method from devise, see:
@@ -326,7 +311,7 @@ class User < ActiveRecord::Base
     if created_by.present?
       create_activity 'created_by_admin', owner: created_by, notified: false
     else
-      create_activity 'created', owner: self, notified: !site_needs_approval?
+      create_activity 'created', owner: self, notified: !needs_approval?
     end
   end
 
