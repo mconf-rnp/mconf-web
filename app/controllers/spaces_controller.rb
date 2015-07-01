@@ -101,8 +101,13 @@ class SpacesController < ApplicationController
           current_user.institution.spaces << @space
         end
 
-        flash[:success] = t('space.created')
-        format.html { redirect_to :action => "show", :id => @space  }
+        if @space.approved?
+          flash[:success] = t('space.created')
+          format.html { redirect_to action: "show", id: @space }
+        else
+          flash[:success] = t('space.created_waiting_moderation')
+          format.html { redirect_to spaces_path }
+        end
       end
     else
       respond_with @space do |format|
@@ -290,7 +295,7 @@ class SpacesController < ApplicationController
 
   def load_spaces_examples
     # TODO: RAND() is specific for mysql
-    @spaces_examples = Space.order('RAND()').limit(3)
+    @spaces_examples = Space.where(approved: true).order('RAND()').limit(3)
   end
 
   def load_events
