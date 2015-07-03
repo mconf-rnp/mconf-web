@@ -74,8 +74,11 @@ class Space < ActiveRecord::Base
   after_update :update_webconf_room
   after_create :create_webconf_room
 
+  # It requires approval if the site globally requires it or
+  # if the creator's institution requires it
+  attr_accessor :created_by # the user trying to create the space
   def require_approval?
-    Site.current.require_space_approval?
+    created_by.institution.try(:require_space_approval?) || Site.current.require_space_approval?
   end
 
   validates :description, :presence => true

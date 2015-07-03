@@ -6,7 +6,7 @@
     = link_to (edit_space_path(space)) do
       = icon_edit(:alt => t('.edit'), :title => t('.edit'))
 
-    - if current_site.require_space_approval?
+    - if current_site.require_space_approval? || space.institution.try(:require_space_approval?)
       = approval_links :space, space
 
     = link_to disable_space_path(space), :data => { :confirm => t('.disable_confirm') }, :method => :delete do
