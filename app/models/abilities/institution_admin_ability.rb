@@ -44,9 +44,12 @@ module Abilities
         !profile.user.institution.nil? && profile.user.institution.admins.include?(user)
       end
 
+      # Can create no matter if the site has creation disabled
+      can [:create], Space
+
       # Institutional admins can edit their institution's spaces and all the resources
       # associated with it, exactly an admin of the space would
-      can [:read, :destroy, :edit, :update, :user_permissions,
+      can [:read, :destroy, :edit, :approve, :disapprove, :update, :user_permissions,
            :webconference_options, :webconference, :recordings], Space do |space|
         !space.disabled &&
           is_institution_admin_of_space(user, space)
