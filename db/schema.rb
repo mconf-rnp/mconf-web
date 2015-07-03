@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150629175319) do
+ActiveRecord::Schema.define(version: 20150703012135) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -175,6 +175,8 @@ ActiveRecord::Schema.define(version: 20150629175319) do
     t.integer  "can_record_limit"
     t.text     "identifier"
     t.boolean  "force_shib_login", default: false
+    t.boolean  "require_space_approval",     default: false
+    t.boolean  "forbid_user_space_creation", default: false
   end
 
   create_table "invitations", force: true do |t|

@@ -7,6 +7,8 @@ pt-br:
         force_shib_login: Somente login via federação
         name: Nome
         user_limit: Máximo de membros
+        require_space_approval: "Moderação de comunidades"
+        forbid_user_space_creation: "Proibir criação de comunidades por usuários"
         identifier: Identificador
       space:
         institution_id: "Instituição"

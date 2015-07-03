@@ -6,4 +6,6 @@ pt-br:
         can_record_limit: "Opcional. Informe um número caso deseje limitar o número de membros que podem gravar reuniões nesta instituição. Deixe em branco para não limitar o número de membros."
         force_shib_login: "Quando habilitado o usuário só poderá se logar através da federação"
         identifier: "Identificador usado para encontrar os usuários que pertencerão a esta instituição. Você pode usar múltiplos valores, um por linha, como expressões regulares. As comparações são \"case-insensitive\" e espaços são removidos do início e fim. Se um usuário é identificado por \"eu@sub.instituicao.org\", por exemplo, um dos valores para localizar este usuário seria \"(.*\\.)?instituicao\\.org\", que funcionaria para qualquer subdomínio de uma instituição."
+        require_space_approval: "Comunidades precisam ser aprovadas por administradores depois de serem criadas"
+        forbid_user_space_creation: "Apenas administradores de instituição podem criar comunidades"
         user_limit: "Opcional. Informe um número caso deseje limitar o número de usuários que podem fazer parte desta instituição. Deixe em branco para não limitar o número de membros."
