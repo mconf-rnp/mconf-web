@@ -113,7 +113,7 @@ module Abilities
         attach.space.admins.include?(user)
       end
       can [:read, :create], Attachment do |attach|
-        attach.space.users.include?(user) && news.space.approved?
+        attach.space.users.include?(user) && attach.space.approved?
       end
       can [:destroy], Attachment do |attach|
         attach.space.users.include?(user) &&

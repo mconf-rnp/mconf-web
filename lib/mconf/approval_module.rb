@@ -24,7 +24,7 @@ module Mconf
     end
 
     # Should be overrided in the model to denote whether it needs to be approved
-    def needs_approval?
+    def require_approval?
       false
     end
   end

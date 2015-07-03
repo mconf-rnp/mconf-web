@@ -412,7 +412,7 @@ ActiveRecord::Schema.define(version: 20150629175319) do
     t.boolean  "repository",  default: false
     t.string   "logo_image"
     t.integer  "institution_id"
-    t.boolean  "approved",    default: true
+    t.boolean  "approved",    default: false
   end
 
   create_table "users", force: true do |t|

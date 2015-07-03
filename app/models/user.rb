@@ -98,7 +98,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  after_update :send_user_approved_mail, if: :site_needs_approval?
+  after_update :send_user_approved_mail, if: :require_approval?
   def send_user_approved_mail
     if approved_changed? && approved?
       AdminMailer.new_user_approved(self.id).deliver
