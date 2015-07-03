@@ -92,6 +92,10 @@ class SpacesController < ApplicationController
   def create
     @space = Space.new(space_params)
 
+    # Not a database field, but we have to insert
+    # it here because to check approval before create
+    @space.created_by = current_user
+
     if @space.save
       respond_with @space do |format|
 
@@ -357,7 +361,7 @@ class SpacesController < ApplicationController
   end
 
   def require_approval?
-    current_site.require_space_approval?
+    @space.institution.require_space_approval? && current_site.require_space_approval?
   end
 
   allow_params_for :space
