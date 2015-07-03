@@ -179,6 +179,8 @@ ActiveRecord::Schema.define(version: 20150824200913) do
     t.integer  "can_record_limit"
     t.text     "identifier"
     t.boolean  "force_shib_login", default: false
+    t.boolean  "require_space_approval",     default: false
+    t.boolean  "forbid_user_space_creation", default: false
   end
 
   create_table "invitations", force: true do |t|
