@@ -79,7 +79,10 @@ class Space < ActiveRecord::Base
   # if the creator's institution requires it
   attr_accessor :created_by # the user trying to create the space
   def require_approval?
-    created_by.institution.try(:require_space_approval?) || Site.current.require_space_approval?
+    # Space institution or creator's institution (when called from create)
+    institution = self.institution || created_by.try(:institution)
+
+    institution.try(:require_space_approval?) || Site.current.require_space_approval?
   end
 
   validates :description, :presence => true

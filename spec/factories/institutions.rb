@@ -11,5 +11,7 @@ FactoryGirl.define do
     name
     acronym { name_to_acronym(name) }
     identifier { "#{acronym}.#{Forgery::Internet.top_level_domain}" }
+    require_space_approval false
+    forbid_user_space_creation false
   end
 end
