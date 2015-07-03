@@ -101,6 +101,9 @@ class SpacesController < ApplicationController
           current_user.institution.spaces << @space
         end
 
+        # pre-approve the space if it's an admin creating it
+        @space.approve! if can?(:approve, @space)
+
         if @space.approved?
           flash[:success] = t('space.created')
           format.html { redirect_to action: "show", id: @space }
