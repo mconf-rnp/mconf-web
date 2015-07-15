@@ -16,6 +16,13 @@ en:
         password: "Password"
     models:
       institution: Institution
+  bigbluebutton_rails:
+    server_configs:
+      layouts:
+        reuniao: "Meeting"
+        video_chat: "Video chat"
+        webconferencia: "Web Conference"
+        webinar: "Webinar"
   frontpage:
     show:
       login:

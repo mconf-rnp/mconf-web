@@ -17,10 +17,13 @@ pt-br:
         password: "Senha"
     models:
       institution: Instituição
-  institution:
-    created: Instituição criada com sucesso.
-    duplicate: Esta instituição é uma duplicata
-    updated: "Instituição atualizada com sucesso"
+  bigbluebutton_rails:
+    server_configs:
+      layouts:
+        reuniao: "Reunião"
+        video_chat: "Vídeo chat"
+        webconferencia: "Webconferência"
+        webinar: "Webinar"
   frontpage:
     show:
       login:
@@ -32,6 +35,10 @@ pt-br:
         register_text: "Criar uma nova conta"
         register_title: "Sua instituição ainda não é membro da CAFe?"
         title: "Outras opções"
+  institution:
+    created: Instituição criada com sucesso.
+    duplicate: Esta instituição é uma duplicata
+    updated: "Instituição atualizada com sucesso"
   institutions:
     form:
       new: Nova instituição
