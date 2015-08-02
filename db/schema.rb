@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150416210956) do
+ActiveRecord::Schema.define(version: 20150703012135) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -175,6 +175,8 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.integer  "can_record_limit"
     t.text     "identifier"
     t.boolean  "force_shib_login", default: false
+    t.boolean  "require_space_approval",     default: false
+    t.boolean  "forbid_user_space_creation", default: false
   end
 
   create_table "invitations", force: true do |t|
@@ -396,6 +398,8 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.boolean  "local_auth_enabled",             default: true
     t.string   "ldap_principal_name_field"
     t.string   "visible_locales",                default: "---\n- en\n- pt-br\n"
+    t.boolean  "require_space_approval",         default: false
+    t.boolean  "forbid_user_space_creation",     default: false
   end
 
   create_table "spaces", force: true do |t|
@@ -406,10 +410,11 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.datetime "updated_at"
     t.text     "description"
     t.string   "permalink"
-    t.boolean  "disabled",       default: false
-    t.boolean  "repository",     default: false
+    t.boolean  "disabled",    default: false
+    t.boolean  "repository",  default: false
     t.string   "logo_image"
     t.integer  "institution_id"
+    t.boolean  "approved",    default: false
   end
 
   create_table "users", force: true do |t|

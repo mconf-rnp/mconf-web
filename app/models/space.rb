@@ -35,8 +35,11 @@
 # * "space.leave": When user leaves a space (parameters: +user_id+, +username+)
 #
 
+require './lib/mconf/approval_module'
+
 class Space < ActiveRecord::Base
   include PublicActivity::Common
+  include Mconf::ApprovalModule
 
   # TODO: temporary, review
   USER_ROLES = ["Admin", "User"]
@@ -71,6 +74,16 @@ class Space < ActiveRecord::Base
   accepts_nested_attributes_for :bigbluebutton_room
   after_update :update_webconf_room
   after_create :create_webconf_room
+
+  # It requires approval if the site globally requires it or
+  # if the creator's institution requires it
+  attr_accessor :created_by # the user trying to create the space
+  def require_approval?
+    # Space institution or creator's institution (when called from create)
+    institution = self.institution || created_by.try(:institution)
+
+    institution.try(:require_space_approval?) || Site.current.require_space_approval?
+  end
 
   validates :description, :presence => true
 

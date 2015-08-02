@@ -6,6 +6,8 @@
 # 3 or later. See the LICENSE file.
 
 class SpacesController < ApplicationController
+  include Mconf::ApprovalControllerModule # for approve, disapprove
+
   before_filter :authenticate_user!, :only => [:new, :create]
 
   load_and_authorize_resource :find_by => :permalink, :except => [:edit_recording, :enable, :destroy, :disable]
@@ -37,7 +39,7 @@ class SpacesController < ApplicationController
     params[:view] = 'thumbnails' if params[:view].nil? || params[:view] != 'list'
     params[:order] = 'relevance' if params[:order].nil? || params[:order] != 'abc'
 
-    spaces = Space.all
+    spaces = Space.where(approved: true)
     @user_spaces = user_signed_in? ? current_user.spaces : Space.none
 
     @spaces = params[:my_spaces] ? @user_spaces : spaces
@@ -90,6 +92,10 @@ class SpacesController < ApplicationController
   def create
     @space = Space.new(space_params)
 
+    # Not a database field, but we have to insert
+    # it here because to check approval before create
+    @space.created_by = current_user
+
     if @space.save
       respond_with @space do |format|
 
@@ -99,8 +105,16 @@ class SpacesController < ApplicationController
           current_user.institution.spaces << @space
         end
 
-        flash[:success] = t('space.created')
-        format.html { redirect_to :action => "show", :id => @space  }
+        # pre-approve the space if it's an admin creating it
+        @space.approve! if can?(:approve, @space)
+
+        if @space.approved?
+          flash[:success] = t('space.created')
+          format.html { redirect_to action: "show", id: @space }
+        else
+          flash[:success] = t('space.created_waiting_moderation')
+          format.html { redirect_to spaces_path }
+        end
       end
     else
       respond_with @space do |format|
@@ -288,7 +302,7 @@ class SpacesController < ApplicationController
 
   def load_spaces_examples
     # TODO: RAND() is specific for mysql
-    @spaces_examples = Space.order('RAND()').limit(3)
+    @spaces_examples = Space.where(approved: true).order('RAND()').limit(3)
   end
 
   def load_events
@@ -308,10 +322,14 @@ class SpacesController < ApplicationController
     if !user_signed_in?
       redirect_to login_path
 
-    # if it's a logged user that tried to access a private space
+    # if it's a logged user that tried to access a private or unnaproved space
     elsif [:show, :edit].include?(exception.action)
 
-      if @space.pending_join_request_for?(current_user)
+      if !@space.approved?
+        flash[:error] = t("spaces.error.unapproved")
+        redirect_to spaces_path
+
+      elsif @space.pending_join_request_for?(current_user)
         # redirect him to the page to ask permission to join, but with a warning that
         # a join request was already sent
         redirect_to new_space_join_request_path :space_id => params[:id]
@@ -328,6 +346,10 @@ class SpacesController < ApplicationController
         redirect_to new_space_join_request_path :space_id => params[:id]
       end
 
+    elsif [:create, :new].include? exception.action # space creation is forbidden for users
+      flash[:error] = t("spaces.error.creation_forbidden")
+      redirect_to spaces_path
+
     # destructive actions are redirected to the 403 error
     else
       flash[:error] = t("space.access_forbidden")
@@ -336,6 +358,10 @@ class SpacesController < ApplicationController
       end
       render_403 exception
     end
+  end
+
+  def require_approval?
+    @space.institution.require_space_approval? && current_site.require_space_approval?
   end
 
   allow_params_for :space

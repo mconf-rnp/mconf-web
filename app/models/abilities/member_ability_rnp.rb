@@ -14,6 +14,9 @@ module Abilities
 
       # Institutions
       can [:select], Institution
+
+      # Users can't create space if their institution forbids it
+      cannot [:create], Space if user.institution.try(:forbid_user_space_creation?)
     end
 
   end
