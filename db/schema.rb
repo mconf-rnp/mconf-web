@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150416210956) do
+ActiveRecord::Schema.define(version: 20150811195101) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.datetime "updated_at"
     t.text     "description"
     t.integer  "meeting_id"
+    t.string   "size"
   end
 
   add_index "bigbluebutton_recordings", ["recordid"], name: "index_bigbluebutton_recordings_on_recordid", unique: true, using: :btree
@@ -175,6 +176,8 @@ ActiveRecord::Schema.define(version: 20150416210956) do
     t.integer  "can_record_limit"
     t.text     "identifier"
     t.boolean  "force_shib_login", default: false
+    t.string   "recordings_disk_used",  default: "0"
+    t.string   "recordings_disk_quota", default: "0"
   end
 
   create_table "invitations", force: true do |t|

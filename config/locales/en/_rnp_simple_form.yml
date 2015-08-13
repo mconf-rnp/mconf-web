@@ -4,6 +4,8 @@ en:
       institution:
         acronym: "Adding an acronym will help users find the right institution when registering."
         can_record_limit: "Optional. Enter a number to limit how many users can record meetings in this intitution. Leave it empty to set no limits."
+        recordings_disk_quota: "Maximum disk space that can be used by recordings from this institution"
+        recordings_disk_used: "Current disk space being used by recordings from this institution"
         force_shib_login: "When enabled the user will only be allowed to login via federation"
         identifier: "Identifier to match users that will belong to this institution. You can use multiple values, one per line, as regular expression. The comparisons are case-insensitive and the strings are trimmed. If a user is identified in the federation as \"user@sub.institution.org\", for example, one possible value to match this user would be \"(.*\\.)?institution\\.org\", that would match any subdomain of an institution."
         user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."

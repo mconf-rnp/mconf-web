@@ -4,6 +4,8 @@ pt-br:
       institution:
         acronym: Sigla
         can_record_limit: Usuários que podem gravar
+        recordings_disk_quota: Quota de disco para gravações
+        recordings_disk_used: Espaço ocupado por gravações
         force_shib_login: Somente login via federação
         name: Nome
         user_limit: Máximo de membros

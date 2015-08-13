@@ -16,6 +16,8 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
+  before_validation :adjust_recordings_disk_quota
+
   def self.roles
     ['User', 'Admin'].map { |r| Role.find_by_name(r) }
   end
@@ -97,6 +99,32 @@ class Institution < ActiveRecord::Base
   def user_role user
     p = Permission.where(:user_id => user.id, :subject_type => 'Institution').first
     p.role.name unless p.nil? or p.role.nil?
+  end
+
+  def exceeded_disk_quota?
+    recordings_disk_used.to_i >= recordings_disk_quota.to_i
+  end
+
+  private
+
+  def adjust_recordings_disk_quota
+    if recordings_disk_quota_changed?
+
+      if is_number?(self.recordings_disk_quota)
+        # express size in bytes if a number without units was present
+        write_attribute(:recordings_disk_quota, Filesize.from("#{self.recordings_disk_quota} B"))
+      elsif is_filesize?(self.recordings_disk_quota)
+        write_attribute(:recordings_disk_quota, Filesize.from(self.recordings_disk_quota).to_i)
+      end
+    end
+  end
+
+  def is_number? n
+    Float(n) rescue nil
+  end
+
+  def is_filesize? n
+    Filesize.parse(n)[:type].present?
   end
 
 end
