@@ -111,8 +111,23 @@ class Institution < ActiveRecord::Base
     update_attribute(:recordings_disk_used, recordings.sum(:size))
   end
 
+  # Simple method to see if the recordings size exceeded the quota
+  # Don't treat this as an exact limit, because it will likely be exceeded
+  # by the last recording before the quota is still valid
   def exceeded_disk_quota?
+    return false if recordings_disk_quota.to_i == 0 # quota == 0 means unlimited
+
     recordings_disk_used.to_i >= recordings_disk_quota.to_i
+  end
+
+  # Returns a number ideally between 0..1 describing the
+  # disk usage ratio for the institution
+  # Could be > 1 if one big recording broke limit
+  # If the quota is unlimited (0) this value is also 0 but should be irrelevant
+  def disk_usage_ratio
+    return 0 if recordings_disk_quota.to_i == 0
+
+    recordings_disk_used.to_f / recordings_disk_quota.to_f
   end
 
   private

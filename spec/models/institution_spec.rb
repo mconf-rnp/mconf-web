@@ -115,6 +115,59 @@ describe Institution do
   it "#can_record_full?"
   it "#admins"
 
+  describe "#disk_usage_ratio and #exceeded_disk_quota?" do
+    let(:institution) { FactoryGirl.create(:institution, recordings_disk_quota: quota, recordings_disk_used: used) }
+
+    context '100%' do
+      let(:quota) { 1001 }
+      let(:used) { 1001 }
+
+      it { institution.disk_usage_ratio.should eq(1) }
+      it { institution.exceeded_disk_quota?.should be(true) }
+    end
+
+    context '50%' do
+      let(:quota) { 500 }
+      let(:used) { 250 }
+
+      it { institution.disk_usage_ratio.should eq(0.5) }
+      it { institution.exceeded_disk_quota?.should be(false) }
+    end
+
+    context '20%' do
+      let(:quota) { 5000 }
+      let(:used) { 1000 }
+
+      it { institution.disk_usage_ratio.should eq(0.2) }
+      it { institution.exceeded_disk_quota?.should be(false) }
+    end
+
+    context '0%' do
+      let(:quota) { 1001 }
+      let(:used) { 0 }
+
+      it { institution.disk_usage_ratio.should eq(0) }
+      it { institution.exceeded_disk_quota?.should be(false) }
+    end
+
+    context '120%' do
+      let(:quota) { 5000 }
+      let(:used) { 6000 }
+
+      it { institution.disk_usage_ratio.should eq(1.2) }
+      it { institution.exceeded_disk_quota?.should be(true) }
+    end
+
+    context 'unlimited quota' do
+      let(:quota) { 0 }
+      let(:used) { 1001 }
+
+      it { institution.disk_usage_ratio.should eq(0) }
+      it { institution.exceeded_disk_quota?.should be(false) }
+    end
+
+  end
+
   describe "#recordings_disk_quota=" do
     let(:institution) { FactoryGirl.create(:institution) }
 
