@@ -115,6 +115,80 @@ describe Institution do
   it "#can_record_full?"
   it "#admins"
 
+  describe "#recordings_disk_quota=" do
+    let(:institution) { FactoryGirl.create(:institution) }
+
+    context 'using a filesize' do
+      before { institution.update_attributes(recordings_disk_quota: '50 Mb'); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(50*(10**6)) }
+    end
+
+    context 'using another filesize' do
+      before { institution.update_attributes(recordings_disk_quota: '50 Mib'); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(50*(1024**2)) }
+    end
+
+    context 'using a number of bytes' do
+      before { institution.update_attributes(recordings_disk_quota: 8000); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(8000) }
+    end
+
+  end
+
+  describe "#update_recordings_disk_used!" do
+    let(:target) { FactoryGirl.create(:institution) }
+    let(:other_institution) { FactoryGirl.create(:institution) }
+
+    before do
+      owners.each_with_index { |owner, i| owner.bigbluebutton_room.recordings << recordings[i] }
+      target.update_recordings_disk_used!
+    end
+
+    context 'some recordings' do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 2),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 3),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 4)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:user, institution: target)
+      ]}
+
+      it { target.recordings_disk_used.to_i.should eq(9) }
+    end
+
+    context 'some recordings on multiple institutions' do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 10),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 20),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 400)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: other_institution)
+      ]}
+
+      it { target.recordings_disk_used.should eq(30) }
+      it { other_institution.recordings_disk_used.to_i.should eq(0) } # method has not been called
+
+      it do
+        other_institution.update_recordings_disk_used!
+        other_institution.recordings_disk_used.to_i.should eq(400)
+      end
+    end
+
+    context 'no recordings' do
+      let(:recordings) { [] }
+      let(:owners) { [] }
+
+      it { target.recordings_disk_used.to_i.should eq(0) }
+    end
+
+  end
+
   describe "#add_member!" do
 
     context "when user has no previous institution" do

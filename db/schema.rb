@@ -99,7 +99,7 @@ ActiveRecord::Schema.define(version: 20150811195101) do
     t.datetime "updated_at"
     t.text     "description"
     t.integer  "meeting_id"
-    t.string   "size"
+    t.integer  "size",        default: 0
   end
 
   add_index "bigbluebutton_recordings", ["recordid"], name: "index_bigbluebutton_recordings_on_recordid", unique: true, using: :btree
