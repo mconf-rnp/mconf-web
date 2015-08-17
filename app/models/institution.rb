@@ -107,7 +107,7 @@ class Institution < ActiveRecord::Base
     room_ids = BigbluebuttonRoom.where(owner_id: spaces.with_disabled.ids, owner_type: 'Space').ids |
             BigbluebuttonRoom.where(owner_id: users.with_disabled.ids, owner_type: 'User').ids
 
-    recordings = BigbluebuttonRecording.where(room_id: room_ids).published()
+    recordings = BigbluebuttonRecording.where(room_id: room_ids)
     update_attribute(:recordings_disk_used, recordings.sum(:size))
   end
 
