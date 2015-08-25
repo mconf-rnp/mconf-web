@@ -61,6 +61,7 @@ pt-br:
         other: "%{count} membros podem gravar"
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
+      disk_used: "%{used} ocupados de %{quota}"
       no_user_limit: "sem limite"
       users:
         zero: 0 membros
