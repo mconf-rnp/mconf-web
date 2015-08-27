@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -111,16 +111,15 @@ class ApplicationController < ActionController::Base
         guest_role
       end
     else
-      if current_user.superuser? && !room.is_running?
+      # Superusers has the right to create and be moderator in any room
+      if current_user.superuser?
         :moderator
       elsif room.owner_type == "User"
         if room.owner.id == current_user.id
           # only the owner is moderator
           :moderator
         else
-          if current_user.superuser?
-            :attendee
-          elsif room.private
+          if room.private
             :key # ask for a password if room is private
           else
             guest_role
@@ -138,9 +137,7 @@ class ApplicationController < ActionController::Base
             :attendee
           end
         else
-          if current_user.superuser?
-            :attendee
-          elsif room.private
+          if room.private
             :key
           else
             guest_role
@@ -193,6 +190,24 @@ class ApplicationController < ActionController::Base
     @webconf_room
   end
 
+  # The payload is used by lograge. We add more information to it here so that it is saved
+  # in the log.
+  def append_info_to_payload(payload)
+    super
+    payload[:session] = {
+      id: session.id,
+      ldap_session: !session[:ldap_data].blank?,
+      shib_session: !session[:shib_data].blank?
+    } unless session.nil?
+    payload[:current_user] = {
+      id: current_user.id,
+      email: current_user.email,
+      username: current_user.username,
+      superuser: current_user.superuser?,
+      can_record: current_user.can_record?
+    } unless current_user.nil?
+  end
+
   private
 
   def set_time_zone
@@ -241,19 +256,35 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Store last url for post-login redirect to whatever the user last visited.
-  # From: https://github.com/plataformatec/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
-  def store_location
+  def path_is_redirectable? path
+    # Paths to which users should never be redirected back to.
     ignored_paths = [ "/login", "/users/login", "/users",
                       "/register", "/users/registration",
                       "/users/registration/signup", "/users/registration/cancel",
                       "/users/password", "/users/password/new",
                       "/users/confirmation/new", "/users/confirmation",
                       "/secure", "/secure/info", "/secure/associate",
-                      "/pending" ]
-    if (!ignored_paths.include?(request.path) &&
-        !request.xhr? && # don't store ajax calls
-        (request.format == "text/html" || request.content_type == "text/html"))
+                      "/pending", "/bigbluebutton/rooms/.*/join", "/bigbluebutton/rooms/.*/end"]
+
+    # Some xhr request need to be stored
+    xhr_paths = ["/manage/users", "/manage/spaces"]
+
+    # This will filter xhr requests that are not for html pages. Requests for html pages
+    # via ajax can change the url and we might want to store them.
+    valid_format = (request.format == "text/html" || request.content_type == "text/html") && ( !request.xhr? || xhr_paths.include?(path) )
+
+    ignored_paths.select{ |ignored| path.match("^"+ignored+"$") }.empty? && valid_format
+  end
+
+  # Store last url for post-login redirect to whatever the user last visited.
+  # From: https://github.com/plataformatec/devise/wiki/How-To:-Redirect-back-to-current-page-after-sign-in,-sign-out,-sign-up,-update
+  def store_location
+    if path_is_redirectable?(request.path)
+      # Used by Mconf-Web. Can't use user_return_to because it is overridden
+      # before actions and views are executed.
+      session[:previous_user_return_to] = session[:user_return_to]
+
+      # used by devise
       session[:user_return_to] = request.fullpath
       # session[:last_request_time] = Time.now.utc.to_i
     end
@@ -263,6 +294,13 @@ class ApplicationController < ActionController::Base
   def clear_stored_location
     session[:user_return_to] = nil
   end
+
+  # Returns the previous path (the referer), if it exists and is a 'redirectable to'
+  # path. Otherwise returns the fallback.
+  def previous_path_or(fallback)
+    session[:previous_user_return_to] || fallback
+  end
+  helper_method :previous_path_or
 
   def institution
     @institution ||= Institution.find_by_permalink(params[:institution_id])

@@ -33,7 +33,11 @@ feature "Editing user institutions" do
           click_button "Save"
         }
         it { has_success_message(I18n.t('user.updated')) }
-        it { expect(page).to have_field('user[institution_id]', with: new_institution.id) }
+
+        context do
+          before { visit edit_user_path(user) }
+          it { expect(page).to have_field('user[institution_id]', with: new_institution.id) }
+        end
       end
     end
   end
@@ -58,7 +62,10 @@ feature "Editing user institutions" do
           click_button "Save"
         }
         it { has_success_message(I18n.t('user.updated')) }
-        it { expect(page).to have_field('user[institution_id]', with: new_institution.id) }
+        context do
+          before { visit edit_user_path(other_user) }
+          it { expect(page).to have_field('user[institution_id]', with: new_institution.id) }
+        end
       end
     end
   end

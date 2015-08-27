@@ -1,5 +1,5 @@
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -143,23 +143,23 @@ module Mconf
     def user_info(ldap_user, ldap_configs)
       # get them as strings since they were symbols but we use to compare
       # with strings in the db
-      if ldap_user[ldap_configs.ldap_username_field].present?
+      if ldap_user[ldap_configs.ldap_username_field] && !ldap_user[ldap_configs.ldap_username_field].empty?
         username = ldap_user[ldap_configs.ldap_username_field].try(:first)
       else
-        username = ldap_user["uid"].try(:first)
+        username = ldap_user['uid'].try(:first)
       end
       username.gsub!(/@[^@]+$/, '') unless username.nil? # use only the first part if this is an email
-      if ldap_user[ldap_configs.ldap_email_field].present?
+      if ldap_user[ldap_configs.ldap_email_field] && !ldap_user[ldap_configs.ldap_email_field].empty?
         email = ldap_user[ldap_configs.ldap_email_field].try(:first)
       else
-        email = ldap_user["mail"].try(:first)
+        email = ldap_user['mail'].try(:first)
       end
-      if ldap_user[ldap_configs.ldap_name_field].present?
+      if ldap_user[ldap_configs.ldap_name_field] && !ldap_user[ldap_configs.ldap_name_field].empty?
         name = ldap_user[ldap_configs.ldap_name_field].try(:first)
       else
-        name = ldap_user["cn"].try(:first)
+        name = ldap_user['cn'].try(:first)
       end
-      if ldap_user[ldap_configs.ldap_principal_name_field].present?
+      if ldap_user[ldap_configs.ldap_principal_name_field] && !ldap_user[ldap_configs.ldap_principal_name_field].empty?
         pn = ldap_user[ldap_configs.ldap_principal_name_field].try(:first)
       else
         pn = ldap_user["mail"].try(:first)

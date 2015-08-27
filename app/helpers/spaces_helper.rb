@@ -1,5 +1,5 @@
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -17,6 +17,11 @@ module SpacesHelper
     @spaces_menu_tab == tab ?
       options.update({ :class => "#{old_class} selected" }) :
       options
+  end
+
+  # Determines whether or not a space should have a visible link on the index page
+  def space_link_visible?(space)
+    user_signed_in? || (space.public? && space.approved?)
   end
 
   # Returns a link to join the space depending on the status of the

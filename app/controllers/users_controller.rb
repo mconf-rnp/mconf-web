@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -8,6 +8,8 @@
 require "digest/sha1"
 
 class UsersController < ApplicationController
+  include Mconf::ApprovalControllerModule # for approve and disapprove
+
   load_and_authorize_resource :find_by => :username, :except => [:enable, :index, :destroy]
   before_filter :load_and_authorize_with_disabled, :only => [:enable, :destroy]
 
@@ -88,7 +90,7 @@ class UsersController < ApplicationController
       sign_in @user, :bypass => true if current_user == @user
 
       flash = { :success => t("user.updated") }
-      redirect_to edit_user_path(@user), :flash => flash
+      redirect_to params[:return_to] || edit_user_path(@user), :flash => flash
     else
       render "edit", :layout => 'no_sidebar'
     end
@@ -186,18 +188,19 @@ class UsersController < ApplicationController
   # Confirms a user's account
   def confirm
     if !@user.confirmed?
-      @user.confirm!
+      @user.confirm
       flash[:notice] = t('users.confirm.confirmed', :username => @user.username)
     end
     redirect_to :back
   end
 
+  # TODO: #1650 these methods are now in a separate module, customize them there
   def approve
     if current_site.require_registration_approval?
       ignore_full = can?(:approve_when_full, @user)
       if @user.approve!(ignore_full)
         @user.create_approval_notification(current_user)
-        flash[:notice] = t('users.approve.approved', :username => @user.username)
+        flash[:notice] = t('users.approve.approved', :name => @user.name)
       else
         flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
       end
@@ -206,11 +209,10 @@ class UsersController < ApplicationController
     end
     redirect_to :back
   end
-
   def disapprove
     if current_site.require_registration_approval?
       @user.disapprove!
-      flash[:notice] = t('users.disapprove.disapproved', :username => @user.username)
+      flash[:notice] = t('users.disapprove.disapproved', :name => @user.name)
     else
       flash[:error] = t('users.disapprove.not_enabled')
     end
@@ -243,9 +245,8 @@ class UsersController < ApplicationController
     end
 
     if @user.save
-      @user.confirm!
+      @user.confirm
       @user.approve!(can?(:approve_when_full, @user))
-
       flash[:success] = t("users.create.success")
       respond_to do |format|
         format.html { redirect_to manage_users_path }
@@ -273,14 +274,24 @@ class UsersController < ApplicationController
     authorize! action_name.to_sym, @user
   end
 
+  def require_approval?
+    current_site.require_registration_approval?
+  end
+
   allow_params_for :user
   def allowed_params
-    allowed = [ :password, :password_confirmation, :remember_me, :current_password,
-      :login, :approved, :disabled, :timezone, :can_record, :receive_digest, :expanded_post ]
-
-    allowed += [:email, :username, :_full_name] if (current_user.superuser? or is_institution_admin?) and (params[:action] == 'create')
+    allowed = [ :remember_me, :login, :approved, :disabled,
+                :timezone, :can_record, :receive_digest, :expanded_post ]
+    allowed += [:password, :password_confirmation, :current_password] if can?(:update_password, @user)
+    allowed += [:email, :username, :_full_name] if current_user.superuser? and (params[:action] == 'create')
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed += [:institution_id] if current_user.superuser?
+
+    # institution admins
+    if is_institution_admin? && params[:action] == 'create'
+      allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
+    end
+
     allowed
   end
 

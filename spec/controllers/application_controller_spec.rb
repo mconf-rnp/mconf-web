@@ -1,5 +1,5 @@
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -84,7 +84,7 @@ describe ApplicationController do
             BigbluebuttonRoom.any_instance.stub(:is_running?).and_return(true)
           }
           before(:each) { get :index, :room_id => room.id }
-          it { assigns(:result).should eql(:attendee) }
+          it { assigns(:result).should eql(:moderator) }
         end
 
         context "and the user is not the owner but is a superuser and the room is not running" do
@@ -126,7 +126,7 @@ describe ApplicationController do
             BigbluebuttonRoom.any_instance.stub(:is_running?).and_return(true)
           }
           before(:each) { get :index, :room_id => room.id }
-          it { assigns(:result).should eql(:attendee) }
+          it { assigns(:result).should eql(:moderator) }
         end
 
         context "and the user is not the owner but is a superuser and the room is not running" do
@@ -248,7 +248,7 @@ describe ApplicationController do
             BigbluebuttonRoom.any_instance.stub(:is_running?).and_return(true)
           }
           before(:each) { get :index, :room_id => room.id }
-          it { assigns(:result).should eql(:attendee) }
+          it { assigns(:result).should eql(:moderator) }
         end
 
         context "and the user is not a member of the space but is a superuser and the room is not running" do
@@ -327,7 +327,7 @@ describe ApplicationController do
             BigbluebuttonRoom.any_instance.stub(:is_running?).and_return(true)
           }
           before(:each) { get :index, :room_id => room.id }
-          it { assigns(:result).should eql(:attendee) }
+          it { assigns(:result).should eql(:moderator) }
         end
 
         context "and the user is not a member of the space but is a superuser and the room is not running" do

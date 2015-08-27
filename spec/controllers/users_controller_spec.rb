@@ -1,5 +1,5 @@
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
@@ -8,6 +8,8 @@ require "spec_helper"
 
 describe UsersController do
   render_views
+
+  it "includes Mconf::ApprovalControllerModule"
 
   describe "#index" do
     context "if has @space set" do
@@ -108,8 +110,9 @@ describe UsersController do
       }
 
       let(:user_allowed_params) {
-        [ :password, :password_confirmation, :remember_me, :current_password, :login,
-          :approved, :disabled, :timezone, :can_record, :receive_digest, :expanded_post ]
+        [ :remember_me, :login, :approved, :disabled,
+          :timezone, :can_record, :receive_digest, :expanded_post,
+          :password, :password_confirmation, :current_password ]
       }
       before {
         sign_in(user)
@@ -944,7 +947,7 @@ describe UsersController do
 
     context "if #require_registration_approval is set in the current site" do
       before(:each) {
-        Site.current.update_attributes(:require_registration_approval => true)
+        Site.current.update_attributes(require_registration_approval: true)
       }
 
       context "and the user is successfully approved" do
@@ -952,7 +955,7 @@ describe UsersController do
           post :approve, :id => user.to_param
         }
         it { should respond_with(:redirect) }
-        it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
+        it { should set_the_flash.to(I18n.t('users.approve.approved', :name => user.name)) }
         it { should redirect_to('/any') }
         it("approves the user") { user.reload.approved?.should be(true) }
         it("confirms the user") { user.reload.confirmed?.should be(true) }
@@ -965,7 +968,7 @@ describe UsersController do
           it {
             user.confirmed?.should be(false) # just to make sure wasn't already confirmed
             expect {
-              post :approve, :id => user.to_param
+              post :approve, id: user.to_param
               user.reload.confirmed?.should be(true)
             }.not_to change{ ActionMailer::Base.deliveries }
           }
@@ -1003,7 +1006,7 @@ describe UsersController do
             post :approve, :id => user.to_param
           }
           it { should respond_with(:redirect) }
-          it { should set_the_flash.to(I18n.t('users.approve.approved', :username => user.username)) }
+          it { should set_the_flash.to(I18n.t('users.approve.approved', :name => user.name)) }
           it { should redirect_to('/any') }
           it("approves the user") { user.reload.approved?.should be_truthy }
           it("confirms the user") { user.reload.confirmed?.should be_truthy }
@@ -1069,9 +1072,9 @@ describe UsersController do
         post :disapprove, id: user.to_param
       }
       it { should respond_with(:redirect) }
-      it { should set_the_flash.to(I18n.t('users.disapprove.disapproved', username: user.username)) }
+      it { should set_the_flash.to(I18n.t('users.disapprove.disapproved', name: user.name)) }
       it { should redirect_to('/any') }
-      it("disapproves the user") { user.reload.approved?.should be_falsey }
+      it("disapproves the user") { user.reload.should_not be_approved }
     end
 
     context "if #require_registration_approval is not set in the current site" do
@@ -1082,13 +1085,27 @@ describe UsersController do
       it { should respond_with(:redirect) }
       it { should set_the_flash.to(I18n.t('users.disapprove.not_enabled')) }
       it { should redirect_to('/any') }
-      it("user is still (auto) approved") { user.reload.approved?.should be_truthy } # auto approved on registration
+      it("user is still (auto) approved") { user.reload.should be_approved } # auto approved on registration
     end
 
     it { should_authorize an_instance_of(User), :disapprove, via: :post, id: user.to_param }
   end
 
   describe "#new" do
+    # see bug #1719
+    context "doesnt store location for redirect from xhr" do
+      let(:superuser) { FactoryGirl.create(:superuser) }
+      before {
+        sign_in superuser
+        controller.session[:user_return_to] = "/home"
+        controller.session[:previous_user_return_to] = "/manage/users"
+        request.env['CONTENT_TYPE'] = "text/html"
+        xhr :get, :new
+      }
+      it { controller.session[:user_return_to].should eq( "/home") }
+      it { controller.session[:previous_user_return_to].should eq("/manage/users") }
+    end
+
     context "logged as a superuser" do
       let(:superuser) { FactoryGirl.create(:superuser) }
       before(:each) { sign_in(superuser) }
@@ -1133,10 +1150,11 @@ describe UsersController do
       before { sign_in(superuser) }
 
       describe "creates a new user with valid attributes" do
+        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+              email: user.email, _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123"
             }
           }.to change(User, :count).by(1)
@@ -1154,10 +1172,11 @@ describe UsersController do
       end
 
       describe "creates a new user with valid attributes and with the ability to record meetings" do
+        let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
             post :create, user: {
-              email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+              email: user.email, _full_name: "Maria Test", username: "maria-test",
               password: "test123", password_confirmation: "test123", can_record: true
             }
           }.to change(User, :count).by(1)
@@ -1194,10 +1213,11 @@ describe UsersController do
         }
 
         describe "creates a new user with valid attributes" do
+          let(:user) { FactoryGirl.build(:user) }
           before {
             expect {
               post :create, user: {
-                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                email: user.email, _full_name: "Maria Test", username: "maria-test",
                 password: "test123", password_confirmation: "test123"
               }
             }.to change(User, :count).by(1)
@@ -1216,10 +1236,11 @@ describe UsersController do
         end
 
         describe "creates a new user with valid attributes and with the ability to record meetings" do
+          let(:user) { FactoryGirl.build(:user) }
           before {
             expect {
               post :create, user: {
-                email: "test@test.com", _full_name: "Maria Test", username: "maria-test",
+                email: user.email, _full_name: "Maria Test", username: "maria-test",
                 password: "test123", password_confirmation: "test123", can_record: true
               }
             }.to change(User, :count).by(1)

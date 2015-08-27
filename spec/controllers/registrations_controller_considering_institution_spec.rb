@@ -39,8 +39,8 @@ describe RegistrationsController do
           }.not_to change{ User.count }
         }
         it { should render_template(:new) }
-        it { controller.resource.errors.messages.should have_key(:institution_id) }
-        it { controller.resource.errors.messages[:institution_id].should include(I18n.t("errors.messages.blank")) }
+        it { controller.send(:resource).errors.messages.should have_key(:institution_id) }
+        it { controller.send(:resource).errors.messages[:institution_id].should include(I18n.t("errors.messages.blank")) }
         it { assigns(:institution).should be_nil }
       end
 
@@ -51,8 +51,8 @@ describe RegistrationsController do
             post :create, :user => attributes
           }.not_to change{ User.count }
         }
-        it { controller.resource.errors.messages.should have_key(:email) }
-        it { controller.resource.errors.messages[:email].should include(I18n.t("errors.messages.blank")) }
+        it { controller.send(:resource).errors.messages.should have_key(:email) }
+        it { controller.send(:resource).errors.messages[:email].should include(I18n.t("errors.messages.blank")) }
       end
     end
   end

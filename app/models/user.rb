@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 # This file is part of Mconf-Web, a web application that provides access
-# to the Mconf webconferencing system. Copyright (C) 2010-2012 Mconf
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
 #
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
 require 'devise/encryptors/station_encryptor'
 require 'digest/sha1'
+require './lib/mconf/approval_module'
+
 class User < ActiveRecord::Base
   include PublicActivity::Common
+  include Mconf::ApprovalModule
 
   # TODO: block :username from being modified after registration
 
@@ -42,10 +45,10 @@ class User < ActiveRecord::Base
   extend FriendlyId
   friendly_id :username
 
-  validates :email, :presence => true, :email => true
+  validates :email, uniqueness: true, presence: true, email: true
 
-  has_and_belongs_to_many :spaces, -> { where(:permissions => {:subject_type => 'Space'}) },
-                          :join_table => :permissions, :association_foreign_key => "subject_id"
+  has_and_belongs_to_many :spaces, -> { where(permissions: {subject_type: 'Space'}).uniq },
+                          join_table: :permissions, association_foreign_key: "subject_id"
 
   has_many :join_requests, :foreign_key => :candidate_id, :dependent => :destroy
   has_many :permissions, :dependent => :destroy
@@ -81,7 +84,7 @@ class User < ActiveRecord::Base
   after_create :set_institution
   after_update :set_institution
 
-  after_create :send_admin_approval_mail, if: :site_needs_approval?
+  after_create :send_admin_approval_mail, if: :require_approval?
   def send_admin_approval_mail
     if !approved?
       if self.institution
@@ -95,14 +98,14 @@ class User < ActiveRecord::Base
     end
   end
 
-  after_update :send_user_approved_mail, if: :site_needs_approval?
+  after_update :send_user_approved_mail, if: :require_approval?
   def send_user_approved_mail
     if approved_changed? && approved?
       AdminMailer.new_user_approved(self.id).deliver
     end
   end
 
-  before_create :automatically_approve, unless: :site_needs_approval?
+  before_create :automatically_approve, unless: :require_approval?
 
   before_destroy :before_disable_and_destroy, prepend: true
 
@@ -151,7 +154,7 @@ class User < ActiveRecord::Base
     self.new_record?
   end
 
-  def site_needs_approval?
+  def require_approval?
     Site.current.require_registration_approval
   end
 
@@ -163,7 +166,8 @@ class User < ActiveRecord::Base
       :name => self._full_name,
       :logout_url => "/feedback/webconf/",
       :moderator_key => SecureRandom.hex(4),
-      :attendee_key => SecureRandom.hex(4)
+      :attendee_key => SecureRandom.hex(4),
+      :dial_number => Mconf::DialNumber.generate(Site.current.try(:room_dial_number_pattern))
     }
     create_bigbluebutton_room(params)
   end
@@ -261,13 +265,7 @@ class User < ActiveRecord::Base
     PrivateMessage.inbox(self).select{|msg| !msg.checked}
   end
 
-  # Automatically approves the user if the current site is not requiring approval
-  # on registration.
-  def automatically_approve
-    self.approved = true
-  end
-
-  # Sets the user as approved
+  # Sets the user as approved and skips confirmation
   def approve!(ignore_full = false)
     if institution_is_full? && !ignore_full
       false
@@ -275,16 +273,6 @@ class User < ActiveRecord::Base
       skip_confirmation! unless confirmed?
       update_attributes(approved: true)
     end
-  end
-
-  # Starts the process of sending a notification to the user that was approved.
-  def create_approval_notification(approved_by)
-    create_activity 'approved', owner: approved_by
-  end
-
-  # Sets the user as not approved
-  def disapprove!
-    update_attributes(approved: false)
   end
 
   # Overrides a method from devise, see:
@@ -326,8 +314,12 @@ class User < ActiveRecord::Base
     if created_by.present?
       create_activity 'created_by_admin', owner: created_by, notified: false
     else
-      create_activity 'created', owner: self, notified: !site_needs_approval?
+      create_activity 'created', owner: self, notified: !require_approval?
     end
+  end
+
+  def created_by_shib?
+    ShibToken.user_created_by_shib?(self)
   end
 
   #

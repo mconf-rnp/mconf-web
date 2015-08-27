@@ -1,6 +1,6 @@
 -# locals: user
 
-- if can?(:read, user.profile!)
+- if can?(:show, user)
   .user-wrapper.user-detailed.thread.thread-user{:class => "#{cycle("thread-even" , "thread-odd")}"}
     .logo-in-thread
       = link_logo_image(user, :size => '48', :url => user_path(user), :title => user.name, :class => "logo logo-user-big")

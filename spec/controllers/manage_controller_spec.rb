@@ -1,3 +1,9 @@
+# This file is part of Mconf-Web, a web application that provides access
+# to the Mconf webconferencing system. Copyright (C) 2010-2015 Mconf.
+#
+# This file is licensed under the Affero General Public License version
+# 3 or later. See the LICENSE file.
+
 require 'spec_helper'
 
 describe ManageController do
@@ -6,6 +12,20 @@ describe ManageController do
     before { User.destroy_all } # exclude seeded user(s)
 
     it "should require authentication"
+
+    # see bug #1719
+    context "stores location for redirect from xhr" do
+      let(:superuser) { FactoryGirl.create(:superuser) }
+      let(:user) { FactoryGirl.create(:user) }
+      before {
+        sign_in superuser
+        controller.session[:user_return_to] = "/home"
+        request.env['CONTENT_TYPE'] = "text/html"
+        xhr :get, :users
+      }
+      it { controller.session[:user_return_to].should eq("/manage/users") }
+      it { controller.session[:previous_user_return_to].should eq("/home") }
+    end
 
     context "authorizes" do
       let(:user) { FactoryGirl.create(:superuser) }
@@ -93,7 +113,7 @@ describe ManageController do
             @u2.profile.update_attributes(:full_name => 'Second')
             @u3 = FactoryGirl.create(:user, :_full_name => 'Secondary')
           }
-          before(:each) { get :users, :q => 'sec' }
+          before(:each) { get :users, :q => 'second' }
           it { assigns(:users).count.should be(2) }
           it { assigns(:users).should include(@u2) }
           it { assigns(:users).should include(@u3) }
@@ -106,7 +126,7 @@ describe ManageController do
             @u2.update_attributes(:username => 'Second')
             @u3 = FactoryGirl.create(:user, :username => 'Secondary')
           }
-          before(:each) { get :users, :q => 'sec' }
+          before(:each) { get :users, :q => 'second' }
           it { assigns(:users).count.should be(2) }
           it { assigns(:users).should include(@u2) }
           it { assigns(:users).should include(@u3) }
@@ -118,7 +138,7 @@ describe ManageController do
             @u2 = FactoryGirl.create(:user, :email => 'second@there.com')
             @u3 = FactoryGirl.create(:user, :email => 'my@secondary.org')
           }
-          before(:each) { get :users, :q => 'sec' }
+          before(:each) { get :users, :q => 'second' }
           it { assigns(:users).count.should be(2) }
           it { assigns(:users).should include(@u2) }
           it { assigns(:users).should include(@u3) }

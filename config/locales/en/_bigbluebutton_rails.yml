@@ -26,9 +26,12 @@ en:
         server_id: "Server ID"
         start_time: "Start Time"
       bigbluebutton_room:
+        allow_start_stop_recording: "Allow user to start/stop recording"
+        attendee_key: "Key for attendees"
         auto_start_video: "Auto start video"
         auto_start_audio: "Auto start audio"
-        attendee_key: "Key for attendees"
+        auto_start_recording: "Auto start recording"
+        background: "Background image"
         default_layout: "Default Layout"
         presenter_share_only: "Only presenter shares audio and video"
         auto_start_video: "Auto start video"
@@ -41,6 +44,7 @@ en:
         meetingid: "Meeting ID"
         metadata: Metadata
         moderator_key: "Key for moderators"
+        moderator_only_message: "Message to be shown to moderators only"
         name: Name
         param: "String ID"
         private: Private
@@ -102,6 +106,7 @@ en:
           success: "Your recording was successfully updated."
     rooms:
       default_welcome_msg: "Welcome to <b>%%CONFNAME%%</b>!<br><br>To join the audio bridge click the headset icon (upper-left hand corner). Use a headset to avoid causing background noise for others.<br>"
+      default_welcome_msg_dial_number: "Welcome to <b>%%CONFNAME%%</b>!<br><br>To join the audio bridge click the headset icon (upper-left hand corner). Use a headset to avoid causing background noise for others.<br>You can call into this conference with a regular phone using the number \"%%DIALNUM%%\".<br>"
       errors:
         fetch_recordings:
           no_server: "There's no server associated with this room."

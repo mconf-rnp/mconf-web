@@ -1,5 +1,5 @@
 - if @space && @space.id != nil
-  - if can?(:read, @space)
+  - if can?(:show, @space)
     = content_for :page_menu do
       %ul
         %li{ spaces_menu_select_if(:home) }

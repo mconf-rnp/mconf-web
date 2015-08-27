@@ -14,6 +14,9 @@ module Abilities
     def register_abilities(user)
       super_register(user)
 
+      # TODO: move checks for disabled/unapproved resources to their own methods,
+      #   as is done in MemberAbility
+
       # Things an institutional admin can make in the users from his institution
       # * Update the user's info
       # * Approve (and change their attribute `:approved`) and confirm
@@ -21,7 +24,7 @@ module Abilities
       # * Manage users (generic, doesn't specify which attributes)
       # * Register new users
       can [:edit, :update, :approve, :manage_user,
-           :give_recording_rights, :confirm], User do |target|
+           :give_recording_rights, :confirm, :update_password], User do |target|
         target.institution.present? && !target.disabled &&
           target.institution.admins.include?(user)
       end
@@ -35,18 +38,19 @@ module Abilities
       end
 
       # Institutional admins can access these actions in their institution
-      can [:read, :users, :spaces], Institution do
+      can :index, Institution
+      can [:show, :users, :spaces], Institution do
         !user.institution.nil? && user.institution.admins.include?(user)
       end
 
       # Institutional admins can edit their institution's users
-      can [:read, :edit, :update], Profile do |profile|
+      can [:show, :edit, :update], Profile do |profile|
         !profile.user.institution.nil? && profile.user.institution.admins.include?(user)
       end
 
       # Institutional admins can edit their institution's spaces and all the resources
       # associated with it, exactly an admin of the space would
-      can [:read, :destroy, :edit, :update, :user_permissions,
+      can [:show, :destroy, :edit, :update, :user_permissions,
            :webconference_options, :webconference, :recordings], Space do |space|
         !space.disabled &&
           is_institution_admin_of_space(user, space)
@@ -56,7 +60,7 @@ module Abilities
         !space.disabled &&
           is_institution_admin_of_space(user, space)
       end
-      can [:read, :edit, :update], Permission do |perm|
+      can [:show, :edit, :update], Permission do |perm|
         case perm.subject_type
         when "Space"
           space = perm.subject
@@ -69,7 +73,7 @@ module Abilities
           false
         end
       end
-      can [:read, :create, :reply_post], Post do |post|
+      can [:show, :create, :reply_post], Post do |post|
         space = post.space
         !space.disabled &&
           is_institution_admin_of_space(user, space)

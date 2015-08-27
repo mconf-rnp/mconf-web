@@ -219,7 +219,7 @@ describe Institution do
 
       context "that's an admin of the institution" do
         before { target.add_member!(user, 'Admin') }
-        it { should_not be_able_to_do_anything_to(target).except([:read, :users, :spaces]) }
+        it { should_not be_able_to_do_anything_to(target).except([:show, :index, :users, :spaces]) }
       end
     end
 
