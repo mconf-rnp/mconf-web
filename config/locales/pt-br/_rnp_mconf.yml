@@ -4,12 +4,12 @@ pt-br:
       institution:
         acronym: Sigla
         can_record_limit: Usuários que podem gravar
+        forbid_user_space_creation: "Proibir que usuários criem comunidades"
         force_shib_login: Somente login via federação
-        name: Nome
-        user_limit: Máximo de membros
-        require_space_approval: "Moderação de comunidades"
-        forbid_user_space_creation: "Proibir criação de comunidades por usuários"
         identifier: Identificador
+        name: Nome
+        require_space_approval: "Moderação de comunidades"
+        user_limit: Máximo de membros
       space:
         institution_id: "Instituição"
         institution_name: "Instituição"

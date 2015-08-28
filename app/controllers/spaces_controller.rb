@@ -367,7 +367,7 @@ class SpacesController < ApplicationController
   end
 
   def require_approval?
-    @space.institution.require_space_approval? && current_site.require_space_approval?
+    @space.institution.try(:require_space_approval?) && current_site.require_space_approval?
   end
 
   allow_params_for :space

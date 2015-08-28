@@ -4,8 +4,11 @@ en:
       institution:
         acronym: Acronym
         can_record_limit: Users that can record
+        forbid_user_space_creation: "Forbid users from creating spaces"
         force_shib_login: Force login only via federation
+        identifier: Identifier
         name: Name
+        require_space_approval: "Moderate spaces"
         user_limit: Maximum of members
       space:
         institution_id: "Institution"
