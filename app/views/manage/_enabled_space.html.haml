@@ -24,6 +24,6 @@
         = link_to space.institution.full_name, spaces_institution_path(space.institution)
 
     - if current_site.require_space_approval? && !space.approved?
-      %span.space-waiting-moderation
+      .resource-waiting-moderation-tooltip
         = icon_waiting_moderation
-        = t("_other.not_approved.tooltip")
+        = t("_other.not_approved.text")
