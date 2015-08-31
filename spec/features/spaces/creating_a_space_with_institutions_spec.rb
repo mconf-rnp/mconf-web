@@ -47,16 +47,15 @@ feature "Creating a space when institutions are present" do
       }
 
       it { Space.last.should_not be_approved }
-      it { current_path.should eq(spaces_path) }
+      it { current_path.should eq(space_path(Space.last)) }
       it { has_success_message t('space.created_waiting_moderation') }
-
-      it { page.should_not have_content(attrs[:name]) }
+      it { page.should have_content(attrs[:name]) }
 
       context 'space appears in user spaces' do
         before { visit spaces_path(my_spaces: 'true') }
 
         it { page.should have_content(attrs[:name]) }
-        it { page.should have_selector('.waiting-approval', count: 1) }
+        it { page.should have_selector('.space-waiting-moderation', count: 1) }
         it { page.should have_selector('.icon-mconf-waiting-moderation', count: 1) }
       end
     end
