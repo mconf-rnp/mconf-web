@@ -23,7 +23,7 @@ module Abilities
       # * Give permission to record (change the attribute `:can_record`)
       # * Manage users (generic, doesn't specify which attributes)
       # * Register new users
-      can [:edit, :update, :approve, :manage_user,
+      can [:edit, :update, :approve, :disapprove, :manage_user,
            :give_recording_rights, :confirm, :update_password], User do |target|
         target.institution.present? && !target.disabled &&
           target.institution.admins.include?(user)
@@ -48,9 +48,12 @@ module Abilities
         !profile.user.institution.nil? && profile.user.institution.admins.include?(user)
       end
 
+      # Can create no matter if the site has creation disabled
+      can [:create, :new], Space
+
       # Institutional admins can edit their institution's spaces and all the resources
       # associated with it, exactly an admin of the space would
-      can [:show, :destroy, :edit, :update, :user_permissions,
+      can [:show, :destroy, :edit, :approve, :disapprove, :update, :user_permissions,
            :webconference_options, :webconference, :recordings], Space do |space|
         !space.disabled &&
           is_institution_admin_of_space(user, space)
