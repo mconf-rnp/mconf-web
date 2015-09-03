@@ -25,5 +25,10 @@
 
       - if institution.recordings_disk_quota.to_i != 0
         .institution-disk
-          = used = t('.disk_used', used: human_file_size(institution.recordings_disk_used), quota: human_file_size(institution.recordings_disk_quota))
-          %meter{min: "0", max: "1.0", low: "0.2", high: "0.9", optimum: "0.5" , value: institution.disk_usage_ratio, title: used}
+
+          = t('.recordings_disk_used')
+          %p.progress-label
+            = t('.disk_used', used: human_file_size(institution.recordings_disk_used), quota: human_file_size(institution.recordings_disk_quota))
+
+          .progress.short-progress
+            .bar{role: 'progressbar', :'aria-valuemin' => '0', :'aria-valuemax' => '1.0', :'aria-valuenow' => institution.disk_usage_ratio, style: "width: #{(institution.disk_usage_ratio * 100)}%;"}

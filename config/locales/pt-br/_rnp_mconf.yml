@@ -62,6 +62,7 @@ pt-br:
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
       disk_used: "%{used} ocupados de %{quota}"
+      recordings_disk_used: Ocupação do disco por gravações
       no_user_limit: "sem limite"
       users:
         zero: 0 membros
