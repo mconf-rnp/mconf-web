@@ -11,13 +11,13 @@ describe BigbluebuttonRecording do
   describe "update institution disk size after CREATING a recording" do
     let(:owner) { FactoryGirl.create(:space) }
     let(:room) { FactoryGirl.create(:bigbluebutton_room, owner: owner) }
-    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server) }
+    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server, size: 500) }
 
     before {
       allow(owner.institution).to receive(:update_recordings_disk_used!)
     }
 
-    it { owner.institution.recordings_disk_used.to_i.should eq(0) }
+    it { owner.institution.recordings_disk_used.to_i.should eq(500) }
   end
 
   describe "update institution disk size after UPDATING a recording" do
@@ -32,7 +32,6 @@ describe BigbluebuttonRecording do
 
     it { owner.institution.recordings_disk_used.to_i.should eq(100) }
   end
-
 
   # This is a model from BigbluebuttonRails, but we have permissions set in cancan for it,
   # so we test them here.

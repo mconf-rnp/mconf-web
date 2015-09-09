@@ -239,7 +239,6 @@ describe Institution do
 
       it { target.recordings_disk_used.to_i.should eq(0) }
     end
-
   end
 
   describe "#add_member!" do

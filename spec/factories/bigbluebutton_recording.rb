@@ -15,6 +15,7 @@ FactoryGirl.define do
     r.published true
     r.start_time { Time.now - rand(5).hours }
     r.end_time { Time.now + rand(5).hours }
+    r.size { rand((20*1024**2)..(500*1024**2)) } # 20MB <-> 500MB
     r.available true
   end
 end

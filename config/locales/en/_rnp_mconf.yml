@@ -8,6 +8,8 @@ en:
         force_shib_login: Force login only via federation
         identifier: Identifier
         name: Name
+        recordings_disk_quota: Disk quota for recordings
+        recordings_disk_used: Disk space used by recordings
         require_space_approval: "Moderate spaces"
         user_limit: Maximum of members
       space:
@@ -62,17 +64,17 @@ en:
       can_record_limit: "maximum: %{limit}"
       destroy: "Remove institution"
       disk_used: "%{used} used of %{quota}"
-      recordings_disk_used: Recordings disk used
       no_user_limit: "no maximum"
+      recordings_disk_used: Disk space used by recordings
+      spaces:
+        zero: 0 spaces
+        one: 1 space
+        other: "%{count} spaces"
       users:
         zero: 0 members
         one: 1 member
         other: "%{count} members"
       user_limit: "maximum: %{limit}"
-      spaces:
-        zero: 0 spaces
-        one: 1 space
-        other: "%{count} spaces"
     institutions:
       create: "Create a new institution"
     menu:

@@ -233,7 +233,8 @@ module Abilities
       # Users can recording meetings in their rooms, but only if they have the record flag set.
       # `:record_meeting` is a custom name, not an action that exists in the controller
       can :record_meeting, BigbluebuttonRoom do |room|
-        user.can_record && user_is_owner_or_belongs_to_rooms_space(user, room)
+        user.can_record && user_is_owner_or_belongs_to_rooms_space(user, room) &&
+          !institution_quota_exceeded(room)
       end
 
       # Currently only user rooms can be updated
@@ -347,6 +348,20 @@ module Abilities
       recording.room.try(:public?)
     end
 
+    # Check if institution disk quota was exceeded.
+    # Only runs if user/space has a institution, if they don't we can't know the correct quota.
+    # Also if there's permission to record without institution it's likely an admin and he should know what he's doing.
+    def institution_quota_exceeded(room)
+      quota_exceeded = false
+      if room.present? && room.owner.present? && room.owner.institution.present?
+        institution = room.owner.institution
+        if institution.try(:exceeded_disk_quota?)
+          quota_exceeded = true
+          Rails.logger.info "RECORDING: '#{room.name}' won't be able to record because disk quota for '#{institution.name}' was exceeded."
+        end
+      end
+      quota_exceeded
+    end
   end
 
 end

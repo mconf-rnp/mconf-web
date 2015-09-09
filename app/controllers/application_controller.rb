@@ -162,17 +162,7 @@ class ApplicationController < ActionController::Base
   def bigbluebutton_create_options(room)
     ability = Abilities.ability_for(current_user)
 
-    # Check if institution disk quota was exceeded
-    #   Only runs if user/space has a institution, if they don't we can't know the correct quota
-    #   Also if there's permission to record without institution it's likely an admin and he should now what he's doing...
-    quota_exceeded = false
-    ins = @room.owner.institution
-    if ins.try(:exceeded_disk_quota?)
-      quota_exceeded = true
-      Rails.logger.info "RECORDING: '#{@room.name}' won't be able to record because disk quota for '#{ins.name}' was exceeded."
-    end
-
-    can_record = ability.can?(:record_meeting, room) && !quota_exceeded
+    can_record = ability.can?(:record_meeting, room)
     if current_site.webconf_auto_record
       # show the record button if the user has permissions to record
       { record: can_record }

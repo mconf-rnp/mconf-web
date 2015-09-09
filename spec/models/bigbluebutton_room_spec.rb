@@ -129,6 +129,26 @@ describe BigbluebuttonRoom do
         context "with permission to record" do
           before { user.update_attributes(:can_record => true) }
           it { should be_able_to(:record_meeting, target) }
+
+          context "in an institution that exceeded its disk quota" do
+            let(:institution) { FactoryGirl.create(:institution) }
+            before {
+              institution.update_attributes(recordings_disk_quota: 100,
+                                            recordings_disk_used: 100)
+              institution.add_member!(user)
+            }
+            it { should_not be_able_to(:record_meeting, target) }
+          end
+
+          context "in an institution that did not exceed its disk quota" do
+            let(:institution) { FactoryGirl.create(:institution) }
+            before {
+              institution.update_attributes(recordings_disk_quota: 101,
+                                            recordings_disk_used: 100)
+              institution.add_member!(user)
+            }
+            it { should be_able_to(:record_meeting, target) }
+          end
         end
 
         context "when the owner is disabled" do
@@ -201,6 +221,40 @@ describe BigbluebuttonRoom do
           context "with permission to record" do
             before { user.update_attributes(:can_record => true) }
             it { should be_able_to(:record_meeting, target) }
+
+            context "in an institution that exceeded its disk quota" do
+              let(:institution) { FactoryGirl.create(:institution) }
+              before {
+                institution.update_attributes(recordings_disk_quota: 100,
+                                              recordings_disk_used: 100)
+                space.update_attributes(institution: institution)
+              }
+              it { should_not be_able_to(:record_meeting, target) }
+            end
+
+            context "in an institution that did not exceed its disk quota" do
+              let(:institution) { FactoryGirl.create(:institution) }
+              before {
+                institution.update_attributes(recordings_disk_quota: 101,
+                                              recordings_disk_used: 100)
+                space.update_attributes(institution: institution)
+              }
+              it { should be_able_to(:record_meeting, target) }
+            end
+
+            context "when the user's institution exceeded the quota, but the space's institution didn't" do
+              let(:institution_user) { FactoryGirl.create(:institution) }
+              let(:institution_space) { FactoryGirl.create(:institution) }
+              before {
+                institution_space.update_attributes(recordings_disk_quota: 101,
+                                                    recordings_disk_used: 100)
+                institution_user.update_attributes(recordings_disk_quota: 100,
+                                                    recordings_disk_used: 100)
+                space.update_attributes(institution: institution_space)
+                institution_user.add_member!(user)
+              }
+              it { should be_able_to(:record_meeting, target) }
+            end
           end
 
           context "when the owner is disabled" do
@@ -265,6 +319,40 @@ describe BigbluebuttonRoom do
           context "with permission to record" do
             before { user.update_attributes(:can_record => true) }
             it { should be_able_to(:record_meeting, target) }
+
+            context "in an institution that exceeded its disk quota" do
+              let(:institution) { FactoryGirl.create(:institution) }
+              before {
+                institution.update_attributes(recordings_disk_quota: 100,
+                                              recordings_disk_used: 100)
+                space.update_attributes(institution: institution)
+              }
+              it { should_not be_able_to(:record_meeting, target) }
+            end
+
+            context "in an institution that did not exceed its disk quota" do
+              let(:institution) { FactoryGirl.create(:institution) }
+              before {
+                institution.update_attributes(recordings_disk_quota: 101,
+                                              recordings_disk_used: 100)
+                space.update_attributes(institution: institution)
+              }
+              it { should be_able_to(:record_meeting, target) }
+            end
+
+            context "when the user's institution exceeded the quota, but the space's institution didn't" do
+              let(:institution_user) { FactoryGirl.create(:institution) }
+              let(:institution_space) { FactoryGirl.create(:institution) }
+              before {
+                institution_space.update_attributes(recordings_disk_quota: 101,
+                                                    recordings_disk_used: 100)
+                institution_user.update_attributes(recordings_disk_quota: 100,
+                                                    recordings_disk_used: 100)
+                space.update_attributes(institution: institution_space)
+                institution_user.add_member!(user)
+              }
+              it { should be_able_to(:record_meeting, target) }
+            end
           end
 
           context "when the owner is disabled" do

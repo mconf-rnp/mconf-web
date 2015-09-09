@@ -64,17 +64,17 @@ pt-br:
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
       disk_used: "%{used} ocupados de %{quota}"
-      recordings_disk_used: Ocupação do disco por gravações
       no_user_limit: "sem limite"
+      recordings_disk_used: Espaço em disco usado por gravações
+      spaces:
+        zero: 0 comunidades
+        one: 1 comunidade
+        other: "%{count} comunidades"
       users:
         zero: 0 membros
         one: 1 membro
         other: "%{count} membros"
       user_limit: "máximo: %{limit}"
-      spaces:
-        zero: 0 comunidades
-        one: 1 comunidade
-        other: "%{count} comunidades"
     institutions:
       create: "Criar uma nova instituição"
     menu:
