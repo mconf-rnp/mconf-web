@@ -61,6 +61,8 @@ en:
         other: "%{count} members can record"
       can_record_limit: "maximum: %{limit}"
       destroy: "Remove institution"
+      disk_used: "%{used} used of %{quota}"
+      recordings_disk_used: Recordings disk used
       no_user_limit: "no maximum"
       users:
         zero: 0 members

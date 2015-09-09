@@ -19,6 +19,7 @@
   = f.input :available, :as => :boolean, :disabled => !editing
   = f.input :start_time, :disabled => !editing
   = f.input :end_time, :disabled => !editing
+  = f.input :size, :disabled => true, input_html: { value: human_file_size(@recording.size) }
 
   %label= BigbluebuttonRecording.human_attribute_name(:metadata)
   #recording-metadata

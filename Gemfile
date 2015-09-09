@@ -105,6 +105,7 @@ gem 'zip-zip' # will load compatibility for old rubyzip API.
 gem 'prism'
 
 gem 'fineuploader-rails', '~> 3.3'
+gem 'filesize'
 
 gem 'resque-lock-timeout'
 

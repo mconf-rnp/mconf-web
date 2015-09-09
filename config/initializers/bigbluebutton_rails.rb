@@ -76,4 +76,8 @@ Rails.application.config.to_prepare do
     }
   end
 
+  BigbluebuttonRecording.instance_eval do
+    include UpdateInstitutionRecordingsDisk
+  end
+
 end

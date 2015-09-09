@@ -10,6 +10,8 @@
       = f.input :force_shib_login
       = f.input :require_space_approval
       = f.input :forbid_user_space_creation
+      = f.input :recordings_disk_quota, as: :string, input_html: { value: human_file_size(@institution.recordings_disk_quota) }
+      = f.input :recordings_disk_used, :disabled => true, input_html: { value: human_file_size(@institution.recordings_disk_used) }
 
   .modal-footer
     = f.button :wrapped, :cancel_modal => true, :value => button_name, :class => "btn btn-primary"

@@ -16,6 +16,8 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
+  before_validation :adjust_recordings_disk_quota
+
   def self.roles
     ['User', 'Admin'].map { |r| Role.find_by_name(r) }
   end
@@ -97,6 +99,57 @@ class Institution < ActiveRecord::Base
   def user_role user
     p = Permission.where(:user_id => user.id, :subject_type => 'Institution').first
     p.role.name unless p.nil? or p.role.nil?
+  end
+
+  # Call this to query all recordings belonging to this institution (users and spaces)
+  # and get a sum of their sizes in the 'recordings_disk_used' field
+  def update_recordings_disk_used!
+    room_ids = BigbluebuttonRoom.where(owner_id: spaces.with_disabled.ids, owner_type: 'Space').ids |
+            BigbluebuttonRoom.where(owner_id: users.with_disabled.ids, owner_type: 'User').ids
+
+    recordings = BigbluebuttonRecording.where(room_id: room_ids)
+    update_attribute(:recordings_disk_used, recordings.sum(:size))
+  end
+
+  # Simple method to see if the recordings size exceeded the quota
+  # Don't treat this as an exact limit, because it will likely be exceeded
+  # by the last recording before the quota is still valid
+  def exceeded_disk_quota?
+    return false if recordings_disk_quota.to_i == 0 # quota == 0 means unlimited
+
+    recordings_disk_used.to_i >= recordings_disk_quota.to_i
+  end
+
+  # Returns a number ideally between 0..1 describing the
+  # disk usage ratio for the institution
+  # Could be > 1 if one big recording broke limit
+  # If the quota is unlimited (0) this value is also 0 but should be irrelevant
+  def disk_usage_ratio
+    return 0 if recordings_disk_quota.to_i == 0
+
+    recordings_disk_used.to_f / recordings_disk_quota.to_f
+  end
+
+  private
+
+  def adjust_recordings_disk_quota
+    if recordings_disk_quota_changed?
+
+      if is_number?(self.recordings_disk_quota)
+        # express size in bytes if a number without units was present
+        write_attribute(:recordings_disk_quota, Filesize.from("#{self.recordings_disk_quota} B").to_i)
+      elsif is_filesize?(self.recordings_disk_quota)
+        write_attribute(:recordings_disk_quota, Filesize.from(self.recordings_disk_quota).to_i)
+      end
+    end
+  end
+
+  def is_number? n
+    Float(n) rescue nil
+  end
+
+  def is_filesize? n
+    Filesize.parse(n)[:type].present?
   end
 
 end

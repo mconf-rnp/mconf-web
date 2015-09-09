@@ -8,6 +8,8 @@ pt-br:
         force_shib_login: Somente login via federação
         identifier: Identificador
         name: Nome
+        recordings_disk_quota: Quota de disco para gravações
+        recordings_disk_used: Espaço ocupado por gravações
         require_space_approval: "Moderação de comunidades"
         user_limit: Máximo de membros
       space:
@@ -61,6 +63,8 @@ pt-br:
         other: "%{count} membros podem gravar"
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
+      disk_used: "%{used} ocupados de %{quota}"
+      recordings_disk_used: Ocupação do disco por gravações
       no_user_limit: "sem limite"
       users:
         zero: 0 membros

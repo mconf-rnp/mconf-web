@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20150824200913) do
     t.datetime "updated_at"
     t.text     "description"
     t.integer  "meeting_id"
+    t.integer  "size",        default: 0
   end
 
   add_index "bigbluebutton_recordings", ["recordid"], name: "index_bigbluebutton_recordings_on_recordid", unique: true, using: :btree
@@ -181,6 +182,8 @@ ActiveRecord::Schema.define(version: 20150824200913) do
     t.boolean  "force_shib_login",           default: false
     t.boolean  "require_space_approval",     default: false
     t.boolean  "forbid_user_space_creation", default: false
+    t.string   "recordings_disk_used",       default: "0"
+    t.string   "recordings_disk_quota",      default: "0"
   end
 
   create_table "invitations", force: true do |t|

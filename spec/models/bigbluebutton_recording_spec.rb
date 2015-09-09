@@ -8,6 +8,32 @@ require "spec_helper"
 
 describe BigbluebuttonRecording do
 
+  describe "update institution disk size after CREATING a recording" do
+    let(:owner) { FactoryGirl.create(:space) }
+    let(:room) { FactoryGirl.create(:bigbluebutton_room, owner: owner) }
+    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server) }
+
+    before {
+      allow(owner.institution).to receive(:update_recordings_disk_used!)
+    }
+
+    it { owner.institution.recordings_disk_used.to_i.should eq(0) }
+  end
+
+  describe "update institution disk size after UPDATING a recording" do
+    let(:owner) { FactoryGirl.create(:space) }
+    let(:room) { FactoryGirl.create(:bigbluebutton_room, owner: owner) }
+    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server) }
+
+    before {
+      allow(owner.institution).to receive(:update_recordings_disk_used!).at_least(:once).and_call_original
+      recording.update_attributes size: 100
+    }
+
+    it { owner.institution.recordings_disk_used.to_i.should eq(100) }
+  end
+
+
   # This is a model from BigbluebuttonRails, but we have permissions set in cancan for it,
   # so we test them here.
   describe "abilities", :abilities => true do
@@ -32,7 +58,7 @@ describe BigbluebuttonRecording do
       end
 
       context "in a public space" do
-        let(:space) { FactoryGirl.create(:space, :public => true) }
+        let(:space) { FactoryGirl.create(:space_with_associations, :public => true) }
         let(:target) { FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room) }
 
         context "he doesn't belong to" do

@@ -22,3 +22,13 @@
           = '(' + t('.can_record_limit', :limit => institution.can_record_limit) + ')'
       .institution-spaces
         = link_to t('.spaces', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)
+
+      - if institution.recordings_disk_quota.to_i != 0
+        .institution-disk
+
+          = t('.recordings_disk_used')
+          %p.progress-label
+            = t('.disk_used', used: human_file_size(institution.recordings_disk_used), quota: human_file_size(institution.recordings_disk_quota))
+
+          .progress.short-progress
+            .bar{role: 'progressbar', :'aria-valuemin' => '0', :'aria-valuemax' => '1.0', :'aria-valuenow' => institution.disk_usage_ratio, style: "width: #{(institution.disk_usage_ratio * 100)}%;"}
