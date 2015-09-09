@@ -41,18 +41,56 @@ describe UserNotificationsWorker do
 
       context "notifies admins when users need approval" do
 
-        context "for multiple admins and multiple users" do
+        context "for multiple global admins and multiple users" do
           let!(:admin1) { FactoryGirl.create(:superuser) }
           let!(:admin2) { FactoryGirl.create(:superuser) }
-          let!(:user1) { FactoryGirl.create(:user, approved: false) }
-          let!(:user2) { FactoryGirl.create(:user, approved: false) }
-          let(:admin_ids) { User.where(superuser: true).pluck(:id) }
+          let!(:user1) { FactoryGirl.create(:user, approved: false, institution: nil) }
+          let!(:user2) { FactoryGirl.create(:user, approved: false, institution: nil) }
+          let(:admin_ids) { User.where(superuser: true).ids }
 
           before(:each) { worker.perform }
 
           it { expect(UserNeedsApprovalSenderWorker).to have_queue_size_of(2) }
           it { expect(UserNeedsApprovalSenderWorker).to have_queued(user1.id, admin_ids) }
           it { expect(UserNeedsApprovalSenderWorker).to have_queued(user2.id, admin_ids) }
+        end
+
+        context "for institution admins and multiple users" do
+          let!(:user1) { FactoryGirl.create(:user, approved: false) }
+          let!(:user2) { FactoryGirl.create(:user, approved: false) }
+          let(:institution1) { user1.institution }
+          let(:institution2) { user2.institution }
+
+          before(:each) {
+            institution1.add_member!(FactoryGirl.create(:user), 'Admin')
+            institution2.add_member!(FactoryGirl.create(:user), 'Admin')
+
+            worker.perform
+          }
+
+          it { expect(UserNeedsApprovalSenderWorker).to have_queue_size_of(2) }
+          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user1.id, user1.institution.admin_ids) }
+          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user2.id, user2.institution.admin_ids) }
+        end
+
+        context "for institution admins and global when institution has no admin" do
+          let!(:admin) { FactoryGirl.create(:superuser) }
+          let!(:user1) { FactoryGirl.create(:user, approved: false) }
+          let!(:user2) { FactoryGirl.create(:user, approved: false) }
+          let(:institution1) { user1.institution }
+          let(:institution2) { user2.institution }
+          let(:global_admins) { User.where(superuser: true).ids }
+
+          before(:each) {
+            institution1.add_member!(FactoryGirl.create(:user), 'Admin')
+            institution1.add_member!(FactoryGirl.create(:user), 'Admin')
+
+            worker.perform
+          }
+
+          it { expect(UserNeedsApprovalSenderWorker).to have_queue_size_of(2) }
+          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user1.id, user1.institution.admin_ids) }
+          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user2.id, global_admins) }
         end
 
         context "ignores users not approved but that already had their notification sent" do
