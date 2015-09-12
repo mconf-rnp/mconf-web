@@ -98,6 +98,13 @@ describe UsersController do
     it { should_authorize an_instance_of(User), :update, via: :post, id: FactoryGirl.create(:user).to_param, user: {} }
 
     context "params_handling" do
+
+      # break this in the cases below
+      skip "a user updating himself"
+      skip "a user updating another user"
+      skip "a superuser updating himself"
+      skip "a superuser updating another user"
+
       let(:user) { FactoryGirl.create(:user) }
       let(:user_attributes) { FactoryGirl.attributes_for(:user) }
       let(:params) {
@@ -110,8 +117,7 @@ describe UsersController do
       }
 
       let(:user_allowed_params) {
-        [ :remember_me, :login, :approved, :disabled,
-          :timezone, :can_record, :receive_digest, :expanded_post,
+        [ :remember_me, :login, :timezone, :receive_digest, :expanded_post,
           :password, :password_confirmation, :current_password ]
       }
       before {
@@ -445,130 +451,182 @@ describe UsersController do
       it { should redirect_to login_path }
     end
 
-    describe "setting :can_record" do
-      before(:each) { @institution = FactoryGirl.create(:institution, :can_record_limit => 1) }
+    describe "with institutions" do
+      describe "setting :can_record" do
+        before(:each) { @institution = FactoryGirl.create(:institution, :can_record_limit => 1) }
 
-      context "a superuser" do
-        before(:each) { sign_in FactoryGirl.create(:superuser) }
+        context "a superuser" do
+          before(:each) { sign_in FactoryGirl.create(:superuser) }
 
-        context "can set to true if the institution has free slots" do
-          before(:each) do
-            @user = FactoryGirl.create(:user, :can_record => false)
-            @institution.add_member!(@user, "User")
+          context "can set to true if the institution has free slots" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, :can_record => false)
+              @institution.add_member!(@user, "User")
 
-            put :update, :id => @user.to_param, :user => { :can_record => true }
+              put :update, :id => @user.to_param, :user => { :can_record => true }
+            end
+
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { @user.reload.can_record.should be(true) }
           end
 
-          it { should redirect_to edit_user_path(@user) }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { @user.reload.can_record.should be(true) }
+          context "can set to true if the institution doesn't have free slots" do
+            before(:each) do
+              FactoryGirl.create(:user, :institution => @institution, :can_record => true)
+              @user = FactoryGirl.create(:user, :can_record => false)
+              @institution.add_member!(@user, "User")
+
+              put :update, :id => @user.to_param, :user => { :can_record => true }
+            end
+
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { @user.reload.can_record.should be(true) }
+            it { @institution.users_that_can_record.count.should > @institution.can_record_limit }
+          end
+
+          context "can set to false event if the institution doesn't have free slots" do
+            before(:each) do
+              FactoryGirl.create(:user, :institution => @institution, :can_record => true)
+              @user = FactoryGirl.create(:user, :can_record => true)
+              @institution.add_member!(@user, "User")
+
+              put :update, :id => @user.to_param, :user => { :can_record => false }
+            end
+
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { @user.reload.can_record.should be(false) }
+          end
         end
 
-        context "can set to true if the institution doesn't have free slots" do
+        context "an institutional admin" do
           before(:each) do
-            FactoryGirl.create(:user, :institution => @institution, :can_record => true)
-            @user = FactoryGirl.create(:user, :can_record => false)
-            @institution.add_member!(@user, "User")
+            @admin = FactoryGirl.create(:user)
+            @institution.add_member!(@admin, "Admin")
 
-            put :update, :id => @user.to_param, :user => { :can_record => true }
+            sign_in @admin
           end
 
-          it { should redirect_to edit_user_path(@user) }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { @user.reload.can_record.should be(true) }
-          it { @institution.users_that_can_record.count.should > @institution.can_record_limit }
+          context "can set to true if the institution has free slots" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, :can_record => false)
+              @institution.add_member!(@user, "User")
+
+              put :update, :id => @user.to_param, :user => { :can_record => true }
+            end
+
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { assigns(:user).can_record.should be(true) }
+          end
+
+          context "cannot set to true if the institution doesn't have free slots" do
+            before(:each) do
+              FactoryGirl.create(:user, :institution => @institution, :can_record => true)
+              @user = FactoryGirl.create(:user, :can_record => false)
+              @institution.add_member!(@user, "User")
+
+              put :update, :id => @user.to_param, :user => { :can_record => true }
+            end
+            it { should respond_with(:success) }
+            it { should render_template('edit') }
+            it { should render_with_layout('no_sidebar') }
+            it { should set_the_flash.to(I18n.t('users.update.error')) }
+            it {
+              expect(assigns(:user).errors.get(:can_record).length).to be(1)
+              expect(assigns(:user).errors.get(:can_record)).to include(I18n.t('users.update.can_record_reached_limit'))
+            }
+            it { assigns(:user).can_record.should be(false) }
+          end
+
+          context "can set to false even if the institution doesn't have free slots" do
+            before(:each) do
+              FactoryGirl.create(:user, :institution => @institution, :can_record => true)
+              @user = FactoryGirl.create(:user, :can_record => true)
+              @institution.add_member!(@user, "User")
+
+              put :update, :id => @user.to_param, :user => { :can_record => false }
+            end
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { assigns(:user).can_record.should be(false) }
+          end
         end
 
-        context "can set to false event if the institution doesn't have free slots" do
-          before(:each) do
-            FactoryGirl.create(:user, :institution => @institution, :can_record => true)
-            @user = FactoryGirl.create(:user, :can_record => true)
-            @institution.add_member!(@user, "User")
+        context "a normal user" do
+          context "cannot set it to himself" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, :institution => @institution, :can_record => false)
+              sign_in @user
 
-            put :update, :id => @user.to_param, :user => { :can_record => false }
+              put :update, :id => @user.to_param, :user => { :can_record => true }
+            end
+            it { should respond_with(:success) }
+            it { should render_template('edit') }
+            it { should render_with_layout('no_sidebar') }
+            it { should set_the_flash.to(I18n.t('users.update.error')) }
+            it {
+              expect(assigns(:user).errors.get(:can_record).length).to be(1)
+              expect(assigns(:user).errors.get(:can_record)).to include(I18n.t('users.update.can_record_reached_limit'))
+            }
+            it { assigns(:user).can_record.should be(false) }
           end
-
-          it { should redirect_to edit_user_path(@user) }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { @user.reload.can_record.should be(false) }
         end
       end
 
-      context "an institutional admin" do
-        before(:each) do
-          @admin = FactoryGirl.create(:user)
-          @institution.add_member!(@admin, "Admin")
+      describe "setting :approved" do
+        before(:each) { @institution = FactoryGirl.create(:institution) }
 
-          sign_in @admin
-        end
-
-        context "can set to true if the institution has free slots" do
+        context "an institutional admin" do
           before(:each) do
-            @user = FactoryGirl.create(:user, :can_record => false)
-            @institution.add_member!(@user, "User")
+            @admin = FactoryGirl.create(:user)
+            @institution.add_member!(@admin, "Admin")
 
-            put :update, :id => @user.to_param, :user => { :can_record => true }
+            sign_in @admin
           end
 
-          it { should redirect_to edit_user_path(@user) }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { assigns(:user).can_record.should be(true) }
-        end
+          context "can set it for users of his institution" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, approved: true)
+              @institution.add_member!(@user)
+              put :update, :id => @user.to_param, :user => { approved: false }
+            end
 
-        context "cannot set to true if the institution doesn't have free slots" do
-          before(:each) do
-            FactoryGirl.create(:user, :institution => @institution, :can_record => true)
-            @user = FactoryGirl.create(:user, :can_record => false)
-            @institution.add_member!(@user, "User")
-
-            put :update, :id => @user.to_param, :user => { :can_record => true }
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { @user.reload.approved.should be(false) }
           end
-          it { should respond_with(:success) }
-          it { should render_template('edit') }
-          it { should render_with_layout('no_sidebar') }
-          it { should set_the_flash.to(I18n.t('users.update.error')) }
-          it {
-            expect(assigns(:user).errors.get(:can_record).length).to be(1)
-            expect(assigns(:user).errors.get(:can_record)).to include(I18n.t('users.update.can_record_reached_limit'))
-          }
-          it { assigns(:user).can_record.should be(false) }
-        end
-
-        context "can set to false even if the institution doesn't have free slots" do
-          before(:each) do
-            FactoryGirl.create(:user, :institution => @institution, :can_record => true)
-            @user = FactoryGirl.create(:user, :can_record => true)
-            @institution.add_member!(@user, "User")
-
-            put :update, :id => @user.to_param, :user => { :can_record => false }
-          end
-          it { should redirect_to edit_user_path(@user) }
-          it { should set_the_flash.to(I18n.t('user.updated')) }
-          it { assigns(:user).can_record.should be(false) }
         end
       end
 
-      context "a normal user" do
-        context "cannot set it to himself" do
-          before(:each) do
-            @user = FactoryGirl.create(:user, :institution => @institution, :can_record => false)
-            sign_in @user
+      describe "setting :disabled" do
+        before(:each) { @institution = FactoryGirl.create(:institution) }
 
-            put :update, :id => @user.to_param, :user => { :can_record => true }
+        context "an institutional admin" do
+          before(:each) do
+            @admin = FactoryGirl.create(:user)
+            @institution.add_member!(@admin, "Admin")
+
+            sign_in @admin
           end
-          it { should respond_with(:success) }
-          it { should render_template('edit') }
-          it { should render_with_layout('no_sidebar') }
-          it { should set_the_flash.to(I18n.t('users.update.error')) }
-          it {
-            expect(assigns(:user).errors.get(:can_record).length).to be(1)
-            expect(assigns(:user).errors.get(:can_record)).to include(I18n.t('users.update.can_record_reached_limit'))
-          }
-          it { assigns(:user).can_record.should be(false) }
+
+          context "can set it for users of his institution" do
+            before(:each) do
+              @user = FactoryGirl.create(:user, disabled: false)
+              @institution.add_member!(@user)
+              put :update, :id => @user.to_param, :user => { disabled: true }
+            end
+
+            it { should redirect_to edit_user_path(@user) }
+            it { should set_the_flash.to(I18n.t('user.updated')) }
+            it { @user.reload.disabled.should be(true) }
+          end
         end
       end
+
     end
-
   end
 
   describe "#destroy" do

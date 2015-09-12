@@ -1143,7 +1143,7 @@ describe Space do
 
           it {
             allowed = [:create, :new, :select, :show, :index, :destroy, :edit, :update, :user_permissions,
-                       :webconference_options, :webconference, :recordings]
+                       :webconference_options, :webconference, :recordings, :show_news]
             should_not be_able_to_do_anything_to(target).except(allowed)
           }
         end

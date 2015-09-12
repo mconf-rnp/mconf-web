@@ -287,9 +287,11 @@ class UsersController < ApplicationController
     allowed += [:superuser] if current_user.superuser? && current_user != @user
     allowed += [:institution_id] if current_user.superuser?
 
-    # institution admins
-    if is_institution_admin? && params[:action] == 'create'
-      allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
+    if is_institution_admin?
+      allowed += [:can_record, :approved, :disabled]
+      if params[:action] == 'create'
+        allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
+      end
     end
 
     allowed
