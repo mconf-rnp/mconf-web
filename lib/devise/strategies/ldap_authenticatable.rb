@@ -84,15 +84,12 @@ module Devise
                   Rails.logger.error "LDAP: authentication failed: application wasn't able to create a new user"
                   fail(I18n.t('devise.strategies.ldap_authenticatable.create_failed'))
                 else
-                  if user.active_for_authentication?
-                    ldap_helper.set_user_institution(user, ldap_user.first, configs)
-                    ldap_helper.sign_user_in(user)
-                    success!(user)
-                  else
-                    # throw the not_approved error that will take the user to the pending approval page
-                    throw(:warden, message: :not_approved)
-                  end
-
+                  # if user.active_for_authentication?
+                  # We don't check authentication here, let devise find out about an
+                  # unapproved user later and show the errors there
+                  ldap_helper.set_user_institution(user, ldap_user.first, configs)
+                  ldap_helper.sign_user_in(user)
+                  success!(user)
                 end
               end
             end
