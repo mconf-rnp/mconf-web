@@ -10,10 +10,8 @@ class SpaceNotificationsWorker < BaseWorker
   @queue = :space_notifications
 
   def self.perform
-    if Site.current.require_space_approval
-      notify_admins_of_spaces_pending_approval
-      notify_space_admins_after_approved
-    end
+    notify_admins_of_spaces_pending_approval
+    notify_space_admins_after_approved
   end
 
   # Gets all spaces that were created and need approval, then schedules a worker to notify the global admins
@@ -22,14 +20,23 @@ class SpaceNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where(trackable_type: 'Space', notified: [nil, false], key: 'space.create')
 
-    recipients = User.where(superuser: true).ids
-    unless recipients.empty?
-      activities.each do |activity|
-        # If space has already been approved, we don't need to send the notification.
-        space = Space.find_by(id: activity.trackable_id)
-        if space.blank? || space.approved?
-          activity.update_attribute(:notified, true)
-        else
+    global_admins = User.where(superuser: true).ids
+
+    activities.each do |activity|
+      # If space has already been approved or doesn't require approval,
+      # we don't need to send the notification.
+      space = Space.find_by(id: activity.trackable_id)
+      if space.try(:approved?) || !space.try(:require_approval?)
+        activity.update_attribute(:notified, true)
+      elsif space
+        recipients = []
+        if space.institution.present? && !space.institution.admin_ids.empty?
+          recipients = space.institution.admin_ids
+        elsif !global_admins.empty?
+          recipients = global_admins
+        end
+
+        if recipients.any?
           Resque.enqueue(SpaceNeedsApprovalSenderWorker, activity.id, recipients)
         end
       end

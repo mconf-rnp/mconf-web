@@ -27,19 +27,25 @@ class UserNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where(trackable_type: 'User', notified: [nil, false], key: 'user.created')
 
-    recipients = User.where(superuser: true).pluck(:id)
-    unless recipients.empty?
-      activities.each do |activity|
-        # If user has already been approved, we don't need to send the notification.
-        # That covers situations where the user is a superuser and also when the
-        # user was automatically approved.
-        user = User.find_by(id: activity.trackable_id)
-        if user
-          if user.approved?
-            activity.update_attribute(:notified, true)
-          else
-            Resque.enqueue(UserNeedsApprovalSenderWorker, activity.id, recipients)
-          end
+    global_admins = User.where(superuser: true).ids
+
+    activities.each do |activity|
+      # If user has already been approved, we don't need to send the notification.
+      # That covers situations where the user is a superuser and also when the
+      # user was automatically approved.
+      user = User.find_by(id: activity.trackable_id)
+      if user.try(:approved?)
+        activity.update_attribute(:notified, true)
+      elsif user
+        recipients = []
+        if user.institution.present? && !user.institution.admin_ids.empty?
+          recipients = user.institution.admin_ids
+        elsif !global_admins.empty?
+          recipients = global_admins
+        end
+
+        if recipients.any?
+          Resque.enqueue(UserNeedsApprovalSenderWorker, activity.id, recipients)
         end
       end
     end

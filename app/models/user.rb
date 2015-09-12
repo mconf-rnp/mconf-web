@@ -84,29 +84,6 @@ class User < ActiveRecord::Base
   after_create :set_institution
   after_update :set_institution
 
-  after_create :send_admin_approval_mail, if: :require_approval?
-  def send_admin_approval_mail
-    if !approved?
-      if self.institution
-        admins = self.institution.admins
-      else
-        admins = User.where(:superuser => true)
-      end
-      admins.each do |admin|
-        AdminMailer.new_user_waiting_for_approval(admin.id, self.id).deliver
-      end
-    end
-  end
-
-  after_update :send_user_approved_mail, if: :require_approval?
-  def send_user_approved_mail
-    if approved_changed? && approved?
-      AdminMailer.new_user_approved(self.id).deliver
-    end
-  end
-
-  before_create :automatically_approve, unless: :require_approval?
-
   before_destroy :before_disable_and_destroy, prepend: true
 
   default_scope { where(disabled: false) }

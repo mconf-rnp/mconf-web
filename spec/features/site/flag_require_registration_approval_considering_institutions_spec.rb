@@ -43,21 +43,6 @@ feature 'Behaviour of the flag Site#require_registration_approval considering in
           mail.body.encoded.should_not match(/http.*users\/confirmation*/)
           mail.body.encoded.should match(t('devise.mailer.confirmation_instructions.confirmation_pending'))
         end
-
-        it "sends an email to each institutional admin", with_truncation: true do
-          [inst_admin, inst_admin2].each do |admin|
-            subject = t('admin_mailer.new_user_waiting_for_approval.subject')
-            mail = email_by_subject_and_receiver subject, admin.email
-            mail.should_not be_nil
-          end
-        end
-
-        it "doesn't send emails to global admins", with_truncation: true do
-          ActionMailer::Base.deliveries.each do |mail|
-            mail.to.should_not eql([User.where(superuser: true).first.email])
-          end
-        end
-
        end
 
       context "signing in via shibboleth for the first time, generating a new account" do
@@ -80,20 +65,6 @@ feature 'Behaviour of the flag Site#require_registration_approval considering in
         it "doesn't a confirmation email to the user", with_truncation: true do
           mail = email_by_subject t('devise.mailer.confirmation_instructions.subject')
           mail.should be_nil
-        end
-
-        it "sends an email to each institutional admin", with_truncation: true do
-          [inst_admin, inst_admin2].each do |admin|
-            subject = t('admin_mailer.new_user_waiting_for_approval.subject')
-            mail = email_by_subject_and_receiver subject, admin.email
-            mail.should_not be_nil
-          end
-        end
-
-        it "doesn't send emails to global admins", with_truncation: true do
-          ActionMailer::Base.deliveries.each do |mail|
-            mail.to.should_not eql([User.where(superuser: true).first.email])
-          end
         end
 
       end

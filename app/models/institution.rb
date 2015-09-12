@@ -9,6 +9,9 @@ class Institution < ActiveRecord::Base
 
   has_many :users, :through => :permissions
 
+  has_and_belongs_to_many :admins, -> { Permission.where(:permissions => {:subject_type => 'Institution', :role_id => Role.find_by_name('Admin')}) },
+   :join_table => :permissions, :class_name => "User", :foreign_key => "subject_id"
+
   has_many :spaces
 
   extend FriendlyId
@@ -62,10 +65,6 @@ class Institution < ActiveRecord::Base
 
   def can_record_full?
     !can_record_limit.nil? && (users_that_can_record.count >= can_record_limit)
-  end
-
-  def admins
-    permissions.where(:role_id => Role.find_by_name('Admin').id).map(&:user)
   end
 
   def add_member! u, role = 'User'
