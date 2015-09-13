@@ -180,8 +180,8 @@ ActiveRecord::Schema.define(version: 20150903182639) do
     t.integer  "can_record_limit"
     t.text     "identifier"
     t.boolean  "force_shib_login",           default: false
-    t.boolean  "require_space_approval",     default: false
-    t.boolean  "forbid_user_space_creation", default: false
+    t.boolean  "require_space_approval",     default: true
+    t.boolean  "forbid_user_space_creation", default: true
     t.string   "recordings_disk_used",       default: "0"
     t.string   "recordings_disk_quota",      default: "0"
   end
