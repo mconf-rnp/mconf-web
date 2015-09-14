@@ -95,7 +95,68 @@ describe InstitutionsController do
     end
   end
 
-  it "#update"
+  describe "#update" do
+    it { should_authorize an_instance_of(Institution), :update, via: :post,id: FactoryGirl.create(:institution).to_param, institution: {} }
+
+    let(:institution) { FactoryGirl.create(:institution) }
+    let(:attrs) { FactoryGirl.attributes_for(:institution) }
+    let(:params) {
+      {
+        id: institution.to_param,
+        controller: "institution",
+        action: "update",
+        institution: attrs
+      }
+    }
+
+    let(:allowed_params) {
+      [ :acronym, :name, :user_limit, :can_record_limit, :identifier, :force_shib_login,
+      :require_space_approval, :forbid_user_space_creation, :recordings_disk_quota ]
+    }
+
+    before {
+      attrs.stub(:permit).and_return(attrs)
+      controller.stub(:params).and_return(params)
+    }
+
+    context "when user is a global admin" do
+      let(:user) { FactoryGirl.create(:superuser) }
+
+      before(:each) {
+        sign_in(user)
+        put :update, id: institution.to_param, institution: attrs
+      }
+      it { attrs.should have_received(:permit).with(*allowed_params) }
+      it { should redirect_to(manage_institutions_path) }
+    end
+
+    context "when the user is an institution admin" do
+      let(:user) { FactoryGirl.create(:user) }
+
+      before(:each) {
+        sign_in(user)
+        expect {
+          put :update, id: institution.to_param, institution: attrs
+        }.to raise_error(CanCan::AccessDenied)
+      }
+
+      it { institution }
+    end
+
+    context "when the user is normal user" do
+      let(:user) { FactoryGirl.create(:user) }
+
+      before(:each) {
+        sign_in(user)
+        expect {
+          put :update, id: institution.to_param, institution: attrs
+        }.to raise_error(CanCan::AccessDenied)
+      }
+
+      it { institution }
+    end
+
+  end
 
   describe "#edit" do
     let(:institution) { FactoryGirl.create(:institution) }

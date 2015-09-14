@@ -9,7 +9,11 @@ module InstitutionsHelper
   # Human readable file size approximating to
   # the largest unit. Assumes 0 as the size if nil
   def human_file_size bytes=0
-    Filesize.from("#{bytes} B").pretty
+    begin
+      Filesize.from("#{bytes} B").pretty
+    rescue ArgumentError
+      bytes
+    end
   end
 
 end

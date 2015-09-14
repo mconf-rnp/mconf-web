@@ -139,6 +139,8 @@ class Institution < ActiveRecord::Base
         write_attribute(:recordings_disk_quota, Filesize.from("#{self.recordings_disk_quota} B").to_i)
       elsif is_filesize?(self.recordings_disk_quota)
         write_attribute(:recordings_disk_quota, Filesize.from(self.recordings_disk_quota).to_i)
+      else
+        self.errors.add(:recordings_disk_quota, :invalid)
       end
     end
   end
