@@ -985,6 +985,66 @@ describe Space do
     end
   end
 
+  describe "#require_approval?" do
+
+    context "with site moderation enabled" do
+      before { Site.current.update_attributes(require_space_approval: true) }
+
+      context "without and institution" do
+        let(:space) { FactoryGirl.create(:space, institution: nil) }
+
+        it { space.require_approval?.should be(true) }
+      end
+
+      context "with an institution" do
+        let(:space) { FactoryGirl.create(:space) }
+
+        context "which moderates spaces" do
+          before { space.institution.update_attributes(require_space_approval: true) }
+
+          it { space.require_approval?.should be(true) }
+        end
+
+        context "which doesn't moderate spaces" do
+          before { space.institution.update_attributes(require_space_approval: false) }
+
+          it { space.require_approval?.should be(false) }
+        end
+
+      end
+
+    end
+
+    context "with site moderation disabled" do
+      before { Site.current.update_attributes(require_space_approval: false) }
+
+      context "without and institution" do
+        let(:space) { FactoryGirl.create(:space, institution: nil) }
+
+        it { space.require_approval?.should be(false) }
+      end
+
+      context "with an institution" do
+        let(:space) { FactoryGirl.create(:space) }
+
+        context "which moderates spaces" do
+          before { space.institution.update_attributes(require_space_approval: true) }
+
+          it { space.require_approval?.should be(true) }
+        end
+
+        context "which doesn't moderate spaces" do
+          before { space.institution.update_attributes(require_space_approval: false) }
+
+          it { space.require_approval?.should be(false) }
+        end
+
+      end
+
+    end
+
+  end
+
   describe "abilities", :abilities => true do
     set_custom_ability_actions([:leave, :enable, :webconference, :select, :disable, :update_logo,
       :user_permissions, :edit_recording, :webconference_options, :recordings,
@@ -1229,14 +1289,57 @@ describe Space do
       context "if the creation of spaces is" do
         context "disabled" do
           before { Site.current.update_attributes(forbid_user_space_creation: true) }
-          it { should_not be_able_to(:create, Space) }
-          it { should_not be_able_to(:new, Space) }
+
+          context "without an institution for the user" do
+            before { user.update_attributes institution: nil }
+
+            it { should_not be_able_to(:create, Space) }
+            it { should_not be_able_to(:new, Space) }
+          end
+
+          context "with an institution" do
+            context "with space creation forbidden" do
+              before { user.institution.update_attributes(forbid_user_space_creation: true) }
+
+              it { should_not be_able_to(:create, Space) }
+              it { should_not be_able_to(:new, Space) }
+            end
+
+            context "with space creation allowed" do
+              before { user.institution.update_attributes(forbid_user_space_creation: false) }
+
+              it { should be_able_to(:create, Space) }
+              it { should be_able_to(:new, Space) }
+            end
+          end
         end
 
         context "enabled" do
           before { Site.current.update_attributes(forbid_user_space_creation: false) }
-          it { should be_able_to(:create, Space) }
-          it { should be_able_to(:new, Space) }
+
+          context "without an institution for the user" do
+            before { user.update_attributes institution: nil }
+
+            it { should be_able_to(:create, Space) }
+            it { should be_able_to(:new, Space) }
+          end
+
+          context "with an institution" do
+            context "with space creation forbidden" do
+              before { user.institution.update_attributes(forbid_user_space_creation: true) }
+
+              it { should_not be_able_to(:create, Space) }
+              it { should_not be_able_to(:new, Space) }
+            end
+
+            context "with space creation allowed" do
+              before { user.institution.update_attributes(forbid_user_space_creation: false) }
+
+              it { should be_able_to(:create, Space) }
+              it { should be_able_to(:new, Space) }
+            end
+          end
+
         end
       end
     end
