@@ -66,7 +66,6 @@ class Space < ActiveRecord::Base
   end
 
   belongs_to :institution
-  # attr_accessible :institution, :institution_id
 
   # for the associated BigbluebuttonRoom
   # attr_accessible :bigbluebutton_room_attributes
@@ -81,7 +80,11 @@ class Space < ActiveRecord::Base
     # Space institution or creator's institution (when called from create)
     institution = self.institution || created_by.try(:institution)
 
-    institution.try(:require_space_approval?) || Site.current.require_space_approval?
+    if institution
+      institution.require_space_approval?
+    else
+      Site.current.require_space_approval?
+    end
   end
 
   validates :description, :presence => true
