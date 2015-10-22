@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150903182639) do
+ActiveRecord::Schema.define(version: 20151020182042) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -91,15 +91,15 @@ ActiveRecord::Schema.define(version: 20150903182639) do
     t.string   "recordid"
     t.string   "meetingid"
     t.string   "name"
-    t.boolean  "published",   default: false
+    t.boolean  "published",             default: false
     t.datetime "start_time"
     t.datetime "end_time"
-    t.boolean  "available",   default: true
+    t.boolean  "available",             default: true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description"
     t.integer  "meeting_id"
-    t.integer  "size",        default: 0
+    t.integer  "size",        limit: 8, default: 0
   end
 
   add_index "bigbluebutton_recordings", ["recordid"], name: "index_bigbluebutton_recordings_on_recordid", unique: true, using: :btree
@@ -229,6 +229,7 @@ ActiveRecord::Schema.define(version: 20150903182639) do
     t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "new_account", default: false
   end
 
   add_index "ldap_tokens", ["identifier"], name: "index_ldap_tokens_on_identifier", unique: true, using: :btree

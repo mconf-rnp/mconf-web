@@ -116,6 +116,7 @@ group :development do
   gem 'brakeman', :require => false
   gem 'librarian-chef'
   gem 'mailcatcher'
+  gem 'xray-rails'
 
   # to show better error pages, with more information
   gem 'better_errors'
@@ -148,4 +149,5 @@ end
 group :test do
   gem 'resque_spec'
   gem 'database_cleaner'
+  gem 'webmock'
 end

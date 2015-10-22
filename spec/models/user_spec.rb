@@ -371,23 +371,6 @@ describe User do
 
   describe "on create" do
 
-    describe "#create_webconf_room" do
-      let(:user) { FactoryGirl.create(:user) }
-
-      context 'should create a new random dial number for the user room if site is configured' do
-        before { Site.current.update_attributes(room_dial_number_pattern: 'xxxxxx') }
-
-        it { user.bigbluebutton_room.dial_number.should be_present }
-        it { user.bigbluebutton_room.dial_number.size.should be(6) }
-      end
-
-      context 'should be nil if the site is not configured' do
-        before { Site.current.update_attributes(room_dial_number_pattern: nil) }
-
-        it { user.bigbluebutton_room.dial_number.should be_blank }
-      end
-    end
-
     describe "#automatically_approve_if_needed" do
       context "if #require_registration_approval is not set in the current site" do
         before { Site.current.update_attributes(require_registration_approval: false) }
@@ -805,7 +788,6 @@ describe User do
       it("sets #trackable") { subject.trackable.should eq(user) }
       it("sets #owner") { subject.owner.should eq(approver) }
       it("sets #key") { subject.key.should eq('user.approved') }
-      it("doesn't set #recipient") { subject.recipient.should be_nil }
     end
   end
 
@@ -1139,6 +1121,22 @@ describe User do
         before {
           Site.current.update_attributes(local_auth_enabled: true)
           FactoryGirl.create(:shib_token, user: target, new_account: false)
+        }
+        it { should be_able_to(:update_password, target) }
+      end
+
+      context "cannot edit the password if the account was created by LDAP" do
+        before {
+          Site.current.update_attributes(local_auth_enabled: true)
+          FactoryGirl.create(:ldap_token, user: target, new_account: true)
+        }
+        it { should_not be_able_to(:update_password, target) }
+      end
+
+      context "can edit the password if the account was not created by LDAP" do
+        before {
+          Site.current.update_attributes(local_auth_enabled: true)
+          FactoryGirl.create(:ldap_token, user: target, new_account: false)
         }
         it { should be_able_to(:update_password, target) }
       end
