@@ -12,7 +12,7 @@ describe 'Space admin in an unapproved space' do
 
   context "should not see these links" do
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space_with_associations, approved: false, repository: true) }
+    let(:space) { FactoryGirl.create(:space_with_associations, institution: nil, approved: false, repository: true) }
 
     before {
       Site.current.update_attributes(require_space_approval: true)
@@ -47,7 +47,7 @@ describe 'Space admin in an unapproved space' do
 
   context "make sure an admin on an approved space sees all the links" do
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space_with_associations, approved: true, repository: true) }
+    let(:space) { FactoryGirl.create(:space_with_associations, institution: nil, approved: true, repository: true) }
 
     before {
       space.add_member!(user, 'Admin')

@@ -14,7 +14,7 @@ feature 'User hits access denied errors' do
 
   context 'while accessing a public space which is unapproved' do
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space, approved: false, :public => true) }
+    let(:space) { FactoryGirl.create(:space, approved: false, institution: nil, :public => true) }
     before { Site.current.update_attributes(require_space_approval: true) }
     subject { page }
 
@@ -56,7 +56,7 @@ feature 'User hits access denied errors' do
       login_as(user, scope: :user)
     }
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space_with_associations, approved: false, public: false) }
+    let(:space) { FactoryGirl.create(:space_with_associations, institution: nil, approved: false, public: false) }
     subject { page }
 
     context 'as a member' do
@@ -81,7 +81,7 @@ feature 'User hits access denied errors' do
 
   context 'while accessing a private space' do
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space_with_associations, :public => false) }
+    let(:space) { FactoryGirl.create(:space_with_associations, institution: nil, :public => false) }
     subject { page }
 
     context 'and is logged out' do
@@ -115,7 +115,7 @@ feature 'User hits access denied errors' do
 
   context 'while accessing the edit page of a public space' do
     let(:user) { FactoryGirl.create(:user) }
-    let(:space) { FactoryGirl.create(:space_with_associations, public: true) }
+    let(:space) { FactoryGirl.create(:space_with_associations, institution: nil, public: true) }
     subject { page }
 
     context 'and is logged out' do

@@ -33,7 +33,7 @@
               = t(".private")
               = t('.with_members', :count => space.users.size)
 
-          - if current_site.require_space_approval? && !space.approved?
+          - if space.require_approval? && !space.approved?
             .space-waiting-moderation.resource-visibility.small
               = icon_waiting_moderation
               = t("_other.not_approved.text")
