@@ -127,11 +127,11 @@ module Mconf
 
       password = SecureRandom.hex(16)
       params = {
-        :username => username.parameterize,
-        :email => id,
-        :password => password,
-        :password_confirmation => password,
-        :_full_name => full_name
+        username: get_unique_login(username),
+        email: id,
+        password: password,
+        password_confirmation: password,
+        _full_name: full_name
       }
       user = User.new(params)
       user.skip_confirmation!
@@ -191,6 +191,13 @@ module Mconf
       RecentActivity.create(
         key: 'ldap.user.created', owner: token, trackable: user, notified: false
       )
+    end
+
+    # Returns an unique login according to the base login returned by LDAP.
+    # If there's no base login, returns nil. Otherwise will always return
+    # a login that doesn't exist yet.
+    def get_unique_login(base)
+      Mconf::Identifier.unique_mconf_id(base)
     end
 
   end
