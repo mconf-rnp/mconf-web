@@ -23,8 +23,8 @@ module Abilities
       # * Give permission to record (change the attribute `:can_record`)
       # * Manage users (generic, doesn't specify which attributes)
       # * Register new users
-      can [:edit, :update, :approve, :disapprove, :manage_user,
-           :give_recording_rights, :confirm, :update_password], User do |target|
+      can [:edit, :update, :approve, :disapprove, :give_recording_rights,
+           :confirm, :update_password], User do |target|
         target.institution.present? && !target.disabled &&
           target.institution.admins.include?(user)
       end

@@ -23,7 +23,7 @@ describe SpaceNotificationsWorker do
       context "notifies admins when spaces need approval" do
 
         context "for multiple global admins and a space with no institution" do
-          let(:space) { FactoryGirl.create(:space, approved: false) }
+          let(:space) { FactoryGirl.create(:space, institution: nil, approved: false) }
           let!(:space_admin) { FactoryGirl.create(:user, institution: nil) }
 
           let!(:admin1) { FactoryGirl.create(:superuser) }
@@ -43,8 +43,8 @@ describe SpaceNotificationsWorker do
         end
 
         context "for multiple spaces with institutions" do
-          let(:space_admin) { FactoryGirl.create(:user) }
-          let(:institution) { space_admin.institution }
+          let(:institution) { FactoryGirl.create(:institution, require_space_approval: true) }
+          let(:space_admin) { FactoryGirl.create(:user, institution: institution) }
 
           let(:space1) { FactoryGirl.create(:space, institution: institution, approved: false) }
           let(:space2) { FactoryGirl.create(:space, institution: institution, approved: false) }
@@ -70,9 +70,9 @@ describe SpaceNotificationsWorker do
         end
 
         context "for multiple spaces some with institutions, some don't" do
-          let!(:space_admin) { FactoryGirl.create(:user) }
+          let(:institution) { FactoryGirl.create(:institution, require_space_approval: true) }
+          let!(:space_admin) { FactoryGirl.create(:user, institution: institution) }
           let!(:space_admin_no_inst) { FactoryGirl.create(:user, institution: nil) }
-          let(:institution) { space_admin.institution }
 
           let(:space1) { FactoryGirl.create(:space, institution: institution, approved: false) }
           let(:space2) { FactoryGirl.create(:space, institution: nil, approved: false) }
@@ -100,8 +100,8 @@ describe SpaceNotificationsWorker do
 
         context "ignores space not approved but that already had their notification sent" do
           let!(:admin) { FactoryGirl.create(:user) }
-          let!(:space1) { FactoryGirl.create(:space, approved: false) }
-          let!(:space2) { FactoryGirl.create(:space, approved: false) }
+          let!(:space1) { FactoryGirl.create(:space, institution: nil, approved: false) }
+          let!(:space2) { FactoryGirl.create(:space, institution: nil, approved: false) }
           before {
             space1.add_member!(admin, 'Admin')
             space1.new_activity('create', admin)

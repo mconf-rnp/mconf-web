@@ -6,6 +6,9 @@
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 
+require 'codeclimate-test-reporter'
+CodeClimate::TestReporter.start
+
 require 'simplecov'
 SimpleCov.start if ENV["COVERAGE"]
 
@@ -41,6 +44,11 @@ Geocoder::Lookup::Test.set_default_stub(
 )
 
 BCrypt::Engine.cost = 4
+
+# Disable all external HTTP requests by default
+# Allow requests to codeclimate for reporinting code coverage
+require 'webmock/rspec'
+WebMock.disable_net_connect!(allow_localhost: true, allow: 'codeclimate.com')
 
 RSpec.configure do |config|
   # == Mock Framework
@@ -92,6 +100,7 @@ RSpec.configure do |config|
     ResqueSpec.reset!
     ActionMailer::Base.deliveries.clear
     Helpers.setup_site
+    Helpers.set_custom_ability_actions([])
     Capybara.current_driver = :webkit if example.metadata[:with_js]
   end
 

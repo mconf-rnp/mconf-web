@@ -24,7 +24,7 @@ def create_space_from_attrs attrs
 end
 
 feature "Creating a space" do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryGirl.create(:user, institution: nil) }
 
   context "as public" do
     let(:attrs) { FactoryGirl.attributes_for(:space, public: true) }

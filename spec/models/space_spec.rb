@@ -771,23 +771,6 @@ describe Space do
 
     context "creates #bigbluebutton_room" do
 
-      context 'intializes dial_number' do
-        let(:space) { FactoryGirl.create(:space_with_associations) }
-
-        context 'with a new random dial number if site is configured' do
-          before { Site.current.update_attributes(room_dial_number_pattern: 'xxxxx') }
-
-          it { space.bigbluebutton_room.dial_number.should be_present }
-          it { space.bigbluebutton_room.dial_number.size.should be(5) }
-        end
-
-        context 'with nil if the site is not configured' do
-          before { Site.current.update_attributes(room_dial_number_pattern: nil) }
-
-          it { space.bigbluebutton_room.dial_number.should be_blank }
-        end
-      end
-
       it "with the space as owner" do
         space.bigbluebutton_room.owner.should be(space)
       end
@@ -985,10 +968,70 @@ describe Space do
     end
   end
 
+  describe "#require_approval?" do
+
+    context "with site moderation enabled" do
+      before { Site.current.update_attributes(require_space_approval: true) }
+
+      context "without and institution" do
+        let(:space) { FactoryGirl.create(:space, institution: nil) }
+
+        it { space.require_approval?.should be(true) }
+      end
+
+      context "with an institution" do
+        let(:space) { FactoryGirl.create(:space) }
+
+        context "which moderates spaces" do
+          before { space.institution.update_attributes(require_space_approval: true) }
+
+          it { space.require_approval?.should be(true) }
+        end
+
+        context "which doesn't moderate spaces" do
+          before { space.institution.update_attributes(require_space_approval: false) }
+
+          it { space.require_approval?.should be(false) }
+        end
+
+      end
+
+    end
+
+    context "with site moderation disabled" do
+      before { Site.current.update_attributes(require_space_approval: false) }
+
+      context "without and institution" do
+        let(:space) { FactoryGirl.create(:space, institution: nil) }
+
+        it { space.require_approval?.should be(false) }
+      end
+
+      context "with an institution" do
+        let(:space) { FactoryGirl.create(:space) }
+
+        context "which moderates spaces" do
+          before { space.institution.update_attributes(require_space_approval: true) }
+
+          it { space.require_approval?.should be(true) }
+        end
+
+        context "which doesn't moderate spaces" do
+          before { space.institution.update_attributes(require_space_approval: false) }
+
+          it { space.require_approval?.should be(false) }
+        end
+
+      end
+
+    end
+
+  end
+
   describe "abilities", :abilities => true do
     set_custom_ability_actions([:leave, :enable, :webconference, :select, :disable, :update_logo,
       :user_permissions, :edit_recording, :webconference_options, :recordings,
-      :manage_join_requests, :show_news, :manage_news, :add])
+      :manage_join_requests, :show_news, :manage_news, :add, :index_event])
 
     subject { ability }
     let(:ability) { Abilities.ability_for(user) }
@@ -1076,7 +1119,7 @@ describe Space do
         let(:target) { FactoryGirl.create(:public_space) }
 
         context "he is not a member of" do
-          it { should_not be_able_to_do_anything_to(target).except([:show, :index, :webconference, :recordings, :create, :new, :select, :show_news]) }
+          it { should_not be_able_to_do_anything_to(target).except([:show, :index, :webconference, :recordings, :create, :new, :select, :show_news, :index_event]) }
         end
 
         context "he is a member of" do
@@ -1087,7 +1130,7 @@ describe Space do
                 list = [
                   :show, :index, :webconference, :recordings, :create, :new, :select, :edit,
                   :update, :update_logo, :disable, :user_permissions, :edit_recording,
-                  :webconference_options, :manage_join_requests, :show_news, :manage_news
+                  :webconference_options, :manage_join_requests, :show_news, :manage_news, :index_event
                 ]
                 should_not be_able_to_do_anything_to(target).except(list)
               }
@@ -1099,7 +1142,7 @@ describe Space do
                 list = [
                   :show, :index, :webconference, :recordings, :create, :new, :select, :leave, :edit,
                   :update, :update_logo, :disable, :user_permissions, :edit_recording,
-                  :webconference_options, :manage_join_requests, :show_news, :manage_news
+                  :webconference_options, :manage_join_requests, :show_news, :manage_news, :index_event
                 ]
                 should_not be_able_to_do_anything_to(target).except(list)
               }
@@ -1121,7 +1164,7 @@ describe Space do
             before { target.add_member!(user, "User") }
             it {
               should_not be_able_to_do_anything_to(target)
-                .except([:show, :index, :webconference, :recordings, :create, :new, :select, :leave, :show_news])
+                .except([:show, :index, :webconference, :recordings, :create, :new, :select, :leave, :show_news, :index_event])
             }
 
             context "when the space is not approved" do
@@ -1143,7 +1186,7 @@ describe Space do
 
           it {
             allowed = [:create, :new, :select, :show, :index, :destroy, :edit, :update, :user_permissions,
-                       :webconference_options, :webconference, :recordings, :show_news]
+                       :webconference_options, :webconference, :recordings, :show_news, :index_event]
             should_not be_able_to_do_anything_to(target).except(allowed)
           }
         end
@@ -1164,7 +1207,7 @@ describe Space do
                 list = [
                   :show, :index, :webconference, :recordings, :create, :new, :select, :edit,
                   :update, :update_logo, :disable, :user_permissions, :edit_recording,
-                  :webconference_options, :manage_join_requests, :show_news, :manage_news
+                  :webconference_options, :manage_join_requests, :show_news, :manage_news, :index_event
                 ]
                 should_not be_able_to_do_anything_to(target).except(list)
               }
@@ -1176,7 +1219,7 @@ describe Space do
                 list = [
                   :show, :index, :webconference, :recordings, :create, :new, :select, :leave, :edit,
                   :update, :update_logo, :disable, :user_permissions, :edit_recording,
-                  :webconference_options, :manage_join_requests, :show_news, :manage_news
+                  :webconference_options, :manage_join_requests, :show_news, :manage_news, :index_event
                 ]
                 should_not be_able_to_do_anything_to(target).except(list)
               }
@@ -1198,7 +1241,7 @@ describe Space do
             before { target.add_member!(user, "User") }
             it {
               should_not be_able_to_do_anything_to(target)
-                .except([:show, :index, :webconference, :recordings, :create, :new, :select, :leave, :show_news])
+                .except([:show, :index, :webconference, :recordings, :create, :new, :select, :leave, :show_news, :index_event])
             }
 
             context "when the space is not approved" do
@@ -1229,14 +1272,57 @@ describe Space do
       context "if the creation of spaces is" do
         context "disabled" do
           before { Site.current.update_attributes(forbid_user_space_creation: true) }
-          it { should_not be_able_to(:create, Space) }
-          it { should_not be_able_to(:new, Space) }
+
+          context "without an institution for the user" do
+            before { user.update_attributes institution: nil }
+
+            it { should_not be_able_to(:create, Space) }
+            it { should_not be_able_to(:new, Space) }
+          end
+
+          context "with an institution" do
+            context "with space creation forbidden" do
+              before { user.institution.update_attributes(forbid_user_space_creation: true) }
+
+              it { should_not be_able_to(:create, Space) }
+              it { should_not be_able_to(:new, Space) }
+            end
+
+            context "with space creation allowed" do
+              before { user.institution.update_attributes(forbid_user_space_creation: false) }
+
+              it { should be_able_to(:create, Space) }
+              it { should be_able_to(:new, Space) }
+            end
+          end
         end
 
         context "enabled" do
           before { Site.current.update_attributes(forbid_user_space_creation: false) }
-          it { should be_able_to(:create, Space) }
-          it { should be_able_to(:new, Space) }
+
+          context "without an institution for the user" do
+            before { user.update_attributes institution: nil }
+
+            it { should be_able_to(:create, Space) }
+            it { should be_able_to(:new, Space) }
+          end
+
+          context "with an institution" do
+            context "with space creation forbidden" do
+              before { user.institution.update_attributes(forbid_user_space_creation: true) }
+
+              it { should_not be_able_to(:create, Space) }
+              it { should_not be_able_to(:new, Space) }
+            end
+
+            context "with space creation allowed" do
+              before { user.institution.update_attributes(forbid_user_space_creation: false) }
+
+              it { should be_able_to(:create, Space) }
+              it { should be_able_to(:new, Space) }
+            end
+          end
+
         end
       end
     end

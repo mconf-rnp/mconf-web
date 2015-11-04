@@ -30,6 +30,7 @@ module Mconf
       shib_data = {}
       env_variables.each do |key, value|
         unless filter.select{ |f| key.to_s.downcase =~ f }.empty?
+          value.force_encoding('UTF-8') if value.present? # see #1774
           shib_data[key.to_s] = value
         end
       end
@@ -84,6 +85,13 @@ module Mconf
     # Returns the login of the user stored in the session, if any.
     def get_login
       get_field(Site.current.shib_login_field) || get_name # uses the name by default
+    end
+
+    # Returns an unique login according to the login stored in the session.
+    # If there's no login in the session, returns nil. Otherwise will always
+    # return a login that doesn't exist yet.
+    def get_unique_login
+      Mconf::Identifier.unique_mconf_id(get_login)
     end
 
     # Returns the shibboleth provider of the user stored in the session, if any.
@@ -142,10 +150,8 @@ module Mconf
     # Expects that at least the email and name will be set in the session!
     def create_user(shib_token)
       password = SecureRandom.hex(16)
-      login = get_login
-      login = login.parameterize unless login.nil?
       params = {
-        username: login, email: get_email,
+        username: get_unique_login, email: get_email,
         password: password, password_confirmation: password,
         _full_name: get_name
       }

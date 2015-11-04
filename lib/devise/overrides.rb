@@ -28,6 +28,9 @@ Devise::Strategies::DatabaseAuthenticatable.class_eval do
     # account created via shibboleth are also excluded from local auth
     return fail(:shib_auth_disabled) if resource.created_by_shib?
 
+    # same as above but for ldap (the error message is the same as a login failure)
+    return fail(:not_found_in_database) if resource.created_by_ldap?
+
     # only some institutions allow local login, others must use shibboleth
     institution = resource.institution
     return fail(:force_shib_login) if !institution.nil? && institution.force_shib_login?
@@ -36,10 +39,10 @@ Devise::Strategies::DatabaseAuthenticatable.class_eval do
   end
 end
 
-# TODO: alternative to fix the bug found in
+# TODO: #1336 alternative to fix the bug found in
 # https://github.com/plataformatec/devise/issues/2976
 Devise::Models::Confirmable.class_eval do
-  #trying to fix the bug of regenerating a new confirmation_token each time an user is updated
+  # trying to fix the bug of regenerating a new confirmation_token each time an user is updated
   def postpone_email_change_until_confirmation_and_regenerate_confirmation_token
     @reconfirmation_required = true
     self.unconfirmed_email = self.email

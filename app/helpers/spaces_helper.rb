@@ -19,11 +19,6 @@ module SpacesHelper
       options
   end
 
-  # Determines whether or not a space should have a visible link on the index page
-  def space_link_visible?(space)
-    user_signed_in? || (space.public? && space.approved?)
-  end
-
   # Returns a link to join the space depending on the status of the
   # current user. Possible cases:
   # * If there's no current user, returns a button to register.
@@ -97,20 +92,6 @@ module SpacesHelper
     @spaces_webconference_menu_tab == tab ?
     options.update({ :class => "#{old_class} active" }) :
       options
-  end
-
-  # TODO: check the methods below
-
-  def max_word_length text
-    first_pos = 0
-    max_length = 0
-    while !((pos = (text+" ").index(' ', first_pos)).nil?)
-      if (pos - first_pos) > max_length
-        max_length = pos - first_pos
-      end
-      first_pos = pos + 1
-    end
-    return max_length
   end
 
 end

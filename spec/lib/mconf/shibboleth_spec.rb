@@ -51,6 +51,14 @@ describe Mconf::Shibboleth do
       it { session[:shib_data]['second'].should eq('second') }
     end
 
+    context "string with encoding ASCII-8BIT" do
+      let(:env) { { :first => 'first', :second => 'çÃïçáõ'.force_encoding("ASCII-8BIT") } }
+      before { shibboleth.save_to_session(env, 'second')}
+      it { session[:shib_data].length.should be(1) }
+      it { session[:shib_data].should have_key('second') }
+      it { session[:shib_data]['second'].should eq('çÃïçáõ') }
+    end
+
     context "accepts keys as strings" do
       let(:env) { { 'first' => 'first', 'second' => 'second' } }
       before { shibboleth.save_to_session(env, 'second') }
@@ -665,6 +673,39 @@ describe Mconf::Shibboleth do
       }
       subject { shibboleth.create_user token }
       it { subject.username.should eq('my-login-aaee-test') }
+    end
+
+    context "doesn't fail if the login already exists" do
+      let(:token) { ShibToken.new(identifier: 'any@email.com') }
+      before {
+        FactoryGirl.create(:user, username: 'any-name')
+        FactoryGirl.create(:user, username: 'any-name-2')
+        shibboleth.should_receive(:get_email).at_least(:once).and_return('any@email.com')
+        shibboleth.should_receive(:get_login).and_return('Any Name')
+        shibboleth.should_receive(:get_name).and_return('Any Name')
+      }
+      it {
+        expect {
+          user = shibboleth.create_user(token)
+          user.username.should eq('any-name-3')
+        }.to change{ User.count }.by(1)
+      }
+    end
+
+    context "doesn't fail if the login is already used as the permalink of a space" do
+      let(:token) { ShibToken.new(identifier: 'any@email.com') }
+      before {
+        FactoryGirl.create(:space, permalink: 'any-name')
+        shibboleth.should_receive(:get_email).at_least(:once).and_return('any@email.com')
+        shibboleth.should_receive(:get_login).and_return('Any Name')
+        shibboleth.should_receive(:get_name).and_return('Any Name')
+      }
+      it {
+        expect {
+          user = shibboleth.create_user(token)
+          user.username.should eq('any-name-2')
+        }.to change{ User.count }.by(1)
+      }
     end
 
     context "returns the user with errors set in it if the call to `save` generated errors" do

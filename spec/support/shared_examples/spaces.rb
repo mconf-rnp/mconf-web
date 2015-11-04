@@ -40,9 +40,9 @@ shared_examples_for "assigns @spaces_examples" do
   context "returns only approved spaces if the site requires approval" do
     before {
       Site.current.update_attributes(require_space_approval: true)
-      @s1 = FactoryGirl.create(:space, approved: false)
-      @s2 = FactoryGirl.create(:space, approved: true)
-      @s3 = FactoryGirl.create(:space, approved: false)
+      @s1 = FactoryGirl.create(:space, institution: nil, approved: false)
+      @s2 = FactoryGirl.create(:space, institution: nil, approved: true)
+      @s3 = FactoryGirl.create(:space, institution: nil, approved: false)
       do_action
     }
     it { assigns(:spaces_examples).count.should be(1) }

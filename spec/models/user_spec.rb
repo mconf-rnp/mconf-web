@@ -42,7 +42,8 @@ describe User do
       FactoryGirl.create(:user, username: 'steve-hairis', email: 'steve-hairis@email.com', created_at: Time.now + 1.second),
       FactoryGirl.create(:user, username: 'ismael-esteves', email: 'ismael-esteves@email.com', created_at: Time.now + 2.second)
     ]}
-    let(:subject) { User.search_by_terms(terms) }
+    let(:include_private) { false }
+    let(:subject) { User.search_by_terms(terms, include_private) }
 
     before {
       users[0].profile.update_attribute(:full_name, 'Steve and Will Soon')
@@ -57,7 +58,7 @@ describe User do
       it { subject.count.should be(3) }
     end
 
-    context 'Composite term finds something' do
+    context 'composite term finds something' do
       let(:terms) { ['steve hair'] }
 
       it { should include(users[1]) }
@@ -109,6 +110,18 @@ describe User do
       it { subject.should_not include(user2) }
       it { subject.should_not include(user4) }
       it { subject.should_not include(user5) }
+    end
+
+    context "searches by email if include_private is true" do
+      let(:include_private) { true }
+      let(:terms) { 'steve-hairis@email.com' }
+      it { subject.count.should be(1) }
+      it { should include(users[1]) }
+    end
+
+    context "doesn't search by email if include_private is false" do
+      let(:terms) { 'steve-hairis@email.com' }
+      it { subject.count.should be(0) }
     end
   end
 
@@ -370,23 +383,6 @@ describe User do
   end
 
   describe "on create" do
-
-    describe "#create_webconf_room" do
-      let(:user) { FactoryGirl.create(:user) }
-
-      context 'should create a new random dial number for the user room if site is configured' do
-        before { Site.current.update_attributes(room_dial_number_pattern: 'xxxxxx') }
-
-        it { user.bigbluebutton_room.dial_number.should be_present }
-        it { user.bigbluebutton_room.dial_number.size.should be(6) }
-      end
-
-      context 'should be nil if the site is not configured' do
-        before { Site.current.update_attributes(room_dial_number_pattern: nil) }
-
-        it { user.bigbluebutton_room.dial_number.should be_blank }
-      end
-    end
 
     describe "#automatically_approve_if_needed" do
       context "if #require_registration_approval is not set in the current site" do
@@ -805,7 +801,6 @@ describe User do
       it("sets #trackable") { subject.trackable.should eq(user) }
       it("sets #owner") { subject.owner.should eq(approver) }
       it("sets #key") { subject.key.should eq('user.approved') }
-      it("doesn't set #recipient") { subject.recipient.should be_nil }
     end
   end
 
@@ -1107,7 +1102,7 @@ describe User do
   describe "abilities", :abilities => true do
     set_custom_ability_actions([
       :fellows, :current, :select, :approve, :enable, :disable, :confirm, :update_password,
-      :manage_user, :give_recording_rights
+      :give_recording_rights
     ])
 
     subject { ability }
@@ -1139,6 +1134,22 @@ describe User do
         before {
           Site.current.update_attributes(local_auth_enabled: true)
           FactoryGirl.create(:shib_token, user: target, new_account: false)
+        }
+        it { should be_able_to(:update_password, target) }
+      end
+
+      context "cannot edit the password if the account was created by LDAP" do
+        before {
+          Site.current.update_attributes(local_auth_enabled: true)
+          FactoryGirl.create(:ldap_token, user: target, new_account: true)
+        }
+        it { should_not be_able_to(:update_password, target) }
+      end
+
+      context "can edit the password if the account was not created by LDAP" do
+        before {
+          Site.current.update_attributes(local_auth_enabled: true)
+          FactoryGirl.create(:ldap_token, user: target, new_account: false)
         }
         it { should be_able_to(:update_password, target) }
       end
@@ -1194,7 +1205,7 @@ describe User do
 
       it {
         allowed = [:index, :show, :edit, :update, :fellows, :current, :select,
-                   :approve, :manage_user, :give_recording_rights, :confirm,
+                   :approve, :give_recording_rights, :confirm,
                    :new, :create, :update_password]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }
