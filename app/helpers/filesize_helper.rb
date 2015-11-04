@@ -4,16 +4,12 @@
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
-module InstitutionsHelper
+module FilesizeHelper
 
   # Human readable file size approximating to
   # the largest unit. Assumes 0 as the size if nil
-  def human_file_size bytes=0
-    begin
-      Filesize.from("#{bytes} B").pretty
-    rescue ArgumentError
-      bytes
-    end
+  def human_file_size(bytes=0)
+    Mconf::Filesize.human_file_size(bytes)
   end
 
 end

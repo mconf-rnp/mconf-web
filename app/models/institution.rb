@@ -19,7 +19,7 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
-  before_validation :adjust_recordings_disk_quota
+  before_validation :validate_and_adjust_recordings_disk_quota
 
   def self.roles
     ['User', 'Admin'].map { |r| Role.find_by_name(r) }
@@ -131,16 +131,17 @@ class Institution < ActiveRecord::Base
 
   private
 
-  def adjust_recordings_disk_quota
+  def validate_and_adjust_recordings_disk_quota
     if recordings_disk_quota_changed?
-
-      if is_number?(self.recordings_disk_quota)
-        # express size in bytes if a number without units was present
-        write_attribute(:recordings_disk_quota, Filesize.from("#{self.recordings_disk_quota} B").to_i)
-      elsif is_filesize?(self.recordings_disk_quota)
-        write_attribute(:recordings_disk_quota, Filesize.from(self.recordings_disk_quota).to_i)
+      if self.recordings_disk_quota.blank?
+        write_attribute(:recordings_disk_quota, nil)
       else
-        self.errors.add(:recordings_disk_quota, :invalid)
+        value = Mconf::Filesize.convert(self.recordings_disk_quota)
+        if value.nil?
+          self.errors.add(:recordings_disk_quota, :invalid)
+        else
+          write_attribute(:recordings_disk_quota, value.to_s)
+        end
       end
     end
   end
