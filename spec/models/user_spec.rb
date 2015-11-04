@@ -1102,7 +1102,7 @@ describe User do
   describe "abilities", :abilities => true do
     set_custom_ability_actions([
       :fellows, :current, :select, :approve, :enable, :disable, :confirm, :update_password,
-      :manage_user, :give_recording_rights
+      :give_recording_rights
     ])
 
     subject { ability }
@@ -1205,7 +1205,7 @@ describe User do
 
       it {
         allowed = [:index, :show, :edit, :update, :fellows, :current, :select,
-                   :approve, :manage_user, :give_recording_rights, :confirm,
+                   :approve, :give_recording_rights, :confirm,
                    :new, :create, :update_password]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }

@@ -16,7 +16,9 @@ class ManageController < ApplicationController
               User.with_disabled.search_by_terms(words, can?(:manage, User))
             else
               # institutional admins search only inside their institution
-              current_user.institution.users.search_by_terms(words, can?(:manage, User))
+              # can pass "true" to get private data since it's only for users
+              # that belong to the institution
+              current_user.institution.users.search_by_terms(words, true)
             end
 
     # start applying filters
