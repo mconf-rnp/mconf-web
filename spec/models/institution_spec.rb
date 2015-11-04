@@ -181,9 +181,30 @@ describe Institution do
       it { institution.recordings_disk_quota.to_i.should eq(50*(1024**2)) }
     end
 
+    context 'using a filesize without the b (300 M -> 300 Mb)' do
+      before { institution.update_attributes(recordings_disk_quota: '300 M'); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(300*(10**6)) }
+    end
+
+    context 'using a filesize without the b (20 G -> 20 Gb)' do
+      before { institution.update_attributes(recordings_disk_quota: '20 G'); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(20*(10**9)) }
+    end
+
     context 'using a number of bytes' do
       before { institution.update_attributes(recordings_disk_quota: 8000); institution.reload }
       it { institution.recordings_disk_quota.to_i.should eq(8000) }
+    end
+
+    context 'using an empty value' do
+      before { institution.update_attributes(recordings_disk_quota: ''); institution.reload }
+      it { institution.recordings_disk_quota.to_i.should eq(0) }
+    end
+
+    context 'using an invalid value' do
+      before { institution.update_attributes(recordings_disk_quota: 'incorrect') }
+      it { institution.should_not be_valid }
+      it { institution.errors[:recordings_disk_quota].size.should eq(1) }
     end
 
   end
