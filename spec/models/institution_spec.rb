@@ -233,25 +233,34 @@ describe Institution do
       it { target.recordings_disk_used.to_i.should eq(9) }
     end
 
-    context 'some recordings on multiple institutions' do
+    context 'with recordings on spaces and users of multiple institutions' do
       let(:recordings) {[
         FactoryGirl.create(:bigbluebutton_recording, published: true, size: 10),
         FactoryGirl.create(:bigbluebutton_recording, published: true, size: 20),
-        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 400)
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 40),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 100),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 200),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 400),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 800),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 1600)
       ]}
       let(:owners) {[
         FactoryGirl.create(:user, institution: target),
         FactoryGirl.create(:user, institution: target),
-        FactoryGirl.create(:user, institution: other_institution)
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:user, institution: other_institution),
+        FactoryGirl.create(:user, institution: other_institution),
+        FactoryGirl.create(:space_with_associations, institution: other_institution),
+        FactoryGirl.create(:space_with_associations, institution: other_institution)
       ]}
 
-      it { target.recordings_disk_used.should eq(30) }
+      it { target.recordings_disk_used.should eq(170) }
       it { other_institution.recordings_disk_used.to_i.should eq(0) } # method has not been called
-
-      it do
+      it {
         other_institution.update_recordings_disk_used!
-        other_institution.recordings_disk_used.to_i.should eq(400)
-      end
+        other_institution.recordings_disk_used.to_i.should eq(3000)
+      }
     end
 
     context 'no recordings' do
@@ -337,6 +346,42 @@ describe Institution do
         before { target.add_member!(user, "Admin") }
         it { target.user_role(user).should eql("Admin") }
       end
+    end
+  end
+
+  describe "#recordings" do
+    let(:target) { FactoryGirl.create(:institution) }
+    let(:other_institution) { FactoryGirl.create(:institution) }
+
+    before do
+      owners.each_with_index { |owner, i| owner.bigbluebutton_room.recordings << recordings[i] }
+    end
+
+    context 'with recordings on spaces and users of multiple institutions' do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true),
+        FactoryGirl.create(:bigbluebutton_recording, published: true),
+        FactoryGirl.create(:bigbluebutton_recording, published: true),
+        FactoryGirl.create(:bigbluebutton_recording, published: true)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:user, institution: other_institution),
+        FactoryGirl.create(:space_with_associations, institution: other_institution),
+      ]}
+
+      it { target.recordings.should include(recordings[0]) }
+      it { target.recordings.should include(recordings[1]) }
+      it { target.recordings.should_not include(recordings[2]) }
+      it { target.recordings.should_not include(recordings[3]) }
+    end
+
+    context 'no recordings' do
+      let(:recordings) { [] }
+      let(:owners) { [] }
+
+      it { target.recordings.should be_empty }
     end
   end
 
