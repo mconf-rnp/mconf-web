@@ -227,7 +227,7 @@ class Space < ActiveRecord::Base
   end
 
   def self.with_disabled
-    self.unscoped
+    unscope(where: :disabled) # removes the target scope only
   end
 
   # Disable the space from the website.
