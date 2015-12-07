@@ -136,18 +136,20 @@ class Institution < ActiveRecord::Base
     BigbluebuttonRecording.where(room_id: room_ids)
   end
 
+  attr_accessor :recordings_disk_quota_human
+
   private
 
   def validate_and_adjust_recordings_disk_quota
-    if recordings_disk_quota_changed?
-      if self.recordings_disk_quota.blank?
+    if !recordings_disk_quota_human.nil?
+      if self.recordings_disk_quota_human.blank?
         write_attribute(:recordings_disk_quota, nil)
       else
-        value = Mconf::Filesize.convert(self.recordings_disk_quota)
+        value = Mconf::Filesize.convert(self.recordings_disk_quota_human)
         if value.nil?
-          self.errors.add(:recordings_disk_quota, :invalid)
+          self.errors.add(:recordings_disk_quota_human, :invalid)
         else
-          write_attribute(:recordings_disk_quota, value.to_s)
+          write_attribute(:recordings_disk_quota, value)
         end
       end
     end

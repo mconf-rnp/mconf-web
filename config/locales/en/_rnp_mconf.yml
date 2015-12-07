@@ -8,7 +8,7 @@ en:
         force_shib_login: Force login only via federation
         identifier: Identifier
         name: Name
-        recordings_disk_quota: Disk quota for recordings
+        recordings_disk_quota_human: Disk quota for recordings
         recordings_disk_used: Disk space used by recordings
         require_space_approval: "Moderate spaces"
         user_limit: Maximum of members

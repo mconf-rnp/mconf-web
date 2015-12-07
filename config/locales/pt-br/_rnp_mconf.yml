@@ -8,7 +8,7 @@ pt-br:
         force_shib_login: Somente login via federação
         identifier: Identificador
         name: Nome
-        recordings_disk_quota: Quota de disco para gravações
+        recordings_disk_quota_human: Quota de disco para gravações
         recordings_disk_used: Espaço ocupado por gravações
         require_space_approval: "Moderação de comunidades"
         user_limit: Máximo de membros

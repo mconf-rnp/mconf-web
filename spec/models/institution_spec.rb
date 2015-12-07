@@ -172,39 +172,39 @@ describe Institution do
     let(:institution) { FactoryGirl.create(:institution) }
 
     context 'using a filesize' do
-      before { institution.update_attributes(recordings_disk_quota: '50 Mb'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(50*(10**6)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '50 Mb'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(50*(10**6)) }
     end
 
     context 'using another filesize' do
-      before { institution.update_attributes(recordings_disk_quota: '50 Mib'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(50*(1024**2)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '50 Mib'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(50*(1024**2)) }
     end
 
     context 'using a filesize without the b (300 M -> 300 Mb)' do
-      before { institution.update_attributes(recordings_disk_quota: '300 M'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(300*(10**6)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '300 M'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(300*(10**6)) }
     end
 
     context 'using a filesize without the b (20 G -> 20 Gb)' do
-      before { institution.update_attributes(recordings_disk_quota: '20 G'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(20*(10**9)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '20 G'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(20*(10**9)) }
     end
 
     context 'using a number of bytes' do
       before { institution.update_attributes(recordings_disk_quota: 8000); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(8000) }
+      it { institution.recordings_disk_quota.should eq(8000) }
     end
 
     context 'using an empty value' do
       before { institution.update_attributes(recordings_disk_quota: ''); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(0) }
+      it { institution.recordings_disk_quota.should eq(nil) }
     end
 
     context 'using an invalid value' do
-      before { institution.update_attributes(recordings_disk_quota: 'incorrect') }
+      before { institution.update_attributes(recordings_disk_quota_human: 'incorrect') }
       it { institution.should_not be_valid }
-      it { institution.errors[:recordings_disk_quota].size.should eq(1) }
+      it { institution.errors[:recordings_disk_quota_human].size.should eq(1) }
     end
 
   end

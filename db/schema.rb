@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151020182042) do
+ActiveRecord::Schema.define(version: 20151207182936) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -182,8 +182,8 @@ ActiveRecord::Schema.define(version: 20151020182042) do
     t.boolean  "force_shib_login",           default: false
     t.boolean  "require_space_approval",     default: true
     t.boolean  "forbid_user_space_creation", default: true
-    t.string   "recordings_disk_used",       default: "0"
-    t.string   "recordings_disk_quota",      default: "0"
+    t.integer  "recordings_disk_used",       limit: 8, default: 0
+    t.integer  "recordings_disk_quota",      limit: 8, default: 0
   end
 
   create_table "invitations", force: true do |t|
