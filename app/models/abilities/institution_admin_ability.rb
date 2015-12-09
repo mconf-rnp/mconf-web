@@ -107,6 +107,12 @@ module Abilities
           is_institution_admin_of_space(user, room.owner)
       end
 
+      if Mconf::Modules.mod_loaded?('events')
+        can :manage, MwebEvents::Event do |event|
+          event.owner_type == 'Space' && is_institution_admin_of_space(user, event.owner)
+        end
+      end
+
       def is_institution_admin_of_space(user, space)
         !space.institution.nil? && space.institution.admins.include?(user)
       end
