@@ -58,11 +58,6 @@ module Abilities
         !space.disabled &&
           is_institution_admin_of_space(user, space)
       end
-      can :manage, News do |news|
-        space = news.space
-        !space.disabled &&
-          is_institution_admin_of_space(user, space)
-      end
       can [:show, :edit, :update], Permission do |perm|
         case perm.subject_type
         when "Space"
