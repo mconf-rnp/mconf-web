@@ -24,8 +24,8 @@ namespace :db do
       Permission.destroy_all
       Space.destroy_all
       if configatron.modules.events.enabled
-        MwebEvents::Event.destroy_all
-        MwebEvents::Participant.destroy_all
+        Event.destroy_all
+        Participant.destroy_all
       end
       RecentActivity.destroy_all
       User.with_disabled.where.not(id: User.first.id).destroy_all
@@ -88,23 +88,6 @@ namespace :db do
       end
     end
 
-    puts "* Create private messages"
-    User.all.each do |user|
-      senders = User.ids - [user.id]
-
-      PrivateMessage.populate 5 do |message|
-        message.receiver_id = user.id
-        message.sender_id = senders
-        message.title = Populator.words(1..3).capitalize
-        message.body = Populator.sentences(1..3)
-        message.checked = [ true, false ]
-        message.deleted_by_sender = false
-        message.deleted_by_receiver = false
-        message.created_at = @created_at_start..Time.now
-        message.updated_at = message.created_at..Time.now
-      end
-    end
-
     puts "* Create spaces (10)"
     Space.populate 10 do |space|
       begin
@@ -122,18 +105,8 @@ namespace :db do
         post.space_id = space.id
         post.title = Populator.words(1..4).titleize
         post.text = Populator.sentences(3..15)
-        post.spam = false
         post.created_at = @created_at_start..Time.now
         post.updated_at = post.created_at..Time.now
-        post.spam = rand(0) > 0.9 # ~10% marked as spam
-      end
-
-      News.populate 2..10 do |news|
-        news.space_id = space.id
-        news.title = Populator.words(3..8).titleize
-        news.text = Populator.sentences(2..10)
-        news.created_at = @created_at_start..Time.now
-        news.updated_at = news.created_at..Time.now
       end
     end
 
@@ -193,7 +166,7 @@ namespace :db do
 
       puts "* Create events: for spaces (20..40)"
       available_spaces = Space.all.to_a
-      MwebEvents::Event.populate 20..40 do |event|
+      Event.populate 20..40 do |event|
         event.owner_id = available_spaces
         event.owner_type = 'Space'
         event.name = Populator.words(1..3).titleize
@@ -212,7 +185,7 @@ namespace :db do
 
       puts "* Create events: for users (20..40)"
       available_users = User.all.to_a
-      MwebEvents::Event.populate 20..40 do |event|
+      Event.populate 20..40 do |event|
         event.owner_id = available_users
         event.owner_type = 'User'
         event.name = Populator.words(1..3).titleize
@@ -378,12 +351,6 @@ namespace :db do
         end
       end
 
-      # News activity
-      space.news.each do |news|
-        author = space.admins.sample
-        news.new_activity :create, author
-      end
-
       # Attachment activity
       space.attachments.each do |att|
         author = space.admins.sample
@@ -438,18 +405,15 @@ namespace :db do
     s.add_member!(u, 'Admin')
     s.add_member!(u2)
 
-    message_attrs = [:title, :body]
-    FactoryGirl.create(:private_message, attrs_to_hash(PrivateMessage, message_attrs).merge(receiver: u, sender: u2))
-
     post_attrs = [:title, :text]
     p = FactoryGirl.create(:post, attrs_to_hash(Post, post_attrs).merge(author: u2, space: s))
     p.new_activity :create, u2
 
     event_attrs = [:name, :summary, :description, :location, :address]
-    e = FactoryGirl.create(:event, attrs_to_hash(MwebEvents::Event, event_attrs).merge(owner_id: s.id, owner_type: 'Space'))
+    e = FactoryGirl.create(:event, attrs_to_hash(Event, event_attrs).merge(owner_id: s.id, owner_type: 'Space'))
     e.new_activity :create, u
 
-    e2 = FactoryGirl.create(:event, attrs_to_hash(MwebEvents::Event, event_attrs).merge(owner_id: u2.id, owner_type: 'User'))
+    e2 = FactoryGirl.create(:event, attrs_to_hash(Event, event_attrs).merge(owner_id: u2.id, owner_type: 'User'))
     e2.new_activity :create, u2
 
     jr_attrs = [:comment]

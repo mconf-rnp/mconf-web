@@ -45,22 +45,13 @@ module Abilities
           (!profile.user.created_by_shib? || !Site.current.shib_update_users?)
       end
 
-      # Private messages
-      can [:new, :create, :index], PrivateMessage
-      can :show, PrivateMessage do |message|
-        [message.sender_id, message.receiver_id].include?(user.id)
-      end
-      can :destroy, PrivateMessage do |message|
-        [message.sender_id, message.receiver_id].include?(user.id)
-      end
-
       # Spaces
       can :select, Space
       can [:create, :new], Space unless Site.current.forbid_user_space_creation?
 
       can [:index], Space
-      can [:show, :webconference, :recordings, :show_news, :index_event], Space, public: true
-      can [:show, :webconference, :recordings, :show_news, :index_event], Space do |space|
+      can [:show, :webconference, :recordings, :index_event], Space, public: true
+      can [:show, :webconference, :recordings, :index_event], Space do |space|
         space.users.include?(user)
       end
       can [:leave], Space do |space|
@@ -99,7 +90,7 @@ module Abilities
       end
 
       # space admins can list requests and invite new members
-      can [:manage_news, :manage_join_requests], Space do |s|
+      can [:manage_join_requests], Space do |s|
         s.admins.include?(user)
       end
 
@@ -117,17 +108,6 @@ module Abilities
         post.space.users.include?(user)
       end
       can [:show, :reply_post, :edit, :update, :destroy], Post, author_id: user.id
-
-      # News
-      # Only admins can create/alter news, the rest can only read
-      # note: :show because :index is only for space admins
-      can :show, News, space: { public: true }
-      can :show, News do |news|
-        news.space.users.include?(user)
-      end
-      can :manage, News do |news|
-        news.space.admins.include?(user)
-      end
 
       # Attachments
       can :index, Attachment # restricted through Space
@@ -171,39 +151,38 @@ module Abilities
           when 'User' then
             event.owner_id == user.id
           when 'Space' then
-            !user.permissions.where(subject_type: 'MwebEvents::Event',
+            !user.permissions.where(subject_type: 'Event',
               role_id: Role.find_by_name('Organizer'), subject_id: event.id).empty? ||
             !user.permissions.where(subject_type: 'Space', subject_id: event.owner_id,
             role_id: Role.find_by_name('Admin')).empty?
           end
         end
 
-        can [:select, :show, :index], MwebEvents::Event
-
-        # Create events if they have a nil owner or are owned by a space you admin
-        can [:create, :new], MwebEvents::Event do |e|
-          e.owner.nil? || event_can_be_managed_by(e, user)
+        can :create_space_event, Space do |s|
+          s.admins.include?(user)
         end
 
-        can [:edit, :update, :destroy, :invite, :send_invitation], MwebEvents::Event do |e|
+        can [:select, :show, :index, :create, :new], Event
+
+        can [:edit, :update, :destroy, :invite, :send_invitation], Event do |e|
           event_can_be_managed_by(e, user)
         end
 
-        can :register, MwebEvents::Event do |e|
-          MwebEvents::Participant.where(owner_id: user.id, event_id: e.id).empty? &&
+        can :register, Event do |e|
+          Participant.where(owner_id: user.id, event_id: e.id).empty? &&
             (e.public || (e.owner_type == 'Space' && e.owner.users.include?(user)))
         end
 
         # Participants from MwebEvents
-        can :destroy, MwebEvents::Participant do |p|
+        can :destroy, Participant do |p|
           p.owner == user
         end
 
-        can [:show, :edit, :update, :destroy], MwebEvents::Participant do |p|
+        can [:show, :edit, :update, :destroy], Participant do |p|
           event_can_be_managed_by(p.event, user)
         end
 
-        can [:index, :create, :new], MwebEvents::Participant
+        can [:index, :create, :new], Participant
       end
 
       restrict_access_to_disabled_resources(user)

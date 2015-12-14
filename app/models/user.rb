@@ -12,6 +12,7 @@ require './lib/mconf/approval_module'
 class User < ActiveRecord::Base
   include PublicActivity::Common
   include Mconf::ApprovalModule
+  include Mconf::DisableModule
 
   # TODO: block :username from being modified after registration
 
@@ -186,15 +187,6 @@ class User < ActiveRecord::Base
     Space.public_spaces.order('name') - spaces
   end
 
-  def disable
-    before_disable_and_destroy
-    update_attribute(:disabled, true)
-  end
-
-  def enable
-    self.update_attribute(:disabled,false)
-  end
-
   def fellows(name=nil, limit=nil)
     limit = limit || 5            # default to 5
     limit = 50 if limit.to_i > 50 # no more than 50
@@ -218,9 +210,9 @@ class User < ActiveRecord::Base
   end
 
   def events
-    ids = MwebEvents::Event.where(:owner_type => 'User', :owner_id => id).ids
-    ids += permissions.where(:subject_type => 'MwebEvents::Event').pluck(:subject_id)
-    MwebEvents::Event.where(:id => ids)
+    ids = Event.where(:owner_type => 'User', :owner_id => id).ids
+    ids += permissions.where(:subject_type => 'Event').pluck(:subject_id)
+    Event.where(:id => ids)
   end
 
   def has_events_in_this_space?(space)
@@ -236,11 +228,6 @@ class User < ActiveRecord::Base
     rooms += Space.public_spaces.map(&:bigbluebutton_room)
     rooms.uniq!
     rooms
-  end
-
-  # Returns the number of unread private messages for this user
-  def unread_private_messages
-    PrivateMessage.inbox(self).select{|msg| !msg.checked}
   end
 
   # Sets the user as approved and skips confirmation
@@ -272,10 +259,6 @@ class User < ActiveRecord::Base
   # Method used by MwebEvents
   def admin?
     superuser
-  end
-
-  def enabled?
-    !disabled?
   end
 
   # Return the list of spaces in which the user has a pending join request or invitation.
@@ -363,6 +346,11 @@ class User < ActiveRecord::Base
     admin_in.each do |space|
       space.disable if space.admins.empty?
     end
+  end
+
+  # For the disable module
+  def before_disable
+    before_disable_and_destroy
   end
 
   def init

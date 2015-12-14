@@ -27,10 +27,7 @@ module Abilities
       can [:show, :current], User, disabled: false
 
       can [:index, :select], Space
-      can [:show, :webconference, :recordings, :show_news], Space, public: true
-
-      can :index, News # restricted through Space
-      can :show, News, space: { public: true }
+      can [:show, :webconference, :recordings], Space, public: true
 
       can :index, Post # restricted through Space
       can :show, Post, space: { public: true }
@@ -40,10 +37,12 @@ module Abilities
 
       # for MwebEvents
       if Mconf::Modules.mod_loaded?('events')
-        can [:show, :index, :select], MwebEvents::Event
+        can [:show, :index, :select], Event
         # Pertraining public and private event registration
-        can :register, MwebEvents::Event, public: true
-        can [:create, :new], MwebEvents::Participant
+        can :register, Event, public: true
+        can [:create, :new], Participant
+
+        can [:index_event], Space, public: true
       end
 
       restrict_access_to_disabled_resources(user)

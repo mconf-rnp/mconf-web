@@ -85,9 +85,4 @@ class ManageController < ApplicationController
     render :layout => 'no_sidebar'
   end
 
-  def spam
-    @spam_posts = Post.where(:spam => true).all
-    render :layout => 'no_sidebar'
-  end
-
 end

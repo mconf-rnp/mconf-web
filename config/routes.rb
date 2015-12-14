@@ -62,13 +62,18 @@ Mconf::Application.routes.draw do
 
   # event module
   if Mconf::Modules.mod_loaded?('events')
-    mount MwebEvents::Engine => '/'
 
     # For invitations
-    resources :events, only: [] do
+    resources :events do
+      collection do
+        get :select
+      end
+
+      resources :participants
+
       member do
-        post :send_invitation, controller: 'mweb_events/events'
-        get  :invite, controller: 'mweb_events/events'
+        post :send_invitation
+        get  :invite
       end
     end
   end
@@ -110,8 +115,6 @@ Mconf::Application.routes.draw do
 
     resources :users, only: :index
 
-    resources :news
-
     resources :join_requests, only: [:index, :show, :new, :create] do
       collection do
         get :invite
@@ -126,7 +129,6 @@ Mconf::Application.routes.draw do
     resources :posts do
       member do
         get :reply_post
-        post :spam_report, action: :spam_report_create
       end
     end
 
@@ -165,8 +167,6 @@ Mconf::Application.routes.draw do
   get '/recordings/:id/edit', to: 'my#edit_recording', as: 'edit_my_recording'
   get '/pending', to: 'my#approval_pending', as: 'my_approval_pending'
 
-  resources :messages, controller: :private_messages, except: [:edit]
-
   resources :feedback, only: [:new, :create] do
     get :webconf, on: :collection
   end
@@ -175,7 +175,7 @@ Mconf::Application.routes.draw do
   resource :site, only: [:show, :edit, :update]
 
   # Management routes
-  ['users', 'spaces', 'spam', 'institutions'].each do |resource|
+  ['users', 'spaces', 'institutions'].each do |resource|
     get "/manage/#{resource}", to: "manage##{resource}", as: "manage_#{resource}"
   end
 

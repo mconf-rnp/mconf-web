@@ -102,14 +102,6 @@
 #   Someone registered to participante in an event.
 #   Created by `MewebEvents::ParticipantsController`, code at `lib/mweb_events/controllers/participants_controller`.
 #
-# * `news.create`:
-#   A news item was created.
-#   Created by `NewsController`.
-#
-# * `news.update`:
-#   A news item was updated.
-#   Created by `NewsController`.
-#
 # * `post.create`:
 #   A post was created.
 #   Created by `PostsController`.
@@ -122,13 +114,6 @@
 #   Somebody replied to a post.
 #   Created by `PostsController`.
 #
-# * `private_message.sent`:
-#   Somebody sent a private message.
-#   Created by `PrivateMessage`.
-#
-# * `private_message.received`:
-#   Somebody received a private message.
-#   Created by `PrivateMessage`.
 #
 class RecentActivity < PublicActivity::Activity
   # Used for home page and user page pagination

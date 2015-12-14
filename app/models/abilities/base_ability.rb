@@ -27,7 +27,6 @@ module Abilities
       cannot :manage, Profile, user: { disabled: true }
       cannot :manage, Post, space: { disabled: true }
       cannot :manage, Attachment, space: { disabled: true }
-      cannot :manage, News, space: { disabled: true }
 
       # won't use :manage so it doesn't block actions such as #index
       cannot [:show, :destroy, :edit, :update, :disable,
@@ -37,24 +36,20 @@ module Abilities
       # only actions over members, not actions over the collection
       actions = [:show, :accept, :decline]
       cannot actions, JoinRequest do |jr|
-        jr.group_type == "Space" && jr.group.disabled
+        jr.group.disabled
       end
 
       if Mconf::Modules.mod_loaded?('events')
         actions = [:show, :edit, :update, :destroy,
                    :invite, :send_invitation, :create_participant]
-        cannot actions, MwebEvents::Event do |event|
-          event.owner.nil? ||
-            (event.owner_type == "User" && event.owner.disabled) ||
-            (event.owner_type == "Space" && event.owner.disabled)
+        cannot actions, Event do |event|
+          event.owner.nil? || event.owner.disabled
         end
 
         # only actions over members, not actions over the collection
-        actions = [:show, :edit, :update, :destroy]
-        cannot actions, MwebEvents::Participant do |part|
-          part.owner.nil? ||
-            (part.owner_type == "User" && part.owner.disabled) ||
-            (part.owner_type == "Space" && part.owner.disabled)
+        actions = [:show, :edit, :update, :destroy] # TODO
+        cannot actions, Participant do |part|
+          part.owner.nil? || part.owner.disabled
         end
       end
 
@@ -63,9 +58,7 @@ module Abilities
                  :invite, :invite_userid, :join_mobile, :join, :fetch_recordings,
                  :recordings, :join_options, :invitation, :send_invitation, :create_meeting]
       cannot actions, BigbluebuttonRoom do |room|
-        room.owner.nil? ||
-          (room.owner_type == "User" && room.owner.disabled) ||
-          (room.owner_type == "Space" && room.owner.disabled)
+        room.owner.nil? || room.owner.disabled
       end
     end
 
@@ -77,23 +70,21 @@ module Abilities
       end
 
       cannot [:webconference, :recordings, :manage_join_requests,
-              :invite, :user_permissions, :manage_news, :show_news,
-              :webconference_options, :edit_recording, :index_event], Space, approved: false
+              :invite, :user_permissions, :webconference_options,
+              :edit_recording, :index_event], Space, approved: false
 
       cannot :manage, Post, space: { approved: false }
       cannot :manage, Attachment, space: { approved: false }
-      cannot :manage, News, space: { approved: false }
 
       cannot [:manage], JoinRequest do |jr|
         !jr.group.approved?
       end
 
-
       # TODO: should restrict :index too, but can't since it doesn't evaluate the
       # block and would restrict it always, not only for unapproved spaces
       # :index of events inside a space is restricted using :index_event
-      cannot [:show, :create, :new, :invite], MwebEvents::Event do |event|
-        event.owner_type == 'Space' && !event.owner.try(:approved?) # use try because of disabled spaces
+      cannot [:show, :invite], Event do |event|
+        !event.owner.try(:approved?) # use try because of disabled spaces/users
       end
 
       # only actions over members, not actions over the collection
