@@ -83,9 +83,6 @@ gem 'font-awesome-rails', '~> 4.1.0.0'
 gem 'premailer-rails'
 gem 'nokogiri'
 
-# event module
-# gem 'mweb_events', :git => 'https://github.com/mconf/mweb_events.git', :branch => 'master'
-
 # send emails in case of exceptions in production
 gem 'exception_notification', '~> 4.0.0'
 
@@ -140,7 +137,7 @@ group :development, :test do
   gem 'capybara'
   gem "capybara-webkit"
   gem 'launchy'
-  gem 'shoulda-matchers', '~> 2.6.1', :require => false
+  gem 'shoulda-matchers', '~> 3.0'
   gem 'shoulda-kept-assign-to'
   gem 'htmlentities', '~> 4.3.3'
   gem 'turn', '0.8.2', :require => false # TODO: why 0.8.2?
@@ -163,4 +160,3 @@ gem 'geocoder'
 gem 'redcarpet'
 gem 'epic-editor-rails'
 gem 'leaflet-rails'
-

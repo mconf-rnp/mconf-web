@@ -18,8 +18,7 @@ module Abilities
 
     # Note: when restricting permissions defined using blocks, we cannot use `:manage`,
     # otherwise it will always block actions over collections, since these don't
-    # evaluate the block. (e.g. MwebEvents::Event#index would be always blocked
-    # for everyone)
+    # evaluate the block. (e.g. Event#index would be always blocked for everyone)
 
     # Remove access for anything related to disabled spaces and users.
     def restrict_access_to_disabled_resources(user)
@@ -39,26 +38,28 @@ module Abilities
         jr.group.disabled
       end
 
-      if Mconf::Modules.mod_loaded?('events')
-        actions = [:show, :edit, :update, :destroy,
-                   :invite, :send_invitation, :create_participant]
-        cannot actions, Event do |event|
-          event.owner.nil? || event.owner.disabled
-        end
-
-        # only actions over members, not actions over the collection
-        actions = [:show, :edit, :update, :destroy] # TODO
-        cannot actions, Participant do |part|
-          part.owner.nil? || part.owner.disabled
-        end
-      end
+      restrict_access_to_disabled_resources_over_events(user)
 
       # only actions over members, not actions over the collection
       actions = [:show, :edit, :update, :destroy, :running, :end, :record_meeting,
                  :invite, :invite_userid, :join_mobile, :join, :fetch_recordings,
-                 :recordings, :join_options, :invitation, :send_invitation, :create_meeting]
+                 :recordings, :invitation, :send_invitation, :create_meeting]
       cannot actions, BigbluebuttonRoom do |room|
         room.owner.nil? || room.owner.disabled
+      end
+    end
+
+    def restrict_access_to_disabled_resources_over_events(user)
+      actions = [:show, :edit, :update, :destroy, :register,
+                 :invite, :send_invitation, :create_participant]
+      cannot actions, Event do |event|
+        event.owner.try(:disabled)
+      end
+
+      # only actions over members, not actions over the collection
+      actions = [:show, :edit, :update, :destroy] # TODO review
+      cannot actions, Participant do |part|
+        part.event.present? && part.event.owner.try(:disabled)
       end
     end
 
@@ -80,23 +81,31 @@ module Abilities
         !jr.group.approved?
       end
 
-      # TODO: should restrict :index too, but can't since it doesn't evaluate the
-      # block and would restrict it always, not only for unapproved spaces
-      # :index of events inside a space is restricted using :index_event
-      cannot [:show, :invite], Event do |event|
-        !event.owner.try(:approved?) # use try because of disabled spaces/users
-      end
+      restrict_access_to_unapproved_resources_over_events(user)
 
       # only actions over members, not actions over the collection
       actions = [:show, :edit, :update, :destroy, :running, :end, :record_meeting,
                  :invite, :invite_userid, :join_mobile, :join, :fetch_recordings,
-                 :recordings, :join_options, :invitation, :send_invitation, :create_meeting]
+                 :recordings, :invitation, :send_invitation, :create_meeting]
       cannot actions, BigbluebuttonRoom do |room|
         room.owner && !room.owner.approved
       end
 
       cannot [:update, :space_edit, :play, :space_show], BigbluebuttonRecording do |recording|
         recording.room && recording.room.owner && !recording.room.owner.approved
+      end
+    end
+
+    def restrict_access_to_unapproved_resources_over_events(user)
+      actions = [:show, :invite, :register, :update, :destroy, :edit, :send_invitation]
+      cannot actions, Event do |event|
+        !event.owner.try(:approved?)
+      end
+
+      # only actions over members, not actions over the collection
+      actions = [:show, :edit, :update, :destroy] # TODO review
+      cannot actions, Participant do |part|
+        part.event.present? && !part.event.owner.try(:approved?)
       end
     end
   end

@@ -18,14 +18,6 @@ pt-br:
       invite_with_introducer_html: "foi convidado(a) por <a href=\"%{introducer_url}\">%{introducer}</a> para entrar na comunidade"
       no_accept_html: "foi adicionado por <a href=\"%{introducer_url}\">%{introducer}</a> à comunidade"
       request_html: "requisitou ingresso na comunidade"
-    mweb_events_event:
-      create_html: criou o evento %{name} na comunidade
-      attend_html: participará do evento %{name} da comunidade
-      not_attend_html: não participará do evento %{name} da comunidade
-      update_html: atualizou as informações do event %{name} da comunidade
-      deleted: que não existe mais
-    mweb_events_participant:
-      create_html: participará do evento %{name} na comunidade
     other:
       admin_html: "Um administrador"
       someone_html: "Um usuário"
@@ -196,7 +188,6 @@ pt-br:
         timezone: "Fuso horário"
         visible_locales: "Linguagens visíveis"
         xmpp_server: "Endereço do servidor XMPP"
-        webconf_auto_record: "Atribuir automaticamente a opção de gravação ao iniciar uma conferência"
       space:
         attendee_key: "Chave para participantes"
         description: "Descrição"
@@ -214,16 +205,12 @@ pt-br:
         expanded_post: "Mostrar mensagens no mural com a visão expandida por padrão"
         password: "Senha"
         password_confirmation: "Confirmação de senha"
+        remember_me: "Permanecer conectado"
         receive_digest: "O quão frequentemente você gostaria de receber emails com um resumo das atividades que aconteceram nas comunidades as quais você pertence?"
         superuser: "Administrador global"
         timezone: "Fuso horário"
         username: "ID"
     errors:
-      models:
-        private_message:
-          attributes:
-            users_tokens:
-              accepted: "deve escolher ao menos um destinatário"
       messages:
         invalid_identifier: "gerou um identificador inválido: \"%{id}\""
         missing: "não encontrado"
@@ -515,16 +502,6 @@ pt-br:
       title: "Acesso móvel à sala \"%{room}\""
       use_default_client: "Se você não está em um cliente móvel, clique aqui para entrar na sessão usando o cliente desktop padrão."
       try_again: "Você possui a aplicação instalada mas ela não foi iniciada? Clique aqui para tentar novamente."
-    join_options:
-      alert_webconf_running: "Uma reunião está atualmente em progresso nesta sala. As opções que você configurar aqui não afetarão a reunião atual, apenas reuniões futuras nesta sala!"
-      metadata:
-        description: "Descrição para esta reunião"
-        title: "Título para esta reunião"
-      record:
-        label: "Gravar reunião"
-        tooltip: "Marque para fazer com que as reuniões nesta sala sejam gravadas. Esta opção não pode ser modificada depois que a reunião está em execução!"
-      start: "Pronto, iniciar reunião!"
-      title: "Opções da reunião"
     new:
       creating_new_room: "Criando uma nova sala"
     recordings:
@@ -791,7 +768,6 @@ pt-br:
     bad_format: "(e-mail mal formatado)"
     email: "e-mail para %{email}"
     title: "Convite para participar de uma webconferência"
-    user_private_msg: "mensagem privada para o usuário %{user}"
   invited: Convidados
   join: Entrar
   join_cam: Participar
@@ -907,10 +883,6 @@ pt-br:
       public: "Comunidade pública"
   less: "menos..."
   locales:
-    de: Deutsch
-    en: English
-    es-419: "Español (América Latina)"
-    pt-br: "Português (Brasil)"
     error: "Linguagem não resgistrada"
   login_or_register: "Login / Registre-se"
   login_request: "Você precisa estar logado para"
@@ -989,29 +961,7 @@ pt-br:
       filter_count_empty: "%{count} usuários encontrados"
       no_user_found: "Nenhum usuário encontrado"
   mandatory_field: "Campo obrigatório"
-  message: 
-    created: "Mensagem enviada com sucesso"
-    error:
-      create: "Erro enviando mensagem privada"
   mconf: Mconf
-  message:
-    created: "Mensagem enviada com sucesso"
-    error:
-      create: "Erro ao enviar mensagem privada"
-    incoming:
-      other: "Mensagens recebidas"
-    private:
-      cant: "Você não pode enviar mensagens privadas porque você não tem parceiros em nenhuma comunidade"
-      editing: "Editando mensagem privada"
-      new: "Nova mensagem privada"
-      none: "Não há mensagens"
-      send: "Enviar uma mensagem privada"
-    reply: "Responder à mensagem"
-    sent:
-      other: "Mensagens enviadas"
-    special1: "A plataforma Mconf estará indisponível a partir de sexta-feira, 17 dezembro às 16:00 UTC, até sábado, 18-Dez 16:00 UTC. Desculpem o incómodo."
-    special2: "A Equipe do Mconf"
-    to: Para 
   moderatorPW: "Senha de Moderador"
   more: mais...
   more_arrows: "mais >>"
@@ -1049,7 +999,6 @@ pt-br:
     webconference_room:
       end: "Parar a reunião"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
-      fast_start: "Início rápido usando as opções já configuradas"
       invite: "Convidar outras pessoas"
       join: "Entrar na reunião!"
       join_mobile_full: "Entrar a partir de um dispositivo móvel"
@@ -1143,14 +1092,6 @@ pt-br:
   preferences: Preferências
   previous: Anterior
   privacy: Privacidade
-  private_message:
-    more:
-      one: "e uma outra mensagem privada..."
-      other: "e mais %{count} mensagens privadas..."
-    one: "Mensagem Privada"
-    other: "Mensagens Privadas"
-    send: "Enviar mensagem privada"
-    title: "Mensagens Privadas (%{count})"
   profile:
     deleted: "Perfil excluído com sucesso"
     description:
@@ -1191,7 +1132,7 @@ pt-br:
     activity: "Atividades recentes"
   recent_activity: 
     empty: "Você ainda não possui atividades recentes para exibir. Ingresse em comunidades e comece a interagir para visualizar itens nesta área."
-    tooltip: "Aqui você encontra as mensagens, eventos e notícias mais novas das comunidades às quais vocẽ pertence"
+    tooltip: "Aqui você encontra os eventso e mensagens mais atuais das comunidades às quais vocẽ pertence"
   recording:
     automatic: Automático
     box_title: Gravação
@@ -1216,7 +1157,6 @@ pt-br:
   registrations:
     signup_form:
       register: "Registre-se"
-  remember_me: "Lembrar de mim"
   remove: Remover
   reply: Responder
   reply_to: "Responder para:"
@@ -1553,7 +1493,6 @@ pt-br:
     sidebar_webconf_buttons:
       end: "Finalizar"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
-      fast_start: "Início rápido usando as opções já configuradas"
       invite: "Convidar outras pessoas"
       join: "Entrar!"
       join_mobile: "Entrar/móvel"
@@ -1722,7 +1661,6 @@ pt-br:
     not_confirmed: "Não confirmados"
     one: Usuário
     other: Usuários
-    private_message: "Enviar Mensagem"
     recent_join: "Usuários recentemente inscritos"
     registered: "Obrigado por se registar! Acabamos de enviar instruções sobre como ativar a sua conta de usuário"
     request_confirmation: "Solicitar e-mail de confirmação"

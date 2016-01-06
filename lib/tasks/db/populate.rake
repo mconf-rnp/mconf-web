@@ -8,7 +8,7 @@ namespace :db do
     # production (cannot load such file -- populator)
     require 'populator'
 
-    reserved_usernames = ['lfzawacki', 'daronco', 'fbottin']
+    reserved_usernames = ['lfzawacki', 'daronco', 'fbottin', 'cassio']
 
     @created_at_start = 1.year.ago
     @created_at_start_months = 12
@@ -20,10 +20,9 @@ namespace :db do
 
     if ENV['CLEAR']
       puts "*** Destroying all resources!"
-      PrivateMessage.destroy_all
       Permission.destroy_all
       Space.destroy_all
-      if configatron.modules.events.enabled
+      if Mconf::Modules.mod_enabled?('events')
         Event.destroy_all
         Participant.destroy_all
       end
@@ -161,7 +160,7 @@ namespace :db do
       end
     end
 
-    if configatron.modules.events.enabled
+    if Mconf::Modules.mod_enabled?('events')
       puts "* Create events"
 
       puts "* Create events: for spaces (20..40)"
@@ -202,8 +201,8 @@ namespace :db do
         event.end_on = 2.hours.since(event.start_on)..2.days.since(event.start_on)
       end
 
-      # TODO: #1115, populate with models from MwebEvents
-      # if configatron.modules.events.loaded
+      # TODO: #1115, populate with participants
+      # if Mconf::Modules.mod_enabled?('events')
       # puts "* Create spaces: \"#{space.name}\" - add users for events"
       # event_role_ids = Role.find_all_by_stage_type('Event').map(&:id)
       # space.events.each do |event|
@@ -342,7 +341,7 @@ namespace :db do
       end
 
       # Event participants activity
-      if configatron.modules.events.enabled
+      if Mconf::Modules.mod_enabled?('events')
         space.events.each do |event|
           event.participants.each do |part|
             attend = part.attend? ? :attend : :not_attend
@@ -400,7 +399,7 @@ namespace :db do
     u2.profile.update_attributes(attrs_to_hash(Profile, profile_attrs))
 
     space_attrs = [:name, :description]
-    s = FactoryGirl.create(:space, attrs_to_hash(Space, space_attrs))
+    s = FactoryGirl.create(:space_with_associations, attrs_to_hash(Space, space_attrs))
     s.new_activity :create, u
     s.add_member!(u, 'Admin')
     s.add_member!(u2)

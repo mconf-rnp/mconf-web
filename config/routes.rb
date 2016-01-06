@@ -43,9 +43,6 @@ Mconf::Application.routes.draw do
     playback_types: 'custom_bigbluebutton_playback_types'
   }
   # register a few custom routes that were added to bigbluebutton_rails
-  get '/bigbluebutton/rooms/:id/join_options',
-    to: 'custom_bigbluebutton_rooms#join_options',
-    as: "join_options_bigbluebutton_room"
   get '/bigbluebutton/rooms/:id/invitation',
     to: 'custom_bigbluebutton_rooms#invitation',
     as: "invitation_bigbluebutton_room"
@@ -60,25 +57,6 @@ Mconf::Application.routes.draw do
     to: 'custom_bigbluebutton_rooms#invite_userid',
     as: "join_webconf"
 
-  # event module
-  if Mconf::Modules.mod_loaded?('events')
-
-    # For invitations
-    resources :events do
-      collection do
-        get :select
-      end
-
-      resources :participants
-
-      member do
-        post :send_invitation
-        get  :invite
-      end
-    end
-  end
-  get 'participant_confirmations/:token', to: 'participant_confirmations#confirm', as: 'participant_confirmation'
-  get 'participant_confirmations/:token/cancel', to: 'participant_confirmations#destroy', as: 'cancel_participant_confirmation'
 
   # shibboleth controller
   get '/secure', to: 'shibboleth#login', as: "shibboleth"
@@ -109,9 +87,7 @@ Mconf::Application.routes.draw do
 
     get '/recordings/:id/edit', to: 'spaces#edit_recording', as: 'edit_recording'
 
-    if Mconf::Modules.mod_loaded?('events')
-      get '/events', to: 'space_events#index', as: 'events'
-    end
+    get '/events', to: 'space_events#index', as: 'events'
 
     resources :users, only: :index
 
@@ -135,8 +111,6 @@ Mconf::Application.routes.draw do
     resources :attachments, except: [:edit, :update]
     delete 'attachments', to: 'attachments#delete_collection'
   end
-
-  resources :permissions, only: [:update, :destroy]
 
   resources :users, except: [:index] do
     collection do
@@ -171,6 +145,8 @@ Mconf::Application.routes.draw do
     get :webconf, on: :collection
   end
 
+  resources :permissions, only: [:update, :destroy]
+
   # The unique Site is created in db/seeds and can only be edited
   resource :site, only: [:show, :edit, :update]
 
@@ -184,6 +160,21 @@ Mconf::Application.routes.draw do
 
   # General statistics for the website
   get '/statistics', to: 'statistics#show', as: 'show_statistics'
+
+  # Events
+  # Note: we load the routes even if the events are disabled in the site
+  resources :events do
+    collection do
+      get :select
+    end
+    resources :participants
+    member do
+      post :send_invitation
+      get  :invite
+    end
+  end
+  get 'participant_confirmations/:token', to: 'participant_confirmations#confirm', as: 'participant_confirmation'
+  get 'participant_confirmations/:token/cancel', to: 'participant_confirmations#destroy', as: 'cancel_participant_confirmation'
 
   # Institutions
   resources :institutions, :except => [:index] do

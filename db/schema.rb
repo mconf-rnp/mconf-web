@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151029191439) do
+ActiveRecord::Schema.define(version: 20151215194513) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -170,22 +170,6 @@ ActiveRecord::Schema.define(version: 20151029191439) do
     t.binary "data"
   end
 
-  create_table "institutions", force: true do |t|
-    t.string   "name"
-    t.string   "acronym"
-    t.string   "permalink"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_limit"
-    t.integer  "can_record_limit"
-    t.text     "identifier"
-    t.boolean  "force_shib_login",           default: false
-    t.boolean  "require_space_approval",     default: true
-    t.boolean  "forbid_user_space_creation", default: true
-    t.string   "recordings_disk_used",       default: "0"
-    t.string   "recordings_disk_quota",      default: "0"
-  end
-
   create_table "events", force: true do |t|
     t.string   "name"
     t.text     "summary"
@@ -206,6 +190,22 @@ ActiveRecord::Schema.define(version: 20151029191439) do
   end
 
   add_index "events", ["permalink"], name: "index_events_on_permalink", using: :btree
+
+  create_table "institutions", force: true do |t|
+    t.string   "name"
+    t.string   "acronym"
+    t.string   "permalink"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_limit"
+    t.integer  "can_record_limit"
+    t.text     "identifier"
+    t.boolean  "force_shib_login",           default: false
+    t.boolean  "require_space_approval",     default: true
+    t.boolean  "forbid_user_space_creation", default: true
+    t.string   "recordings_disk_used",       default: "0"
+    t.string   "recordings_disk_quota",      default: "0"
+  end
 
   create_table "invitations", force: true do |t|
     t.integer  "target_id"
@@ -365,7 +365,6 @@ ActiveRecord::Schema.define(version: 20151029191439) do
     t.string   "shib_login_field"
     t.string   "timezone",                       default: "UTC"
     t.string   "external_help"
-    t.boolean  "webconf_auto_record",            default: false
     t.boolean  "ldap_enabled"
     t.string   "ldap_host"
     t.integer  "ldap_port"
