@@ -69,7 +69,7 @@ describe RegistrationsController do
     }
     before(:each) { put :create }
     it { should redirect_to(root_path) }
-    it { should set_the_flash.to(I18n.t("users.registrations.shibboleth.error.force_shib_registration"))}
+    it { should set_flash.to(I18n.t("users.registrations.shibboleth.error.force_shib_registration"))}
   end
 
 end

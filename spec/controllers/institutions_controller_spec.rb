@@ -76,7 +76,7 @@ describe InstitutionsController do
 
       describe "sets the flash with a success message" do
         before(:each) { post :create, :institution => {:name => institution.name} }
-        it { should set_the_flash.to(I18n.t('institution.created')) }
+        it { should set_flash.to(I18n.t('institution.created')) }
       end
     end
 

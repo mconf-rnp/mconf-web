@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151020182042) do
+ActiveRecord::Schema.define(version: 20151215194513) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -170,6 +170,27 @@ ActiveRecord::Schema.define(version: 20151020182042) do
     t.binary "data"
   end
 
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "summary"
+    t.text     "description"
+    t.string   "social_networks"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "start_on"
+    t.datetime "end_on"
+    t.string   "time_zone"
+    t.string   "location"
+    t.string   "address"
+    t.float    "latitude",        limit: 24
+    t.float    "longitude",       limit: 24
+    t.string   "permalink"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "events", ["permalink"], name: "index_events_on_permalink", using: :btree
+
   create_table "institutions", force: true do |t|
     t.string   "name"
     t.string   "acronym"
@@ -235,49 +256,20 @@ ActiveRecord::Schema.define(version: 20151020182042) do
   add_index "ldap_tokens", ["identifier"], name: "index_ldap_tokens_on_identifier", unique: true, using: :btree
   add_index "ldap_tokens", ["user_id"], name: "index_ldap_tokens_on_user_id", unique: true, using: :btree
 
-  create_table "mweb_events_events", force: true do |t|
-    t.string   "name"
-    t.text     "summary"
-    t.text     "description"
-    t.string   "social_networks"
-    t.integer  "owner_id"
-    t.string   "owner_type"
-    t.datetime "start_on"
-    t.datetime "end_on"
-    t.string   "time_zone"
-    t.string   "location"
-    t.string   "address"
-    t.float    "latitude",        limit: 24
-    t.float    "longitude",       limit: 24
-    t.string   "permalink"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "mweb_events_events", ["permalink"], name: "index_mweb_events_events_on_permalink", using: :btree
-
-  create_table "mweb_events_participants", force: true do |t|
-    t.integer  "owner_id"
-    t.string   "owner_type"
-    t.integer  "event_id"
-    t.string   "email"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "news", force: true do |t|
-    t.string   "title"
-    t.text     "text"
-    t.integer  "space_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "participant_confirmations", force: true do |t|
     t.string   "token"
     t.integer  "participant_id"
     t.datetime "confirmed_at"
     t.datetime "email_sent_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "participants", force: true do |t|
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.integer  "event_id"
+    t.string   "email"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -301,20 +293,6 @@ ActiveRecord::Schema.define(version: 20151020182042) do
     t.integer  "author_id"
     t.string   "author_type"
     t.integer  "parent_id"
-    t.boolean  "spam",        default: false
-  end
-
-  create_table "private_messages", force: true do |t|
-    t.integer  "sender_id"
-    t.integer  "receiver_id"
-    t.integer  "parent_id"
-    t.boolean  "checked",             default: false
-    t.string   "title"
-    t.text     "body"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "deleted_by_sender",   default: false
-    t.boolean  "deleted_by_receiver", default: false
   end
 
   create_table "profiles", force: true do |t|
@@ -382,13 +360,11 @@ ActiveRecord::Schema.define(version: 20151020182042) do
     t.string   "smtp_domain"
     t.string   "smtp_auth_type"
     t.string   "smtp_sender"
-    t.boolean  "chat_enabled",                   default: false
     t.string   "xmpp_server"
     t.text     "shib_env_variables"
     t.string   "shib_login_field"
     t.string   "timezone",                       default: "UTC"
     t.string   "external_help"
-    t.boolean  "webconf_auto_record",            default: false
     t.boolean  "ldap_enabled"
     t.string   "ldap_host"
     t.integer  "ldap_port"
