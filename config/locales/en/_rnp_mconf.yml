@@ -41,8 +41,9 @@ en:
         title: "Other options"
   institution:
     created: Institution created successfully.
+    deleted: "Institution removed successfully"
     duplicate: This institution is a duplicate
-    updated: "Instituição atualizada com sucesso"
+    updated: "Institution updated successfully"
   institutions:
     form:
       new: New institution
@@ -63,6 +64,7 @@ en:
         other: "%{count} members can record"
       can_record_limit: "maximum: %{limit}"
       destroy: "Remove institution"
+      destroy_confirm: "Are you sure you want to remove the institution %{name}?"
       disk_used: "%{used} used of %{quota}"
       no_user_limit: "no maximum"
       recordings_disk_used: Disk space used by recordings
