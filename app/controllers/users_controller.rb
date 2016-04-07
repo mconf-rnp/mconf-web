@@ -138,31 +138,6 @@ class UsersController < InheritedResources::Base
     redirect_to :back
   end
 
-  # TODO: #1650 these methods are now in a separate module, customize them there
-  def approve
-    if current_site.require_registration_approval?
-      ignore_full = can?(:approve_when_full, @user)
-      if @user.approve!(ignore_full)
-        @user.create_approval_notification(current_user)
-        flash[:notice] = t('users.approve.approved', :name => @user.name)
-      else
-        flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
-      end
-    else
-      flash[:error] = t('users.approve.not_enabled')
-    end
-    redirect_to :back
-  end
-  def disapprove
-    if current_site.require_registration_approval?
-      @user.disapprove!
-      flash[:notice] = t('users.disapprove.disapproved', :name => @user.name)
-    else
-      flash[:error] = t('users.disapprove.not_enabled')
-    end
-    redirect_to :back
-  end
-
   # Methods to let admins create new users
   def new
     respond_to do |format|
@@ -186,14 +161,17 @@ class UsersController < InheritedResources::Base
       end
     end
 
-    respond_to do |format|
-
-      if @user.save
-        @user.confirm
-        @user.approve!(can?(:approve_when_full, @user))
-        flash[:success] = t("users.create.success")
-      else
-        flash[:error] = t('users.create.error', errors: @user.errors.full_messages.join(", "))
+    if @user.save
+      @user.confirm
+      @user.approve!
+      flash[:success] = t("users.create.success")
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
+      end
+    else
+      flash[:error] = t('users.create.error', errors: @user.errors.full_messages.join(", "))
+      respond_to do |format|
+        format.html { redirect_to manage_users_path }
       end
 
       format.html { redirect_to manage_users_path }

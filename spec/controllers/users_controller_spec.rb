@@ -1279,15 +1279,11 @@ describe UsersController do
         it("confirms the user") { user.reload.confirmed?.should be(true) }
 
         context "skips the confirmation email" do
-          let(:user) { FactoryGirl.create(:unconfirmed_user) }
-          before(:each) {
-            Site.current.update_attributes(:require_registration_approval => true)
-          }
           it {
-            user.confirmed?.should be(false) # just to make sure wasn't already confirmed
+            user.should_not be_confirmed # just to make sure wasn't already confirmed
             expect {
               post :approve, id: user.to_param
-              user.reload.confirmed?.should be(true)
+              user.reload.should be_confirmed
             }.not_to change{ ActionMailer::Base.deliveries }
           }
         end
@@ -1303,8 +1299,7 @@ describe UsersController do
 
       context "but the user's approval fails" do
         before {
-          User.any_instance.should_receive(:approve!).and_return(false)
-          user.institution.update_attributes(:user_limit => 1)
+          user.institution.update_attributes(:user_limit => 0)
         }
         before(:each) {
           post :approve, :id => user.to_param
@@ -1319,37 +1314,7 @@ describe UsersController do
       context "and the institution's limit was reached" do
         before { user.institution.update_attributes(:user_limit => 0) }
 
-        context "but the current user can still approve users" do
-          before(:each) {
-            post :approve, :id => user.to_param
-          }
-          it { should respond_with(:redirect) }
-          it { should set_flash.to(I18n.t('users.approve.approved', :name => user.name)) }
-          it { should redirect_to('/any') }
-          it("approves the user") { user.reload.approved?.should be_truthy }
-          it("confirms the user") { user.reload.confirmed?.should be_truthy }
-
-          context "skips the confirmation email" do
-            let(:user) { FactoryGirl.create(:unconfirmed_user) }
-            before(:each) {
-              Site.current.update_attributes(:require_registration_approval => true)
-            }
-            it {
-              user.confirmed?.should be(false) # just to make sure wasn't already confirmed
-              expect {
-                post :approve, :id => user.to_param
-                user.reload.confirmed?.should be(true)
-              }.not_to change{ ActionMailer::Base.deliveries }
-            }
-          end
-        end
-
         context "and the current user cannot approve users" do
-          before {
-            controller.should_receive(:can?)
-              .with(:approve_when_full, user)
-              .and_return(false)
-          }
           before(:each) {
             post :approve, :id => user.to_param
           }

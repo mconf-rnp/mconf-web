@@ -10,7 +10,13 @@ module Mconf
         resource = instance_variable_get("@#{controller_name.singularize}")
 
         resource.approve!
-        flash[:notice] = t("#{controller_name}.approve.approved", :name => resource.name)
+
+        if resource.errors.any?
+          # Show user approved error if we fail right after approving
+          flash[:error] = resource.errors[:approved].first
+        else
+          flash[:notice] = t("#{controller_name}.approve.approved", :name => resource.name)
+        end
       else
         flash[:error] = t("#{controller_name}.approve.not_enabled")
       end

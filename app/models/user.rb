@@ -84,6 +84,9 @@ class User < ActiveRecord::Base
   after_create :set_institution
   after_update :set_institution
 
+  # Before approving via user update, check if institution isn't full
+  before_update :check_if_can_approve, if: -> { require_approval? && approved_changed? }
+
   before_destroy :before_disable_and_destroy, prepend: true
 
   default_scope { where(disabled: false) }
@@ -230,14 +233,9 @@ class User < ActiveRecord::Base
     rooms
   end
 
-  # Sets the user as approved and skips confirmation
-  def approve!(ignore_full = false)
-    if institution_is_full? && !ignore_full
-      false
-    else
-      skip_confirmation! unless confirmed?
-      update_attributes(approved: true)
-    end
+  # Returns the number of unread private messages for this user
+  def unread_private_messages
+    PrivateMessage.inbox(self).select{|msg| !msg.checked}
   end
 
   # Overrides a method from devise, see:
@@ -324,6 +322,18 @@ class User < ActiveRecord::Base
   end
 
   protected
+
+  # User model specific code for approval module
+  def check_if_can_approve
+    if institution_is_full?
+      self.errors.add(:approved, I18n.t('users.approve.institution_full', name: institution.name, limit: institution.user_limit))
+      false
+    else
+      # Also confirm user if necessary
+      skip_confirmation! unless confirmed?
+      true
+    end
+  end
 
   def before_disable_and_destroy
     # All the spaces the user is an admin of
