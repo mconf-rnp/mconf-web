@@ -34,7 +34,12 @@ class UsersController < ApplicationController
 
   def show
     @user_spaces = @user.spaces
-    @recent_activities = RecentActivity.user_public_activity(@user).order('updated_at DESC').page(params[:page])
+
+    # Show activity only in spaces where the current user is a member
+    in_spaces = current_user.present? ? current_user.spaces : []
+    @recent_activities = RecentActivity.user_public_activity(@user, in_spaces: in_spaces)
+    @recent_activities = @recent_activities.order('updated_at DESC').page(params[:page])
+
     @profile = @user.profile
     respond_to do |format|
       format.html { render 'profiles/show' }
@@ -155,8 +160,8 @@ class UsersController < ApplicationController
       @users = query.limit(limit)
     else
       @users = query
-      .search_by_terms(words)
-      .limit(limit)
+        .search_by_terms(words, can?(:manage, User))
+        .limit(limit)
     end
 
     respond_with @users do |format|
@@ -288,7 +293,7 @@ class UsersController < ApplicationController
     allowed += [:institution_id] if current_user.superuser?
 
     if is_institution_admin?
-      allowed += [:can_record, :approved, :disabled]
+      allowed += [:can_record, :disabled]
       if params[:action] == 'create'
         allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
       end

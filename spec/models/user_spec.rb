@@ -42,7 +42,8 @@ describe User do
       FactoryGirl.create(:user, username: 'steve-hairis', email: 'steve-hairis@email.com', created_at: Time.now + 1.second),
       FactoryGirl.create(:user, username: 'ismael-esteves', email: 'ismael-esteves@email.com', created_at: Time.now + 2.second)
     ]}
-    let(:subject) { User.search_by_terms(terms) }
+    let(:include_private) { false }
+    let(:subject) { User.search_by_terms(terms, include_private) }
 
     before {
       users[0].profile.update_attribute(:full_name, 'Steve and Will Soon')
@@ -57,7 +58,7 @@ describe User do
       it { subject.count.should be(3) }
     end
 
-    context 'Composite term finds something' do
+    context 'composite term finds something' do
       let(:terms) { ['steve hair'] }
 
       it { should include(users[1]) }
@@ -109,6 +110,18 @@ describe User do
       it { subject.should_not include(user2) }
       it { subject.should_not include(user4) }
       it { subject.should_not include(user5) }
+    end
+
+    context "searches by email if include_private is true" do
+      let(:include_private) { true }
+      let(:terms) { 'steve-hairis@email.com' }
+      it { subject.count.should be(1) }
+      it { should include(users[1]) }
+    end
+
+    context "doesn't search by email if include_private is false" do
+      let(:terms) { 'steve-hairis@email.com' }
+      it { subject.count.should be(0) }
     end
   end
 
@@ -695,10 +708,9 @@ describe User do
   end
 
   describe ".with_disabled" do
-    let!(:user1) { FactoryGirl.create(:user, disabled: true) }
-    let!(:user2) { FactoryGirl.create(:user, disabled: false) }
-
-    context "finds users even if disabled" do
+    context "finds users that are disabled" do
+      let!(:user1) { FactoryGirl.create(:user, disabled: true) }
+      let!(:user2) { FactoryGirl.create(:user, disabled: false) }
       subject { User.with_disabled }
       it { should be_include(user1) }
       it { should be_include(user2) }
@@ -708,11 +720,20 @@ describe User do
       it { User.with_disabled.should be_kind_of(ActiveRecord::Relation) }
     end
 
+    context "doesn't remove previous scopes from the query" do
+      let!(:user1) { FactoryGirl.create(:user, disabled: true, can_record: true) }
+      let!(:user2) { FactoryGirl.create(:user, disabled: true, can_record: false) }
+
+      subject { User.where(can_record: true).with_disabled.all }
+      it { should include(user1) }
+      it { should_not include(user2) }
+    end
+
     context "is chainable" do
-      let!(:user3) { FactoryGirl.create(:user, can_record: true, username: "abc") }
-      let!(:user4) { FactoryGirl.create(:user, can_record: true, username: "def") }
-      let!(:user5) { FactoryGirl.create(:user, can_record: false, username: "abc-2") }
-      let!(:user6) { FactoryGirl.create(:user, can_record: false, username: "def-2") }
+      let!(:user1) { FactoryGirl.create(:user, can_record: true, username: "abc") }
+      let!(:user2) { FactoryGirl.create(:user, can_record: true, username: "def") }
+      let!(:user3) { FactoryGirl.create(:user, can_record: false, username: "abc-2") }
+      let!(:user4) { FactoryGirl.create(:user, can_record: false, username: "def-2") }
       subject { User.where(can_record: true).with_disabled.where('users.username LIKE ?', '%abc%') }
       it { subject.count.should eq(1) }
     end
@@ -1089,7 +1110,7 @@ describe User do
   describe "abilities", :abilities => true do
     set_custom_ability_actions([
       :fellows, :current, :select, :approve, :enable, :disable, :confirm, :update_password,
-      :manage_user, :give_recording_rights
+      :give_recording_rights
     ])
 
     subject { ability }
@@ -1232,7 +1253,7 @@ describe User do
 
       it {
         allowed = [:index, :show, :edit, :update, :fellows, :current, :select,
-                   :approve, :manage_user, :give_recording_rights, :confirm,
+                   :approve, :give_recording_rights, :confirm,
                    :new, :create, :update_password]
         should_not be_able_to_do_anything_to(target).except(allowed)
       }

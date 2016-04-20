@@ -179,6 +179,7 @@ en:
         ldap_principal_name_field: "LDAP: Field for principal name (unique ID)"
         local_auth_enabled: "Enable local authentication"
         locale: "Language"
+        max_upload_size: "Maximum file size for uploads"
         name: "Name"
         presence_domain: "XMPP Chat Domain"
         registration_enabled: "Allow users to create new accounts"
@@ -924,6 +925,7 @@ en:
       public: "Public space"
   less: "less..."
   locales: 
+    de: Deutsch
     en: English
     es-419: "Español (América Latina)"
     pt-br: "Português (Brasil)"

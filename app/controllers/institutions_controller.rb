@@ -47,7 +47,7 @@ class InstitutionsController < ApplicationController
     else
       flash[:error] = t('error.change')
       respond_with @institution do |format|
-        format.html { render :edit }
+        format.html { redirect_to manage_institutions_path }
       end
     end
   end

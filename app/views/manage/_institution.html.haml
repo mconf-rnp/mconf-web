@@ -3,7 +3,7 @@
     - if can?(:edit, institution)
       = link_to icon_edit(:alt => t('_other.edit'), :title => t('_other.edit')), edit_institution_path(institution), :class => 'open-modal'
     - if can?(:destroy, institution)
-      = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
+      = link_to institution_path(institution), :method => :delete, :data => { :confirm => t('.destroy_confirm', name: institution.name) } do
         = icon_delete(:alt => t('disable'), :title => t('.destroy'))
 
   .thread-content

@@ -9,8 +9,11 @@ class Institution < ActiveRecord::Base
 
   has_many :users, :through => :permissions
 
-  has_and_belongs_to_many :admins, -> { Permission.where(:permissions => {:subject_type => 'Institution', :role_id => Role.find_by_name('Admin')}) },
-   :join_table => :permissions, :class_name => "User", :foreign_key => "subject_id"
+  has_and_belongs_to_many :admins, -> {
+    Permission.where(
+      permissions: { subject_type: 'Institution', role_id: Role.find_by_name('Admin') }
+    )
+  }, join_table: :permissions, class_name: "User", foreign_key: "subject_id"
 
   has_many :spaces
 
@@ -19,7 +22,7 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
-  before_validation :adjust_recordings_disk_quota
+  before_validation :validate_and_adjust_recordings_disk_quota
 
   def self.roles
     ['User', 'Admin'].map { |r| Role.find_by_name(r) }
@@ -103,11 +106,8 @@ class Institution < ActiveRecord::Base
   # Call this to query all recordings belonging to this institution (users and spaces)
   # and get a sum of their sizes in the 'recordings_disk_used' field
   def update_recordings_disk_used!
-    room_ids = BigbluebuttonRoom.where(owner_id: spaces.with_disabled.ids, owner_type: 'Space').ids |
-            BigbluebuttonRoom.where(owner_id: users.with_disabled.ids, owner_type: 'User').ids
-
-    recordings = BigbluebuttonRecording.where(room_id: room_ids)
-    update_attribute(:recordings_disk_used, recordings.sum(:size))
+    size = self.recordings.sum(:size)
+    update_attribute(:recordings_disk_used, size)
   end
 
   # Simple method to see if the recordings size exceeded the quota
@@ -129,16 +129,26 @@ class Institution < ActiveRecord::Base
     recordings_disk_used.to_f / recordings_disk_quota.to_f
   end
 
+  # Returns all the recordings associated with this institution.
+  def recordings
+    room_ids = BigbluebuttonRoom.where(owner_id: spaces.with_disabled.ids, owner_type: 'Space').ids |
+               BigbluebuttonRoom.where(owner_id: users.with_disabled.ids, owner_type: 'User').ids
+    BigbluebuttonRecording.where(room_id: room_ids)
+  end
+
   private
 
-  def adjust_recordings_disk_quota
+  def validate_and_adjust_recordings_disk_quota
     if recordings_disk_quota_changed?
-
-      if is_number?(self.recordings_disk_quota)
-        # express size in bytes if a number without units was present
-        write_attribute(:recordings_disk_quota, Filesize.from("#{self.recordings_disk_quota} B").to_i)
-      elsif is_filesize?(self.recordings_disk_quota)
-        write_attribute(:recordings_disk_quota, Filesize.from(self.recordings_disk_quota).to_i)
+      if self.recordings_disk_quota.blank?
+        write_attribute(:recordings_disk_quota, nil)
+      else
+        value = Mconf::Filesize.convert(self.recordings_disk_quota)
+        if value.nil?
+          self.errors.add(:recordings_disk_quota, :invalid)
+        else
+          write_attribute(:recordings_disk_quota, value.to_s)
+        end
       end
     end
   end

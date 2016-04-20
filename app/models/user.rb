@@ -71,7 +71,6 @@ class User < ActiveRecord::Base
 
   # BigbluebuttonRoom requires an identifier with 3 chars generated from :name
   # So we'll require :_full_name and :username to have length >= 3
-  # TODO: review, see issue #737
   validates :_full_name, :presence => true, :length => { :minimum => 3 }, :on => :create
 
   # for the associated BigbluebuttonRoom
@@ -93,7 +92,7 @@ class User < ActiveRecord::Base
   RECEIVE_DIGEST_DAILY = 1
   RECEIVE_DIGEST_WEEKLY = 2
 
-  scope :search_by_terms, -> (words) {
+  scope :search_by_terms, -> (words, include_private=false) {
     query = joins(:profile).includes(:profile).order("profiles.full_name")
 
     words ||= []
@@ -102,8 +101,11 @@ class User < ActiveRecord::Base
     query_params = []
 
     words.each do |word|
-      query_strs << "profiles.full_name LIKE ? OR users.username LIKE ? OR users.email LIKE ?"
-      query_params += ["%#{word}%", "%#{word}%", "%#{word}%"]
+      str  = "profiles.full_name LIKE ? OR users.username LIKE ?"
+      str += " OR users.email LIKE ?" if include_private
+      query_strs << str
+      query_params += ["%#{word}%", "%#{word}%"]
+      query_params += ["%#{word}%"] if include_private
     end
 
     query.where(query_strs.join(' OR '), *query_params.flatten)
@@ -173,7 +175,7 @@ class User < ActiveRecord::Base
   end
 
   def self.with_disabled
-    unscope(where: :disabled) # removes the default scope only
+    unscope(where: :disabled) # removes the target scope only
   end
 
   def <=>(user)

@@ -63,7 +63,8 @@
         - collection.push([User::RECEIVE_DIGEST_WEEKLY, t('.receive_digest.weekly')])
         = f.collection_radio_buttons :receive_digest, collection, :first, :last
 
-  - if user_signed_in? && can?(:manage_user, @user)
+  - permissions = [:change_institution, :give_recording_rights, :approve, :make_superuser, :confirm, :disable]
+  - if user_signed_in? && permissions.map{|a| can?(a, @user)}.any?
     #management-options.alert.alert-gray
       %h3= t('.management_options')
       - if can?(:change_institution, @user)
@@ -77,7 +78,7 @@
       -# prevent admins from mistakenly removing themselves from being admins or blocking
       -# access to their account
       - unless current_user == @user
-        = f.input :approved, :required => false if can?(:approve, @user)
+        = f.input :approved, :required => false if current_user.superuser?
         = f.input :superuser, :required => false if can?(:make_superuser, @user)
         - if !@user.confirmed? && can?(:confirm, @user)
           .input
