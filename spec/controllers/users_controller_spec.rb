@@ -733,7 +733,7 @@ describe UsersController do
             sign_in @admin
           end
 
-          context "can set it for users of his institution" do
+          context "cannot set it for users of his institution" do
             before(:each) do
               @user = FactoryGirl.create(:user, approved: true)
               @institution.add_member!(@user)
@@ -742,7 +742,7 @@ describe UsersController do
 
             it { should redirect_to edit_user_path(@user) }
             it { should set_flash.to(I18n.t('user.updated')) }
-            it { @user.reload.approved.should be(false) }
+            it { @user.reload.approved.should be(true) }
           end
         end
       end
