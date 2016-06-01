@@ -54,6 +54,16 @@ Rails.application.config.to_prepare do
     def invitation_url
       Rails.application.routes.url_helpers.join_webconf_url(self, host: Site.current.domain)
     end
+
+    # Selects always the default server, but sets on it the shared secret of the institution that
+    # owns this room, if any.
+    def select_server(api_method=nil)
+      server = BigbluebuttonServer.default
+      if self.owner && self.owner.institution && !self.owner.institution.shared_secret.blank?
+        server.salt = self.owner.institution.shared_secret
+      end
+      server
+    end
   end
 
   BigbluebuttonServer.instance_eval do

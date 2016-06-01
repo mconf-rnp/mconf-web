@@ -10,4 +10,5 @@ pt-br:
         recordings_disk_quota: "Limite máximo de espaço no servidor que pode ser ocupado por gravações desta instituição (e.g. '100 GB', '200 GiB', '1500000000')."
         recordings_disk_used: "Espaço em disco atualmente ocupado por gravações dessa instituição."
         require_space_approval: "Se selecionado, comunidades precisam ser aprovadas por um administrador da instituição para que possam ser vistas e utilizadas por outros usuários"
+        shared_secret: "Chave de acesso que deve ser utilizada ao fazer chamadas da API ao servidor de webconferência. Se vazio, usará a chave padrão do servidor."
         user_limit: "Opcional. Informe um número caso deseje limitar o número de usuários que podem fazer parte desta instituição. Deixe em branco para não limitar o número de membros."

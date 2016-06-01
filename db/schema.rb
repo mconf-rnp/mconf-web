@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151215194513) do
+ActiveRecord::Schema.define(version: 20160601110553) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -205,6 +205,7 @@ ActiveRecord::Schema.define(version: 20151215194513) do
     t.boolean  "forbid_user_space_creation", default: true
     t.string   "recordings_disk_used",       default: "0"
     t.string   "recordings_disk_quota",      default: "0"
+    t.string   "shared_secret"
   end
 
   create_table "invitations", force: true do |t|
@@ -386,8 +387,8 @@ ActiveRecord::Schema.define(version: 20151215194513) do
     t.string   "room_dial_number_pattern"
     t.boolean  "require_space_approval",         default: false
     t.boolean  "forbid_user_space_creation",     default: false
-    t.string   "max_upload_size",                default: "15000000"
     t.boolean  "shib_update_users",              default: false
+    t.string   "max_upload_size",                default: "15000000"
   end
 
   create_table "spaces", force: true do |t|

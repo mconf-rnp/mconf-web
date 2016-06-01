@@ -11,6 +11,7 @@ pt-br:
         recordings_disk_quota: Quota de disco para gravações
         recordings_disk_used: Espaço ocupado por gravações
         require_space_approval: "Moderação de comunidades"
+        shared_secret: "Chave de acesso ao servidor de webconferência"
         user_limit: Máximo de membros
       space:
         institution_id: "Instituição"

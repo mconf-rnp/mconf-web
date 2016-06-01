@@ -11,6 +11,7 @@ en:
         recordings_disk_quota: Disk quota for recordings
         recordings_disk_used: Disk space used by recordings
         require_space_approval: "Moderate spaces"
+        shared_secret: "Web conference server shared secret"
         user_limit: Maximum of members
       space:
         institution_id: "Institution"
