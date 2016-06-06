@@ -56,6 +56,15 @@ pt-br:
       title: "Comunidades na instituição %{name}"
     users:
       title: "Usuários na instituição %{name}"
+  layouts:
+    footer:
+      about_service:
+        mconf_tec: "Mconf Tecnologia"
+        service_page: "Página do serviço"
+        title: "Mais sobre o serviço"
+      links:
+        check: "Checar requisitos de uso"
+        user_guide: "Manual do usuário"
   manage:
     institution:
       can_record_users:

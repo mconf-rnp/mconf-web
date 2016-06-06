@@ -56,6 +56,15 @@ en:
       title: "Spaces in the institution %{name}"
     users:
       title: "Users in the institution %{name}"
+  layouts:
+    footer:
+      about_service:
+        mconf_tec: "Mconf Tecnologia"
+        service_page: "Service page"
+        title: "More about the service"
+      links:
+        check: "Check software requirements"
+        user_guide: "User manual"
   manage:
     institution:
       can_record_users:

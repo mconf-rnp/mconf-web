@@ -23,3 +23,72 @@
     }
   }
 }
+
+#footer {
+  h3 {
+    margin-top: 0;
+  }
+
+  .link-group.footer-languages {
+    float: right;
+    text-align: right;
+    margin-right: 0;
+
+    ul {
+      margin-right: 0;
+    }
+
+    li {
+      display: inline-block;
+      margin-left: 10px;
+    }
+  }
+
+  .link-group {
+    margin-right: 50px;
+  }
+
+  #copyright {
+    clear: both;
+    padding-top: 15px;
+    color: #888;
+    float: left;
+  }
+
+  .current-version {
+    float: right;
+    clear: none;
+    padding-top: 15px;
+    color: #888;
+  }
+}
+
+/* Notifications */
+.noty_bar .noty_message {
+  @include font-size($font-medium);
+  padding: 8px 35px 8px 14px;
+  text-shadow: none;
+}
+.noty_bar.noty_alert {
+  $notif-notice-bg: $rnp-warning-color;
+  background-color: $notif-notice-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-notice-bg, 5);
+}
+.noty_bar.noty_error {
+  $notif-error-bg: $rnp-danger-color;
+  background-color: $notif-error-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-error-bg, 5);
+}
+.noty_bar.noty_success {
+  $notif-success-bg: darken($rnp-success-color, 10);
+  background-color: $notif-success-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-color: darken($notif-success-bg, 5);
+}
