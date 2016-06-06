@@ -1,0 +1,25 @@
+@import "compass/css3";
+@import "compass/typography/links";
+@import "definitions";
+
+#main-logo {
+  margin-top: 4px;
+  margin-right: 15px;
+
+  img {
+    width: 70px;
+    height: 34px;
+  }
+}
+
+#navbar {
+  ul#navbar-left-links, #navbar-right-links {
+    .user-info-dropdown {
+      padding: 9px 10px 7px 10px;
+    }
+
+    li {
+      margin-top: 14px;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 #main-logo
   - url = user_signed_in? ? main_app.my_home_path : main_app.root_path
-  %a.title{:href => url}= current_site.name
+  %a.title{:href => url}
+    = image_tag("rnp/logo-inverted.png")
 
 %ul#navbar-left-links
   - if user_signed_in?
