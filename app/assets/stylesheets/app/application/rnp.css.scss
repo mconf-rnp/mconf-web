@@ -36,11 +36,8 @@
 
     ul {
       margin-right: 0;
-    }
-
-    li {
-      display: inline-block;
-      margin-left: 10px;
+      float: none;
+      text-align: center;
     }
   }
 
@@ -91,4 +88,80 @@
   color: #fff;
   @include box-shadow(none);
   border-color: darken($notif-success-bg, 5);
+}
+
+/* Custom frontpage and sign in page */
+body.frontpage, body.sessions.create, body.sessions.new {
+  $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
+
+  #page-header {
+    text-align: center;
+  }
+
+  .form-area {
+    border: 1px solid #ddd;
+    @include border-radius(2px);
+    width: $form-area-width;
+    @include mconf-clearfix;
+    margin-top: 30px;
+
+    h3 {
+      margin: 0;
+      background: #f6f6f6;
+      padding: 15px;
+      text-align: center;
+      color: #404040;
+    }
+
+    .form-area-content {
+      position: relative;
+    }
+
+    form .input input {
+      width: 50%;
+    }
+  }
+
+  #login-box {
+    float: right;
+
+    .action-links {
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+    }
+
+    .form-actions {
+      margin-bottom: 0;
+    }
+
+    form {
+      float: none;
+      padding-top: 10px;
+
+      .input {
+        margin-top: 8px;
+        margin-bottom: 15px;
+        padding: 0 15px;
+      }
+    }
+  }
+
+  #federation-box {
+    float: left;
+    text-align: center;
+
+    .form-area-content {
+      padding: 59px 40px;
+    }
+
+    .sign-in-cafe {
+      width: 390px;
+      height: 60px;
+    }
+  }
+
+  #footer #copyright {
+    padding-top: 30px;
+  }
 }

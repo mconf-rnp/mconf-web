@@ -29,16 +29,15 @@ pt-br:
         webconferencia: "Webconferência"
         webinar: "Webinar"
   frontpage:
-    show:
+    sign_in_and_title:
+      headline: "Portal do serviço de conferência web"
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
         click_here: "(clique aqui para entrar)"
-      other:
-        local_account_text: "Clique aqui para acesso não federado"
-        local_account_title: "Sua instituição não está na federação CAFe?"
-        register_text: "Criar uma nova conta"
-        register_title: "Sua instituição ainda não é membro da CAFe?"
-        title: "Outras opções"
+        lost_password: "Esqueceu sua senha?"
+        title: "Acesso federado"
+      local_auth:
+        title: "Acesso não federado"
   institution:
     created: Instituição criada com sucesso.
     deleted: "Instituição removida com sucesso"

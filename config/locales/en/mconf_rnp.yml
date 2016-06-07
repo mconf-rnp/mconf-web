@@ -29,16 +29,15 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   frontpage:
-    show:
+    sign_in_and_title:
+      headline: "Web conference service portal"
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
         click_here: "(click here to sign in)"
-      other:
-        local_account_text: "Click here for non-federated access"
-        local_account_title: "Your institution is not on CAFe?"
-        register_text: "Create a new account"
-        register_title: "Your institution is not a member of CAFe yet?"
-        title: "Other options"
+        lost_password: "Forgot your password?"
+        title: "Federated access"
+      local_auth:
+        title: "Non federated access"
   institution:
     created: Institution created successfully.
     deleted: "Institution removed successfully"
