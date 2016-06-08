@@ -94,7 +94,7 @@ feature 'Visitor logs in' do
     scenario 'from the login page (/login)' do
       visit login_path
 
-      click_link 'Sign in'
+      visit login_path
       expect(current_path).to eq(login_path)
 
       sign_in_with @user.username, @user.password, false
@@ -155,7 +155,7 @@ feature 'Visitor logs in' do
       click_button "Request password"
       expect(current_path).to eq("/users/login")
 
-      click_link 'Sign in'
+      visit login_path
       expect(current_path).to eq(login_path)
 
       sign_in_with @user.username, @user.password, false
@@ -177,7 +177,7 @@ feature 'Visitor logs in' do
       click_button 'Request confirmation email'
       expect(current_path).to eq("/users/login")
 
-      click_link 'Sign in'
+      visit login_path
       expect(current_path).to eq(login_path)
 
       sign_in_with @user.username, @user.password, false

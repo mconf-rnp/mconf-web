@@ -34,7 +34,7 @@ en:
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
         click_here: "(click here to sign in)"
-        lost_password: "Forgot your password?"
+        lost_password: "Lost your password?"
         title: "Federated access"
       local_auth:
         title: "Non federated access"

@@ -161,6 +161,12 @@ body.frontpage, body.sessions.create, body.sessions.new {
     }
   }
 
+  #login-options {
+    clear: both;
+    float: right;
+    margin-top: 20px;
+  }
+
   #footer #copyright {
     padding-top: 30px;
   }

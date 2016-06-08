@@ -317,7 +317,7 @@ describe 'User signs in via shibboleth' do
     context "when he was in the frontpage" do
       before {
         visit root_url
-        click_link t('frontpage.show.login.click_here') # federation login link
+        click_link t('frontpage.sign_in_and_title.login.click_here') # federation login link
       }
 
       it { current_path.should eq(my_home_path) }
