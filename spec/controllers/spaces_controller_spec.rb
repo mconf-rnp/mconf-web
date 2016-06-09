@@ -70,12 +70,16 @@ describe SpacesController do
         RecentActivity.create(owner: spaces[2], created_at: now + 1.day)
       ]}
 
-      before { get :index }
+      before {
+        Space.calculate_last_activity_indexes!
+        get :index
+      }
       it { should assign_to(:spaces).with([spaces[1], spaces[2], spaces[0]]) }
     end
 
     it "orders by name if params[:order]=='abc'"
     it "returns only approved spaces"
+    it "should paginate spaces (18 per page)"
 
     context "if there's a user signed in" do
 
@@ -241,7 +245,9 @@ describe SpacesController do
       describe "creates a new activity for the space created" do
         before(:each) {
           expect {
-            post :create, :space => space_attributes
+            PublicActivity.with_tracking do
+              post :create, :space => space_attributes
+            end
           }.to change(RecentActivity, :count).by(1)
         }
         it { RecentActivity.last.trackable.should eq(Space.last) }
@@ -347,8 +353,8 @@ describe SpacesController do
           :repository, :crop_x, :crop_y, :crop_w, :crop_h, :crop_img_w, :crop_img_h,
           :institution_id,
           :bigbluebutton_room_attributes =>
-          [ :id, :attendee_key, :moderator_key, :default_layout, :private,
-            :welcome_msg, :presenter_share_only, :auto_start_video, :auto_start_audio ] ]
+            [ :id, :attendee_key, :moderator_key, :default_layout, :private, :welcome_msg ]
+        ]
       }
       before {
         space_attributes.stub(:permit).and_return(space_attributes)
@@ -356,7 +362,9 @@ describe SpacesController do
       }
       before(:each) {
         expect {
-          put :update, :id => space.to_param, :space => space_attributes
+          PublicActivity.with_tracking do
+            put :update, :id => space.to_param, :space => space_attributes
+          end
         }.to change { RecentActivity.count }.by(1)
       }
       it { space_attributes.should have_received(:permit).with(*space_allowed_params) }
@@ -379,7 +387,9 @@ describe SpacesController do
       let(:space_params) { {name: "#{space.name}_new", description: "#{space.description} new" } }
       before(:each) {
         expect {
-          put :update, :id => space.to_param, :space => space_params
+          PublicActivity.with_tracking do
+            put :update, :id => space.to_param, :space => space_params
+          end
         }.to change {RecentActivity.count}.by(1)
       }
 
@@ -394,7 +404,9 @@ describe SpacesController do
 
       before(:each) {
         expect {
-          post :update_logo, space_params
+          PublicActivity.with_tracking do
+            post :update_logo, space_params
+          end
         }.to change {RecentActivity.count}.by(1)
       }
 
@@ -814,5 +826,7 @@ describe SpacesController do
 
       it { should respond_with(:success) }
     end
+    it "should paginate user permission (10 per page)"
+
   end
 end

@@ -62,7 +62,9 @@ describe RegistrationsController do
 
         before {
           expect {
-            post :create, :user => attributes
+            PublicActivity.with_tracking do
+              post :create, :user => attributes
+            end
           }.to change{ User.count }.by(1)
         }
         it { should redirect_to(my_approval_pending_path) }
@@ -84,7 +86,9 @@ describe RegistrationsController do
 
         before {
           expect {
-            post :create, :user => attributes
+            PublicActivity.with_tracking do
+              post :create, :user => attributes
+            end
           }.to change{ User.count }.by(1)
         }
         it { should redirect_to(my_home_path) }
