@@ -120,6 +120,12 @@ body.frontpage, body.sessions.create, body.sessions.new {
     form .input input {
       width: 50%;
     }
+
+    #user_remember_me {
+      width: auto;
+      float: right;
+      margin-left: 5px;
+    }
   }
 
   #login-box {
