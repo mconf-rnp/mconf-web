@@ -18,7 +18,7 @@ feature 'Behaviour of the flag Site#registration_enabled' do
 
       it { page.should have_content(t('devise.shared.links.register')) }
       it { page.should have_content(t('devise.shared.links.resend_confirmation_email')) }
-      it { page.should have_css("#navbar a[href='#{register_path}']") }
+      it { page.should have_css("a[href='#{register_path}']") }
     end
 
     context "events/index shows a link for anonymous to register" do

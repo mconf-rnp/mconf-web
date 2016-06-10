@@ -1,0 +1,179 @@
+@import "compass/css3";
+@import "compass/typography/links";
+@import "definitions";
+
+#main-logo {
+  margin-top: 4px;
+  margin-right: 15px;
+
+  img {
+    width: 70px;
+    height: 34px;
+  }
+}
+
+#navbar {
+  ul#navbar-left-links, #navbar-right-links {
+    .user-info-dropdown {
+      padding: 9px 10px 7px 10px;
+    }
+
+    li {
+      margin-top: 14px;
+    }
+  }
+}
+
+#footer {
+  h3 {
+    margin-top: 0;
+  }
+
+  .link-group.footer-languages {
+    float: right;
+    text-align: right;
+    margin-right: 0;
+
+    ul {
+      margin-right: 0;
+      float: none;
+      text-align: center;
+    }
+  }
+
+  .link-group {
+    margin-right: 50px;
+  }
+
+  #copyright {
+    clear: both;
+    padding-top: 15px;
+    color: #888;
+    float: left;
+  }
+
+  .current-version {
+    float: right;
+    clear: none;
+    padding-top: 15px;
+    color: #888;
+  }
+}
+
+/* Notifications */
+.noty_bar .noty_message {
+  @include font-size($font-medium);
+  padding: 8px 35px 8px 14px;
+  text-shadow: none;
+}
+.noty_bar.noty_alert {
+  $notif-notice-bg: $rnp-warning-color;
+  background-color: $notif-notice-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-notice-bg, 5);
+}
+.noty_bar.noty_error {
+  $notif-error-bg: $rnp-danger-color;
+  background-color: $notif-error-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-error-bg, 5);
+}
+.noty_bar.noty_success {
+  $notif-success-bg: darken($rnp-success-color, 10);
+  background-color: $notif-success-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-color: darken($notif-success-bg, 5);
+}
+
+/* Custom frontpage and sign in page */
+body.frontpage, body.sessions.create, body.sessions.new {
+  $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
+
+  #page-header {
+    text-align: center;
+  }
+
+  .form-area {
+    border: 1px solid #ddd;
+    @include border-radius(2px);
+    width: $form-area-width;
+    @include mconf-clearfix;
+    margin-top: 30px;
+
+    h3 {
+      margin: 0;
+      background: #f6f6f6;
+      padding: 15px;
+      text-align: center;
+      color: #404040;
+    }
+
+    .form-area-content {
+      position: relative;
+    }
+
+    form .input input {
+      width: 50%;
+    }
+
+    #user_remember_me {
+      width: auto;
+      float: right;
+      margin-left: 5px;
+    }
+  }
+
+  #login-box {
+    float: right;
+
+    .action-links {
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+    }
+
+    .form-actions {
+      margin-bottom: 0;
+    }
+
+    form {
+      float: none;
+      padding-top: 10px;
+
+      .input {
+        margin-top: 8px;
+        margin-bottom: 15px;
+        padding: 0 15px;
+      }
+    }
+  }
+
+  #federation-box {
+    float: left;
+    text-align: center;
+
+    .form-area-content {
+      padding: 59px 40px;
+    }
+
+    .sign-in-cafe {
+      width: 390px;
+      height: 60px;
+    }
+  }
+
+  #login-options {
+    clear: both;
+    float: right;
+    margin-top: 20px;
+  }
+
+  #footer #copyright {
+    padding-top: 30px;
+  }
+}

@@ -387,24 +387,29 @@ ActiveRecord::Schema.define(version: 20160601110553) do
     t.string   "room_dial_number_pattern"
     t.boolean  "require_space_approval",         default: false
     t.boolean  "forbid_user_space_creation",     default: false
-    t.boolean  "shib_update_users",              default: false
     t.string   "max_upload_size",                default: "15000000"
+    t.boolean  "shib_update_users",              default: false
   end
 
   create_table "spaces", force: true do |t|
     t.string   "name"
     t.boolean  "deleted"
-    t.boolean  "public",         default: false
+    t.boolean  "public",              default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description"
     t.string   "permalink"
-    t.boolean  "disabled",       default: false
-    t.boolean  "repository",     default: false
+    t.boolean  "disabled",            default: false
+    t.boolean  "repository",          default: false
     t.string   "logo_image"
     t.integer  "institution_id"
-    t.boolean  "approved",       default: false
+    t.boolean  "approved",            default: false
+    t.datetime "last_activity"
+    t.integer  "last_activity_count"
   end
+
+  add_index "spaces", ["last_activity"], name: "index_spaces_on_last_activity", using: :btree
+  add_index "spaces", ["last_activity_count"], name: "index_spaces_on_last_activity_count", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "username"

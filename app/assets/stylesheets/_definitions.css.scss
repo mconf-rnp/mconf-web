@@ -238,3 +238,27 @@ $mail-font-size: $font-normal;
   font-weight: normal;
   @include font-size($font-small);
 }
+
+// RNP
+$rnp-blue: #243d8f; //#0c488e;
+$rnp-primary: $rnp-blue;
+$rnp-secondary: #666666;
+$rnp-grey: #8c8c8c;
+$rnp-light-grey: #fcfcfc;
+$rnp-bg-color: #ffffff;
+$rnp-danger-color: #9e0b0f;
+$rnp-info-color: #049cdb;
+$rnp-warning-color: #f89406;
+$rnp-success-color: #2ecc71;
+
+$link-color: #4078c0; //$rnp-blue; //lighten($rnp-blue, 15); //lighten($main-color, 15);
+$link-color-hover: lighten($link-color, 10); //$second-color;
+$link-color-active: $link-color;
+$navbar-bg-color-dark: $rnp-blue;
+$navbar-bg-color-light: $rnp-blue;
+$navbar-height: 44px;
+$navbar-font-color: #ddd;
+$navbar-font-color-hover: white;
+$navbar-menu-open-link: $link-color;
+$navbar-menu-open-link-hover: $link-color-hover;
+$footer-height: 140px;

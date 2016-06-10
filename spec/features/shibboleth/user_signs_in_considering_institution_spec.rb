@@ -21,7 +21,7 @@ feature 'User signs in via shibboleth' do
       before { visit root_path }
 
       it { should have_link '', :href => shibboleth_path }
-      it { should have_content t('frontpage.show.login.click_here') }
+      it { should have_content t('frontpage.sign_in_and_title.login.click_here') }
     end
 
     context 'and valid shib data' do
@@ -99,7 +99,7 @@ feature 'User signs in via shibboleth' do
           User.last.profile.update_attributes :full_name => @new_name
 
           visit root_path
-          click_link t('frontpage.show.login.click_here')
+          click_link t('frontpage.sign_in_and_title.login.click_here')
         }
 
         it { current_path.should eq(my_home_path) }

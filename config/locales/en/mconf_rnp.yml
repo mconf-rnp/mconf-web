@@ -30,16 +30,15 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   frontpage:
-    show:
+    sign_in_and_title:
+      headline: "Web conference service portal"
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
         click_here: "(click here to sign in)"
-      other:
-        local_account_text: "Click here for non-federated access"
-        local_account_title: "Your institution is not on CAFe?"
-        register_text: "Create a new account"
-        register_title: "Your institution is not a member of CAFe yet?"
-        title: "Other options"
+        lost_password: "Lost your password?"
+        title: "Federated access"
+      local_auth:
+        title: "Non federated access"
   institution:
     created: Institution created successfully.
     deleted: "Institution removed successfully"
@@ -57,6 +56,15 @@ en:
       title: "Spaces in the institution %{name}"
     users:
       title: "Users in the institution %{name}"
+  layouts:
+    footer:
+      about_service:
+        mconf_tec: "Mconf Tecnologia"
+        service_page: "Service page"
+        title: "More about the service"
+      links:
+        check: "Check software requirements"
+        user_guide: "User manual"
   manage:
     institution:
       can_record_users:
@@ -66,9 +74,9 @@ en:
       can_record_limit: "maximum: %{limit}"
       destroy: "Remove institution"
       destroy_confirm: "Are you sure you want to remove the institution %{name}?"
-      disk_used: "%{used} used of %{quota}"
+      disk_used: "%{used} used of %{quota} for recordings"
+      disk_used_no_quota: "%{used} used for recordings (no quota)"
       no_user_limit: "no maximum"
-      recordings_disk_used: Disk space used by recordings
       spaces:
         zero: 0 spaces
         one: 1 space
@@ -97,6 +105,19 @@ en:
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
+  simple_form:
+    hints:
+      institution:
+        acronym: "Adding an acronym will help users find the right institution when registering."
+        can_record_limit: "Optional. Enter a number to limit how many users can record meetings in this intitution. Leave it empty to set no limits."
+        forbid_user_space_creation: "Only administrators of the institution will be able to create spaces"
+        force_shib_login: "When enabled the user will only be allowed to login via federation"
+        identifier: "Identifier to match users that will belong to this institution. You can use multiple values, one per line, as regular expression. The comparisons are case-insensitive and the strings are trimmed. If a user is identified in the federation as \"user@sub.institution.org\", for example, one possible value to match this user would be \"(.*\\.)?institution\\.org\", that would match any subdomain of an institution."
+        recordings_disk_quota: "Maximum disk space that can be used by recordings from this institution (e.g. '100 GB', '200 GiB', '1500000000')."
+        recordings_disk_used: "Current disk space being used by recordings from this institution."
+        require_space_approval: "When checked, spaces have to be approved by an administrator of the institution before other users can see and use them"
+        shared_secret: "The shared secret to use when making API calls to the web conference server. If empty, will use the default secret."
+        user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
   spaces:
     edit:
       institution_placeholder: "Select an institution"

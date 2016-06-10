@@ -29,12 +29,95 @@
 // Example:
 // @linkColor: #ff0000;
 
-// We customize here exactly what's customized in mconf/bootstrap
-// See what's changed from bootstrap's defaults at:
-// https://github.com/mconf/bootstrap/compare/master...mconf
+// The variables available in the version of bootstrap we use are defined at:
+// https://github.com/twbs/bootstrap/blob/v2.3.2/less/variables.less
 
 @linkColor: #367380;
 @btnPrimaryBackground: #5bc0de;
 @btnPrimaryBackgroundHighlight: #2f96b4;
 @navbarBackground: #0a3138;
 @navbarBackgroundHighlight: #27535C;
+
+// RNP
+@linkColor: #4078c0;
+@navbarBackground: #243d8f;
+@navbarBackgroundHighlight: #243d8f;
+@btnBackground: #f6f6f6;
+@btnPrimaryBackground: #243d8f; //lighten(#3E82B0, 5%);
+@btnPrimaryBackgroundHover: #2946a3; //lighten(#3E82B0, 5%);
+@btnPrimaryBackgroundHighlight: @btnPrimaryBackground;
+@btnPrimaryBorderColor: orange;
+@btnInfoBackground: #049cdb; //#004B82;
+@btnInfoBackgroundHover: lighten(@btnInfoBackground, 5%);
+@btnInfoBackgroundHighlight: @btnInfoBackground;
+@btnSuccessBackground: darken(#2ecc71, 10%); //#6FA600;
+@btnSuccessBackgroundHover: lighten(@btnSuccessBackground, 5%);
+@btnSuccessBackgroundHighlight: @btnSuccessBackground;
+@btnWarningBackground: #f89406;
+@btnWarningBackgroundHover: lighten(@btnWarningBackground, 5%);
+@btnWarningBackgroundHighlight: @btnWarningBackground;
+@btnDangerBackground: #9e0b0f;
+@btnDangerBackgroundHover: lighten(@btnDangerBackground, 5%);
+@btnDangerBackgroundHighlight: @btnDangerBackground;
+@btnInverseBackground: #444;
+@btnInverseBackgroundHighlight: @btnInverseBackground;
+
+.btn {
+  box-shadow: none;
+  background: #f6f6f6;
+  background-image: none;
+
+  &:hover {
+    background: #ffffff;
+  }
+}
+
+.btn-primary {
+  border-color: @btnPrimaryBackground;
+  background: @btnPrimaryBackground;
+
+  &:hover {
+    background: @btnPrimaryBackgroundHover;
+    border-color: @btnPrimaryBackgroundHover;
+  }
+}
+
+.btn-info {
+  border-color: @btnInfoBackground;
+  background: @btnInfoBackground;
+
+  &:hover {
+    background: @btnInfoBackgroundHover;
+    border-color: @btnInfoBackgroundHover;
+  }
+}
+
+.btn-success {
+  border-color: @btnSuccessBackground;
+  background: @btnSuccessBackground;
+
+  &:hover {
+    background: @btnSuccessBackgroundHover;
+    border-color: @btnSuccessBackgroundHover;
+  }
+}
+
+.btn-warning {
+  border-color: @btnWarningBackground;
+  background: @btnWarningBackground;
+
+  &:hover {
+    background: @btnWarningBackgroundHover;
+    border-color: @btnWarningBackgroundHover;
+  }
+}
+
+.btn-danger {
+  border-color: @btnDangerBackground;
+  background: @btnDangerBackground;
+
+  &:hover {
+    background: @btnDangerBackgroundHover;
+    border-color: @btnDangerBackgroundHover;
+  }
+}
