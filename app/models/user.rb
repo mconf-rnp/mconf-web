@@ -85,7 +85,7 @@ class User < ActiveRecord::Base
   after_update :set_institution
 
   # Before approving via user update, check if institution isn't full
-  before_update :check_if_can_approve, if: -> { require_approval? && approved_changed? }
+  before_update :check_if_can_approve, if: -> { require_approval? && approved_changed? && approved? }
 
   before_destroy :before_disable_and_destroy, prepend: true
 

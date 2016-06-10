@@ -173,8 +173,6 @@ class UsersController < InheritedResources::Base
       respond_to do |format|
         format.html { redirect_to manage_users_path }
       end
-
-      format.html { redirect_to manage_users_path }
     end
   end
 
