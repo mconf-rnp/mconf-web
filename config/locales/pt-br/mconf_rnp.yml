@@ -73,9 +73,9 @@ pt-br:
       can_record_limit: "máximo: %{limit}"
       destroy: "Remover instituição"
       destroy_confirm: "Você tem certeza que deseja remover a instituição %{name}?"
-      disk_used: "%{used} ocupados de %{quota}"
+      disk_used: "%{used} de %{quota} ocupados para gravações"
+      disk_used_no_quota: "%{used} ocupados para gravações (sem quota)"
       no_user_limit: "sem limite"
-      recordings_disk_used: Espaço em disco usado por gravações
       spaces:
         zero: 0 comunidades
         one: 1 comunidade
