@@ -18,8 +18,9 @@
 
       - if current_site.shib_enabled?
         .shibboleth-container
-          = link_to(image_tag("logos/shib_federation_small.jpg"), shibboleth_path)
-          = link_to(t(".member.shibboleth.click_here"), shibboleth_path)
+          = link_to shibboleth_path do
+            = image_tag "rnp/cafe.png", :size => "213x80"
+            %div= t(".member.shibboleth.click_here")
 
   #webconf-room-userid-non-member
     .container
