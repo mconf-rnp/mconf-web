@@ -9,6 +9,9 @@ require "spec_helper"
 describe UsersController do
   render_views
 
+  let!(:referer) { "http://#{Site.current.domain}" }
+  before { request.env["HTTP_REFERER"] = referer }
+
   it "includes Mconf::ApprovalControllerModule"
 
   describe "#index" do
@@ -28,6 +31,8 @@ describe UsersController do
     # TODO: how to test nested authorization? might have to adapt should_authorize
     skip { should_authorize Space, :show }
     skip { should_authorize User, :index, space_id: space.to_param }
+
+    it "should paginate users (10 per page)"
 
     context "loads the space" do
       before { get :index, space_id: space.to_param }
@@ -123,13 +128,15 @@ describe UsersController do
       let(:public_space) { FactoryGirl.create(:space_with_associations, public: true) }
       let(:private_space) { FactoryGirl.create(:space_with_associations, public: false) }
       before {
-        public_space.add_member!(user)
-        private_space.add_member!(user)
-        @activities = [
-          public_space.new_activity(:join, user),
-          private_space.new_activity(:join, user),
-          private_space.new_activity(:update, user),
-        ]
+        PublicActivity.with_tracking do
+          public_space.add_member!(user)
+          private_space.add_member!(user)
+          @activities = [
+            public_space.new_activity(:join, user),
+            private_space.new_activity(:join, user),
+            private_space.new_activity(:update, user),
+          ]
+        end
       }
 
       context 'the user himself' do
@@ -146,11 +153,13 @@ describe UsersController do
 
       context 'a user belonging to both spaces' do
         before {
-          user2 = FactoryGirl.create(:user)
-          public_space.add_member!(user2)
-          private_space.add_member!(user2)
-          sign_in(user2)
-          get :show, id: user.to_param
+          PublicActivity.with_tracking do
+            user2 = FactoryGirl.create(:user)
+            public_space.add_member!(user2)
+            private_space.add_member!(user2)
+            sign_in(user2)
+            get :show, id: user.to_param
+          end
         }
 
         it { assigns(:recent_activities).count.should be(3) }
@@ -161,10 +170,12 @@ describe UsersController do
 
       context 'a user belonging to the private space only' do
         before {
-          user2 = FactoryGirl.create(:user)
-          private_space.add_member!(user2)
-          sign_in(user2)
-          get :show, id: user.to_param
+          PublicActivity.with_tracking do
+            user2 = FactoryGirl.create(:user)
+            private_space.add_member!(user2)
+            sign_in(user2)
+            get :show, id: user.to_param
+          end
         }
 
         it { assigns(:recent_activities).count.should be(3) }
@@ -175,9 +186,11 @@ describe UsersController do
 
       context 'a user not belonging to any space' do
         before {
-          user2 = FactoryGirl.create(:user)
-          sign_in(user2)
-          get :show, id: user.to_param
+          PublicActivity.with_tracking do
+            user2 = FactoryGirl.create(:user)
+            sign_in(user2)
+            get :show, id: user.to_param
+          end
         }
 
         it { assigns(:recent_activities).count.should be(1) }
@@ -325,7 +338,6 @@ describe UsersController do
           it { response.status.should == 302 }
           it { response.should redirect_to edit_user_path(user) }
           it { user.superuser.should be(false) }
-
         end
 
         context "when admin and target is self" do
@@ -759,7 +771,7 @@ describe UsersController do
             sign_in @admin
           end
 
-          context "can set it for users of his institution" do
+          context "cannot set it for users of his institution" do
             before(:each) do
               @user = FactoryGirl.create(:user, approved: true)
               @institution.add_member!(@user)
@@ -768,7 +780,7 @@ describe UsersController do
 
             it { should redirect_to edit_user_path(@user) }
             it { should set_flash.to(I18n.t('user.updated')) }
-            it { @user.reload.approved.should be(false) }
+            it { @user.reload.approved.should be(true) }
           end
         end
       end
@@ -934,8 +946,8 @@ describe UsersController do
   end
 
   describe "#enable" do
+    let(:referer) { manage_users_path }
     before(:each) {
-      request.env["HTTP_REFERER"] = manage_users_path
       login_as(FactoryGirl.create(:superuser))
     }
 
@@ -1241,7 +1253,6 @@ describe UsersController do
   describe "#confirm" do
     let(:user) { FactoryGirl.create(:unconfirmed_user) }
     before {
-      request.env["HTTP_REFERER"] = "/any"
       login_as(FactoryGirl.create(:superuser))
     }
 
@@ -1250,7 +1261,7 @@ describe UsersController do
         post :confirm, id: user.to_param
       }
       it { should respond_with(:redirect) }
-      it { should redirect_to('/any') }
+      it { should redirect_to(referer) }
       it ("confirms the user") { user.reload.confirmed?.should be(true) }
     end
   end
@@ -1259,7 +1270,6 @@ describe UsersController do
     let(:user) { FactoryGirl.create(:unconfirmed_user, approved: false) }
     let(:admin) { FactoryGirl.create(:superuser) }
     before {
-      request.env["HTTP_REFERER"] = "/any"
       login_as(admin)
     }
 
@@ -1270,11 +1280,13 @@ describe UsersController do
 
       context "and the user is successfully approved" do
         before(:each) {
-          post :approve, :id => user.to_param
+          PublicActivity.with_tracking do
+            post :approve, :id => user.to_param
+          end
         }
         it { should respond_with(:redirect) }
         it { should set_flash.to(I18n.t('users.approve.approved', :name => user.name)) }
-        it { should redirect_to('/any') }
+        it { should redirect_to(referer) }
         it("approves the user") { user.reload.approved?.should be(true) }
         it("confirms the user") { user.reload.confirmed?.should be(true) }
 
@@ -1292,8 +1304,8 @@ describe UsersController do
           subject { RecentActivity.where(key: 'user.approved').last }
           it { subject.should_not be_nil }
           it { subject.owner.should eql admin }
-          it { subject.trackable.should eql user}
-          it { subject.notified.should be_falsey }
+          it { subject.trackable.should eql(user) }
+          it { subject.notified?.should be(false) }
         end
       end
 
@@ -1306,8 +1318,8 @@ describe UsersController do
         }
         it { should respond_with(:redirect) }
         it { should set_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
-        it { should redirect_to('/any') }
-        it("doesn't approve the user") { user.reload.approved?.should be_falsey }
+        it { should redirect_to(referer) }
+        it("doesn't approve the user") { user.reload.approved?.should be(false) }
         it("doesn't confirm the user") { user.reload.confirmed?.should be(false) }
       end
 
@@ -1320,8 +1332,8 @@ describe UsersController do
           }
           it { should respond_with(:redirect) }
           it { should set_flash.to(I18n.t('users.approve.institution_full', :name => user.institution.name, :limit => user.institution.user_limit)) }
-          it { should redirect_to('/any') }
-          it("doesn't approve the user") { user.reload.approved?.should be_falsey }
+          it { should redirect_to(referer) }
+          it("doesn't approve the user") { user.reload.approved?.should be(false) }
           it("doesn't confirm the user") { user.reload.confirmed?.should be(false) }
         end
       end
@@ -1334,7 +1346,7 @@ describe UsersController do
       }
       it { should respond_with(:redirect) }
       it { should set_flash.to(I18n.t('users.approve.not_enabled')) }
-      it { should redirect_to('/any') }
+      it { should redirect_to(referer) }
       it { user.should be_approved } # auto approved
       it("should not create an activity") { RecentActivity.where(key: 'user.approved').should be_empty }
     end
@@ -1345,7 +1357,6 @@ describe UsersController do
   describe "#disapprove" do
     let(:user) { FactoryGirl.create(:user, approved: true) }
     before {
-      request.env["HTTP_REFERER"] = "/any"
       login_as(FactoryGirl.create(:superuser))
     }
 
@@ -1356,7 +1367,7 @@ describe UsersController do
       }
       it { should respond_with(:redirect) }
       it { should set_flash.to(I18n.t('users.disapprove.disapproved', name: user.name)) }
-      it { should redirect_to('/any') }
+      it { should redirect_to(referer) }
       it("disapproves the user") { user.reload.should_not be_approved }
     end
 
@@ -1367,7 +1378,7 @@ describe UsersController do
       }
       it { should respond_with(:redirect) }
       it { should set_flash.to(I18n.t('users.disapprove.not_enabled')) }
-      it { should redirect_to('/any') }
+      it { should redirect_to(referer) }
       it("user is still (auto) approved") { user.reload.should be_approved } # auto approved on registration
     end
 
@@ -1436,10 +1447,12 @@ describe UsersController do
         let(:user) { FactoryGirl.build(:user) }
         before(:each) {
           expect {
-            post :create, user: {
-              email: user.email, _full_name: "Maria Test", username: "maria-test",
-              password: "test123", password_confirmation: "test123"
-            }
+            PublicActivity.with_tracking do
+              post :create, user: {
+                     email: user.email, _full_name: "Maria Test", username: "maria-test",
+                     password: "test123", password_confirmation: "test123"
+                   }
+            end
           }.to change(User, :count).by(1)
         }
 
@@ -1499,10 +1512,12 @@ describe UsersController do
           let(:user) { FactoryGirl.build(:user) }
           before {
             expect {
-              post :create, user: {
-                email: user.email, _full_name: "Maria Test", username: "maria-test",
-                password: "test123", password_confirmation: "test123"
-              }
+              PublicActivity.with_tracking do
+                post :create, user: {
+                       email: user.email, _full_name: "Maria Test", username: "maria-test",
+                       password: "test123", password_confirmation: "test123"
+                     }
+              end
             }.to change(User, :count).by(1)
           }
 

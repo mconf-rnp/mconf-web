@@ -7,7 +7,7 @@
 
 class FrontpageController < ApplicationController
 
-  layout 'clean'
+  layout 'no_sidebar'
 
   def show
    respond_to do |format|

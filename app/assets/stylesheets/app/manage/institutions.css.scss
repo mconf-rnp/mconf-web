@@ -16,12 +16,18 @@ body.manage.institutions {
     .btn { float: right; }
   }
 
+  .institution-details {
+    float: left;
+    width: 40%;
+  }
+
   .institution-disk {
-    padding-top: 10px;
+    float: left;
+    margin-left: 15px;
+    width: 40%;
   }
 
-  .short-progress {
-    width: 20%;
+  .progress {
+    margin: 0;
   }
-
 }

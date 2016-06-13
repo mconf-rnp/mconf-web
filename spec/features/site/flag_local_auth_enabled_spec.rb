@@ -24,16 +24,16 @@ feature 'Behaviour of the flag Site#local_auth_enabled' do
 
       it { page.should have_content(t('devise.shared.links.lost_password')) }
       it { page.should have_css("input[type='submit'][value='Login']") }
-      it { page.should have_css("#navbar a[href='#{login_path}']") }
+      # it { page.should have_css("#navbar a[href='#{login_path}']") } # not for RNP
     end
 
-    context "shows the 'login' link in the navbar even if LDAP is disabled" do
+    context "shows the 'login' form even if LDAP is disabled" do
       before {
         Site.current.update_attributes(ldap_enabled: false)
         visit new_user_session_path
       }
 
-      it { page.should have_css("#navbar a[href='#{login_path}']") }
+      it { page.should have_css("input[type='submit'][value='Login']") }
     end
 
     context "shows the password inputs in users/edit even for normal users" do
@@ -107,14 +107,13 @@ feature 'Behaviour of the flag Site#local_auth_enabled' do
       end
     end
 
-    context "shows 'login' link from the navbar if LDAP is also enabled" do
+    context "shows the 'login' form even if LDAP is disabled" do
       before {
         Site.current.update_attributes(local_auth_enabled: false, ldap_enabled: true)
         visit new_user_session_path
       }
 
-      it { page.should have_css("#navbar a[href='#{login_path}']") }
+      it { page.should have_css("input[type='submit'][value='Login']") }
     end
-
   end
 end

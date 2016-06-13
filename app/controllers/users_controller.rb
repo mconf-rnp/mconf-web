@@ -40,14 +40,17 @@ class UsersController < InheritedResources::Base
 
     authorize! :show, @space
 
-    @users = @space.users.sort {|x,y| x.name <=> y.name }
+    @users = @space.users.joins(:profile)
+      .order("profiles.full_name ASC")
+      .paginate(:page => params[:page], :per_page => 10)
+    @userCount = @space.users.count
   end
 
   def show
     @user_spaces = @user.spaces
 
     # Show activity only in spaces where the current user is a member
-    in_spaces = current_user.present? ? current_user.spaces : []
+    in_spaces = current_user.present? ? current_user.space_ids : []
     @recent_activities = RecentActivity.user_public_activity(@user, in_spaces: in_spaces)
     @recent_activities = @recent_activities.order('updated_at DESC').page(params[:page])
 
@@ -222,7 +225,7 @@ class UsersController < InheritedResources::Base
     allowed += [:institution_id] if current_user.superuser?
 
     if is_institution_admin?
-      allowed += [:can_record, :approved, :disabled]
+      allowed += [:can_record, :disabled]
       if params[:action] == 'create'
         allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
       end
