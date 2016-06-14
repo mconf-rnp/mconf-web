@@ -3,23 +3,23 @@
 
 #content
 
-  #login-box.form-area
+  .secondary-box.form-area
     %h3= t('.local_auth.title')
 
     .form-area-content
-      = render :partial => 'sessions/login_form'
+      = render 'sessions/login_form', autofocus: false
       .action-links
         %ul
           %li= link_to t('.login.lost_password'), new_user_password_path
 
   - if current_site.shib_enabled?
 
-    #federation-box.form-area
+    .primary-box.form-area
       %h3= t('.login.title')
 
       .form-area-content
         = link_to shibboleth_path do
-          = image_tag "rnp/cafe.png", :size => "267x100", :class => "sign-in-cafe", :alt => t('.login.cafe_alt')
+          = image_tag "rnp/cafe.png", size: "267x100", class: "sign-in-cafe", alt: t('.login.cafe_alt')
           %div= t('.login.click_here')
 
   - if current_site.registration_enabled?

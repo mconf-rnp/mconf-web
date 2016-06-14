@@ -90,8 +90,10 @@
   border-color: darken($notif-success-bg, 5);
 }
 
-/* Custom frontpage and sign in page */
-body.frontpage, body.sessions.create, body.sessions.new {
+
+/* Custom frontpage, sign in and meeting invite pages */
+body.frontpage, body.sessions.create, body.sessions.new,
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
   $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
 
   #page-header {
@@ -117,7 +119,7 @@ body.frontpage, body.sessions.create, body.sessions.new {
       position: relative;
     }
 
-    form .input input {
+    .input input {
       width: 50%;
     }
 
@@ -126,10 +128,6 @@ body.frontpage, body.sessions.create, body.sessions.new {
       float: right;
       margin-left: 5px;
     }
-  }
-
-  #login-box {
-    float: right;
 
     .action-links {
       position: absolute;
@@ -151,15 +149,6 @@ body.frontpage, body.sessions.create, body.sessions.new {
         padding: 0 15px;
       }
     }
-  }
-
-  #federation-box {
-    float: left;
-    text-align: center;
-
-    .form-area-content {
-      padding: 37px 40px;
-    }
 
     .sign-in-cafe {
       width: 267px;
@@ -174,6 +163,15 @@ body.frontpage, body.sessions.create, body.sessions.new {
     }
   }
 
+  .secondary-box {
+    float: right;
+  }
+
+  .primary-box {
+    float: left;
+    text-align: center;
+  }
+
   #login-options {
     clear: both;
     float: right;
@@ -182,5 +180,41 @@ body.frontpage, body.sessions.create, body.sessions.new {
 
   #footer #copyright {
     padding-top: 30px;
+  }
+}
+body.frontpage, body.sessions.create, body.sessions.new {
+  .primary-box .form-area-content {
+    padding: 37px 40px;
+  }
+}
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
+  .form-area {
+    margin-top: 0;
+  }
+
+  .shibboleth-container {
+    padding: 20px 0;
+  }
+
+  .form-area.secondary-box {
+    h4 {
+      text-align: center;
+    }
+    .input input {
+      width: 97%;
+    }
+  }
+
+  #webconf-room-invite .form-area {
+    margin: 0 auto 0 auto;
+    .input input {
+      width: 97%;
+    }
+  }
+
+  #webconf-room-invite-header {
+    .room-status, .room-type {
+      padding-left: 135px;
+    }
   }
 }

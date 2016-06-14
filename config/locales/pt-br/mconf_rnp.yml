@@ -28,6 +28,15 @@ pt-br:
         video_chat: "Vídeo chat"
         webconferencia: "Webconferência"
         webinar: "Webinar"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      member:
+        non_federated_title: "Minha conta não é federada"
+        shibboleth:
+          click_here: "(clique aqui para entrar)"
+        title: "Já tenho uma conta"
+      non_member:
+        title_short: "Convidado"
   frontpage:
     sign_in_and_title:
       headline: "Portal do serviço de conferência web"
