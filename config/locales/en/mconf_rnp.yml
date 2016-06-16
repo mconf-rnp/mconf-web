@@ -11,7 +11,7 @@ en:
         recordings_disk_quota: Disk quota for recordings
         recordings_disk_used: Disk space used by recordings
         require_space_approval: "Moderate spaces"
-        shared_secret: "Web conference server shared secret"
+        secret: "Web conference server shared secret"
         user_limit: Maximum of members
       space:
         institution_id: "Institution"
@@ -116,7 +116,7 @@ en:
         recordings_disk_quota: "Maximum disk space that can be used by recordings from this institution (e.g. '100 GB', '200 GiB', '1500000000')."
         recordings_disk_used: "Current disk space being used by recordings from this institution."
         require_space_approval: "When checked, spaces have to be approved by an administrator of the institution before other users can see and use them"
-        shared_secret: "The shared secret to use when making API calls to the web conference server. If empty, will use the default secret."
+        secret: "The shared secret to use when making API calls to the web conference server. If empty, will use the default secret."
         user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
   spaces:
     edit:

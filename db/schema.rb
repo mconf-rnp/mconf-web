@@ -209,7 +209,7 @@ ActiveRecord::Schema.define(version: 20160610205353) do
     t.boolean  "forbid_user_space_creation", default: true
     t.string   "recordings_disk_used",       default: "0"
     t.string   "recordings_disk_quota",      default: "0"
-    t.string   "shared_secret"
+    t.string   "secret"
   end
 
   create_table "invitations", force: true do |t|

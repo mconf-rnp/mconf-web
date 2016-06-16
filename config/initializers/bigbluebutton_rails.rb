@@ -59,9 +59,18 @@ Rails.application.config.to_prepare do
     # owns this room, if any.
     def select_server(api_method=nil)
       server = BigbluebuttonServer.default
-      if self.owner && self.owner.institution && !self.owner.institution.shared_secret.blank?
-        server.salt = self.owner.institution.shared_secret
+
+      meeting = self.get_current_meeting
+      if meeting.present? && !meeting.server_secret.blank? && !meeting.ended?
+        Rails.logger.info "#select_server: selected the secret from the meeting for #{self.meetingid}, #{self.create_time}"
+        server.secret = meeting.server_secret
+      elsif self.owner && self.owner.institution && !self.owner.institution.secret.blank?
+        Rails.logger.info "#select_server: selected the secret from the institution for #{self.meetingid}, #{self.create_time}"
+        server.secret = self.owner.institution.secret
+      else
+        Rails.logger.info "#select_server: selected the secret from the server for #{self.meetingid}, #{self.create_time}"
       end
+
       server
     end
   end
