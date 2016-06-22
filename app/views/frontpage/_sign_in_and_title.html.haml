@@ -20,7 +20,9 @@
       .form-area-content
         = link_to shibboleth_path do
           = image_tag "rnp/cafe.png", size: "267x100", class: "sign-in-cafe", alt: t('.login.cafe_alt')
-          %div= t('.login.click_here')
+        .form-actions
+          = link_to shibboleth_path, class: 'btn btn-primary btn-sign-in-cafe' do
+            = t('.login.click_here')
 
   - if current_site.registration_enabled?
     %ul#login-options

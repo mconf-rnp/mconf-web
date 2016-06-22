@@ -153,13 +153,18 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     .sign-in-cafe {
       width: 267px;
       height: 100px;
-      margin-bottom: 5px;
       opacity: 0.9;
       @include transition(all 0.2s ease-in);
+      margin: 18px 0;
 
       &:hover {
         opacity: 1;
       }
+    }
+
+    .btn-sign-in-cafe {
+      padding: 7px 20px;
+      display: inline-block;
     }
   }
 
@@ -182,11 +187,6 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     padding-top: 30px;
   }
 }
-body.frontpage, body.sessions.create, body.sessions.new {
-  .primary-box .form-area-content {
-    padding: 37px 40px;
-  }
-}
 body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
   .form-area {
     margin-top: 0;
@@ -199,9 +199,20 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
   .form-area.secondary-box {
     h4 {
       text-align: center;
+      font-weight: normal;
     }
     .input input {
       width: 97%;
+    }
+  }
+
+  .primary-box {
+    h4 {
+      text-align: center;
+      font-weight: normal;
+      margin-top: 0;
+      border-top: 1px dashed #ddd;
+      padding-top: 15px;
     }
   }
 
