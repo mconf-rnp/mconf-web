@@ -31,12 +31,14 @@ pt-br:
   custom_bigbluebutton_rooms:
     invite_userid:
       member:
-        non_federated_title: "Minha conta não é federada"
+        email_or_username: "E-mail"
+        non_federated_click: "Minha conta não é federada"
+        non_federated_title: "Acessar usando uma conta local"
         shibboleth:
           click_here: "Entrar via CAFe"
         title: "Já tenho uma conta"
       non_member:
-        title_short: "Convidado"
+        title: "Não tenho uma conta"
   frontpage:
     sign_in_and_title:
       headline: "Portal do serviço de conferência web"
@@ -105,6 +107,8 @@ pt-br:
     form:
       no_organization: "<nenhuma organização atribuída>"
   sessions:
+    login_form:
+      email_or_login: "E-mail"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Autenticação federada"

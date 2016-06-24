@@ -192,15 +192,20 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     margin-top: 0;
   }
 
-  .shibboleth-container {
-    padding: 20px 0;
-  }
-
   .form-area.secondary-box {
+    .form-area-content {
+      padding-top: 25px;
+    }
+
+    .form-actions {
+      margin-top: 37px;
+    }
+
     h4 {
       text-align: center;
       font-weight: normal;
     }
+
     .input input {
       width: 97%;
     }
@@ -211,8 +216,34 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
       text-align: center;
       font-weight: normal;
       margin-top: 0;
-      border-top: 1px dashed #ddd;
       padding-top: 15px;
+    }
+
+    .local-sign-in-area {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s linear;
+
+      &.open {
+        opacity: 1;
+      }
+    }
+
+    .form-actions {
+      position: relative;
+    }
+
+    .local-sign-in-trigger {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      padding: 10px 10px 14px 10px;
+      margin-left: 10px;
+      @include border-radius(10px 10px 0 0);
+
+      &.open {
+        background: white;
+      }
     }
   }
 
