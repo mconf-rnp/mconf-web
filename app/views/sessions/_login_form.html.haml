@@ -1,5 +1,7 @@
+- autofocus = true unless defined?(autofocus)
+
 = simple_form_for(resource, :as => resource_name, :url => user_session_path, :html => { :class => 'form-inline single-column' }) do |f|
-  = f.input :login, :label => t('.email_or_login'), :required => true, :autofocus => true
+  = f.input :login, :label => t('.email_or_login'), :required => true, :autofocus => autofocus
   = f.input :password, :label => t('.password'), :required => true
   .remember-me
     = f.input :remember_me, :as => :boolean if devise_mapping.rememberable?

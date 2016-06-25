@@ -46,16 +46,17 @@ body.custom_bigbluebutton_rooms.invite_userid {
 
         a { display: block; }
         img {
-          width: 240px;
-          height: 41px;
+          width: 213px;
+          height: 80px;
           margin: 10px 0;
         }
       }
     }
 
-    input[type=text], input[type=password] {
-      width: 95%;
-    }
+    /* for RNP */
+    /* input[type=text], input[type=password] { */
+    /*   width: 95%; */
+    /* } */
 
     input[type=submit] {
       padding-left: 20px;

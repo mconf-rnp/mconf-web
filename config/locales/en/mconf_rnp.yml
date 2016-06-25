@@ -28,12 +28,21 @@ en:
         video_chat: "Video chat"
         webconferencia: "Web Conference"
         webinar: "Webinar"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      member:
+        non_federated_title: "My account is not federated"
+        shibboleth:
+          click_here: "Sign in via CAFe"
+        title: "I have an account"
+      non_member:
+        title_short: "Guest"
   frontpage:
     sign_in_and_title:
       headline: "Web conference service portal"
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
-        click_here: "(click here to sign in)"
+        click_here: "Sign in via CAFe"
         lost_password: "Lost your password?"
         title: "Federated access"
       local_auth:
@@ -100,7 +109,7 @@ en:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Federated authentication"
       local_authentication: "Local authentication"
-      sign_in_federation: "(click here to sign in)"
+      sign_in_federation: "Sign in via CAFe"
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."

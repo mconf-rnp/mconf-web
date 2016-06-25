@@ -28,12 +28,21 @@ pt-br:
         video_chat: "Vídeo chat"
         webconferencia: "Webconferência"
         webinar: "Webinar"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      member:
+        non_federated_title: "Minha conta não é federada"
+        shibboleth:
+          click_here: "Entrar via CAFe"
+        title: "Já tenho uma conta"
+      non_member:
+        title_short: "Convidado"
   frontpage:
     sign_in_and_title:
       headline: "Portal do serviço de conferência web"
       login:
         cafe_alt: "CAFe: Comunidade Acadêmica Federada"
-        click_here: "(clique aqui para entrar)"
+        click_here: "Entrar via CAFe"
         lost_password: "Esqueceu sua senha?"
         title: "Acesso federado"
       local_auth:
@@ -100,7 +109,7 @@ pt-br:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Autenticação federada"
       local_authentication: "Autenticação local"
-      sign_in_federation: "(clique aqui para entrar)"
+      sign_in_federation: "Entrar via CAFe"
   simple_form:
     hints:
       institution:
