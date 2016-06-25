@@ -233,11 +233,6 @@ class User < ActiveRecord::Base
     rooms
   end
 
-  # Returns the number of unread private messages for this user
-  def unread_private_messages
-    PrivateMessage.inbox(self).select{|msg| !msg.checked}
-  end
-
   # Overrides a method from devise, see:
   # https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
   def active_for_authentication?

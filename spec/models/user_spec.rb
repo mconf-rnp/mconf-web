@@ -799,27 +799,27 @@ describe User do
     end
 
     context "approve with update_attributes if institution is full" do
-        before {
-          FactoryGirl.create(:user, :institution => user.institution)
-          user.institution.update_attributes(:user_limit => 2)
-          user.update_attributes(approved: true)
-          user.reload
-        }
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 2)
+        user.update_attributes(approved: true)
+        user.reload
+      }
 
-        it { user.should be_approved }
-        it { user.errors[:approved].should be_blank }
+      it { user.should be_approved }
+      it { user.errors[:approved].should be_blank }
     end
 
     context "approve with update_attributes if institution is full" do
-        before {
-          FactoryGirl.create(:user, :institution => user.institution)
-          user.institution.update_attributes(:user_limit => 1)
-          user.update_attributes(approved: true)
-          user.reload
-        }
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 1)
+        user.update_attributes(approved: true)
+        user.reload
+      }
 
-        it { user.should_not be_approved }
-        it { user.errors[:approved].should be_present }
+      it { user.should_not be_approved }
+      it { user.errors[:approved].should be_present }
     end
   end
 
