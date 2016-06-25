@@ -225,7 +225,7 @@ class UsersController < InheritedResources::Base
     allowed += [:institution_id] if current_user.superuser?
 
     if is_institution_admin?
-      allowed += [:can_record, :disabled]
+      allowed += [:can_record, :approved, :disabled]
       if params[:action] == 'create'
         allowed += [:email, :username, :_full_name, :password, :password_confirmation, :current_password]
       end
