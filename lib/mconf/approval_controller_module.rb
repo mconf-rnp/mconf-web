@@ -1,12 +1,22 @@
 module Mconf
   module ApprovalControllerModule
+
+    def self.included base
+      base.after_filter :create_approval_notification, only: [:approve, :update], if: :require_approval?
+    end
+
     def approve
       if require_approval?
         resource = instance_variable_get("@#{controller_name.singularize}")
 
         resource.approve!
-        resource.create_approval_notification(current_user)
-        flash[:notice] = t("#{controller_name}.approve.approved", :name => resource.name)
+
+        if resource.errors.any?
+          # Show user approved error if we fail right after approving
+          flash[:error] = resource.errors[:approved].first
+        else
+          flash[:notice] = t("#{controller_name}.approve.approved", :name => resource.name)
+        end
       else
         flash[:error] = t("#{controller_name}.approve.not_enabled")
       end
@@ -29,5 +39,16 @@ module Mconf
     def require_approval?
       false
     end
+
+    private
+
+    def create_approval_notification
+      resource = instance_variable_get("@#{controller_name.singularize}")
+
+      if resource.approved? && resource.errors.empty?
+        resource.create_approval_notification(current_user)
+      end
+    end
+
   end
 end

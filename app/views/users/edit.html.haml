@@ -78,7 +78,7 @@
       -# prevent admins from mistakenly removing themselves from being admins or blocking
       -# access to their account
       - unless current_user == @user
-        = f.input :approved, :required => false if current_user.superuser?
+        = f.input :approved, :required => false if can?(:approve, @user)
         = f.input :superuser, :required => false if can?(:make_superuser, @user)
         - if !@user.confirmed? && can?(:confirm, @user)
           .input
