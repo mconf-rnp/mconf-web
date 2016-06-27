@@ -2,8 +2,18 @@ container = "#webconf-room-invite-header .room-status"
 
 $ ->
   if isOnPage 'custom_bigbluebutton_rooms', 'invite|invite_userid|auth'
+    bindLocalSignIn()
     updateStatus()
     setInterval updateStatus, 10000
+
+bindLocalSignIn = ->
+  $('.local-sign-in-trigger a').on "click", (e) ->
+    $('.local-sign-in-area').slideToggle()
+    $('.local-sign-in-area').toggleClass('open')
+    $(this).parent().toggleClass('open')
+    if $('.local-sign-in-area').is(':visible')
+      $('.local-sign-in-area input[type=text]:first').focus()
+    e.preventDefault()
 
 updateStatus = ->
   url = $(container).attr("data-url")
