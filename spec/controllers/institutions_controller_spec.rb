@@ -111,7 +111,7 @@ describe InstitutionsController do
 
     let(:allowed_params) {
       [ :acronym, :name, :user_limit, :can_record_limit, :identifier, :force_shib_login,
-      :require_space_approval, :forbid_user_space_creation, :recordings_disk_quota ]
+      :require_space_approval, :forbid_user_space_creation, :recordings_disk_quota, :secret ]
     }
 
     before {
