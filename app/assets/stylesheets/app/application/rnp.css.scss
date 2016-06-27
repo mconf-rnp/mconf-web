@@ -120,7 +120,7 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     }
 
     .input input {
-      width: 50%;
+      width: 70%;
     }
 
     #user_remember_me {
@@ -271,6 +271,15 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
 
   .form-actions .btn {
     padding: 6px 12px !important;
+  }
+
+  .login-options {
+    @include mconf-clearfix;
+    text-align: right;
+    margin: 10px 20px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    padding-right: 10px;
   }
 }
 

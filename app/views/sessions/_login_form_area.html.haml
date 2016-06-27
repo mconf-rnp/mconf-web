@@ -19,4 +19,11 @@
         = f.input :password, :label => t('.member.password'), :required => true
         .remember-me
           = f.input :remember_me, :as => :boolean
+
+        %ul.login-options
+          %li= link_to t('devise.shared.links.lost_password'), new_password_path('user')
+          - if current_site.registration_enabled?
+            %li= link_to t('devise.shared.links.register'), register_path
+            %li= link_to t("devise.shared.links.resend_confirmation_email"), new_confirmation_path('user')
+
         = f.button :wrapped, :value => t(".login")
