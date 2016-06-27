@@ -187,6 +187,8 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     padding-top: 30px;
   }
 }
+
+body.frontpage, body.sessions.create, body.sessions.new,
 body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
   .form-area {
     margin-top: 0;
@@ -231,18 +233,25 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
 
     .form-actions {
       position: relative;
+
+      &.open {
+        border-bottom: 1px solid #ddd;
+      }
     }
 
     .local-sign-in-trigger {
       position: absolute;
       left: 0;
-      bottom: 0;
+      bottom: -1px;
       padding: 10px 10px 14px 10px;
       margin-left: 10px;
       @include border-radius(10px 10px 0 0);
+      border: 1px solid #f6f6f6;
 
       &.open {
         background: white;
+        border: 1px solid #ddd;
+        border-bottom: 1px solid #fff;
       }
     }
   }
@@ -258,5 +267,16 @@ body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_u
     .room-status, .room-type {
       padding-left: 135px;
     }
+  }
+
+  .form-actions .btn {
+    padding: 6px 12px !important;
+  }
+}
+
+body.frontpage, body.sessions.create, body.sessions.new {
+  .primary-box {
+    float: none;
+    margin: 0 auto;
   }
 }

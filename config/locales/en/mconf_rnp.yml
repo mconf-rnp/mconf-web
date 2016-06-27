@@ -30,25 +30,8 @@ en:
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
     invite_userid:
-      member:
-        email_or_username: "Email"
-        non_federated_click: "My account is not federated"
-        non_federated_title: "Access using a local account"
-        shibboleth:
-          click_here: "Sign in via CAFe"
-        title: "I have an account"
       non_member:
         title: "I don't have an account"
-  frontpage:
-    sign_in_and_title:
-      headline: "Web conference service portal"
-      login:
-        cafe_alt: "CAFe: Comunidade Acadêmica Federada"
-        click_here: "Sign in via CAFe"
-        lost_password: "Lost your password?"
-        title: "Federated access"
-      local_auth:
-        title: "Non federated access"
   institution:
     created: Institution created successfully.
     deleted: "Institution removed successfully"
@@ -66,6 +49,9 @@ en:
       title: "Spaces in the institution %{name}"
     users:
       title: "Users in the institution %{name}"
+  frontpage:
+    sign_in_and_title:
+      headline: "Web conference service portal"
   layouts:
     footer:
       about_service:
@@ -109,11 +95,21 @@ en:
   sessions:
     login_form:
       email_or_login: "Email"
+    login_form_area:
+      login: "Login"
+      title: "I already have an account"
+      member:
+        email_or_username: "Email"
+        non_federated_click: "My account is not federated"
+        non_federated_title: "Access using a local account"
+        password: "Password"
+        shibboleth:
+          click_here: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Federated authentication"
       local_authentication: "Local authentication"
-      sign_in_federation: "Sign in via CAFe"
+      sign_in_federation: "Login"
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."

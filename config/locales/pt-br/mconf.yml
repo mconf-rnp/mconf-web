@@ -501,7 +501,7 @@ pt-br:
         title: "Eu sou um membro deste site"
       non_member:
         name: "Seu nome completo"
-        next: "Próximo"
+        next: "Entrar"
         title: "Eu não possuo uma conta, quero entrar como convidado"
       title: "Acessar sala: %{name}"
     join:
