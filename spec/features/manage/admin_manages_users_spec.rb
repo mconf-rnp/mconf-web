@@ -22,9 +22,10 @@ describe 'Admin manages users' do
       @unapproved_user.update_attributes(:approved => false)
       @disabled_user1 = FactoryGirl.create(:user, disabled: true)
       @disabled_user2 = FactoryGirl.create(:user, disabled: true)
-      @unconfirmed_user = FactoryGirl.create(:unconfirmed_user)
-      @unconfirmed_unapproved_user = FactoryGirl.create(:unconfirmed_user)
-      @unconfirmed_unapproved_user.update_attributes(:approved => false)
+      @unconfirmed_user = FactoryGirl.create(:unconfirmed_user, approved: false)
+      @unconfirmed_unapproved_user = FactoryGirl.create(:unconfirmed_user, approved: false)
+
+      @unconfirmed_user.update_column(:approved, true)
     }
 
     context 'listing users in management screen' do

@@ -67,7 +67,9 @@
                   = link_to t('edit'), main_app.edit_user_profile_path(current_user)
 
     - else
-      - unless params[:controller] == 'frontpage' || params[:controller] == 'sessions'
+      - on_invite = params[:controller] == 'custom_bigbluebutton_rooms' && ['invite', 'invite_userid'].include?(params[:action])
+      - on_login = ['frontpage', 'sessions'].include?(params[:controller])
+      - unless on_login || on_invite
         - if current_site.local_auth_enabled? || current_site.ldap_enabled?
           %li.last= link_to t('.login'), main_app.login_path
         - if current_site.registration_enabled?

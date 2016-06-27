@@ -497,7 +497,7 @@ en:
         title: "I'm a member of this website"
       non_member:
         name: "Your full name"
-        next: "Next"
+        next: "Login"
         title: "I don't have an account, I will join this room as a guest"
       title: "Join the room: %{name}"
     join:

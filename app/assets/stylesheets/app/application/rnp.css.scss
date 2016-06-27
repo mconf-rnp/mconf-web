@@ -90,8 +90,10 @@
   border-color: darken($notif-success-bg, 5);
 }
 
-/* Custom frontpage and sign in page */
-body.frontpage, body.sessions.create, body.sessions.new {
+
+/* Custom frontpage, sign in and meeting invite pages */
+body.frontpage, body.sessions.create, body.sessions.new,
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
   $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
 
   #page-header {
@@ -117,8 +119,8 @@ body.frontpage, body.sessions.create, body.sessions.new {
       position: relative;
     }
 
-    form .input input {
-      width: 50%;
+    .input input {
+      width: 70%;
     }
 
     #user_remember_me {
@@ -126,10 +128,6 @@ body.frontpage, body.sessions.create, body.sessions.new {
       float: right;
       margin-left: 5px;
     }
-  }
-
-  #login-box {
-    float: right;
 
     .action-links {
       position: absolute;
@@ -151,20 +149,32 @@ body.frontpage, body.sessions.create, body.sessions.new {
         padding: 0 15px;
       }
     }
-  }
-
-  #federation-box {
-    float: left;
-    text-align: center;
-
-    .form-area-content {
-      padding: 59px 40px;
-    }
 
     .sign-in-cafe {
-      width: 390px;
-      height: 60px;
+      width: 267px;
+      height: 100px;
+      opacity: 0.9;
+      @include transition(all 0.2s ease-in);
+      margin: 18px 0;
+
+      &:hover {
+        opacity: 1;
+      }
     }
+
+    .btn-sign-in-cafe {
+      padding: 7px 20px;
+      display: inline-block;
+    }
+  }
+
+  .secondary-box {
+    float: right;
+  }
+
+  .primary-box {
+    float: left;
+    text-align: center;
   }
 
   #login-options {
@@ -175,5 +185,107 @@ body.frontpage, body.sessions.create, body.sessions.new {
 
   #footer #copyright {
     padding-top: 30px;
+  }
+}
+
+body.frontpage, body.sessions.create, body.sessions.new,
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
+  .form-area {
+    margin-top: 0;
+  }
+
+  .form-area.secondary-box {
+    .form-area-content {
+      padding-top: 25px;
+    }
+
+    .form-actions {
+      margin-top: 37px;
+    }
+
+    h4 {
+      text-align: center;
+      font-weight: normal;
+    }
+
+    .input input {
+      width: 97%;
+    }
+  }
+
+  .primary-box {
+    h4 {
+      text-align: center;
+      font-weight: normal;
+      margin-top: 0;
+      padding-top: 15px;
+    }
+
+    .local-sign-in-area {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s linear;
+
+      &.open {
+        opacity: 1;
+      }
+    }
+
+    .form-actions {
+      position: relative;
+
+      &.open {
+        border-bottom: 1px solid #ddd;
+      }
+    }
+
+    .local-sign-in-trigger {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      padding: 10px 10px 14px 10px;
+      margin-left: 10px;
+      @include border-radius(10px 10px 0 0);
+      border: 1px solid #f6f6f6;
+
+      &.open {
+        background: white;
+        border: 1px solid #ddd;
+        border-bottom: 1px solid #fff;
+      }
+    }
+  }
+
+  #webconf-room-invite .form-area {
+    margin: 0 auto 0 auto;
+    .input input {
+      width: 97%;
+    }
+  }
+
+  #webconf-room-invite-header {
+    .room-status, .room-type {
+      padding-left: 135px;
+    }
+  }
+
+  .form-actions .btn {
+    padding: 6px 12px !important;
+  }
+
+  .login-options {
+    @include mconf-clearfix;
+    text-align: right;
+    margin: 10px 20px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    padding-right: 10px;
+  }
+}
+
+body.frontpage, body.sessions.create, body.sessions.new {
+  .primary-box {
+    float: none;
+    margin: 0 auto;
   }
 }

@@ -29,16 +29,10 @@ pt-br:
         video_chat: "Vídeo chat"
         webconferencia: "Webconferência"
         webinar: "Webinar"
-  frontpage:
-    sign_in_and_title:
-      headline: "Portal do serviço de conferência web"
-      login:
-        cafe_alt: "CAFe: Comunidade Acadêmica Federada"
-        click_here: "(clique aqui para entrar)"
-        lost_password: "Esqueceu sua senha?"
-        title: "Acesso federado"
-      local_auth:
-        title: "Acesso não federado"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      non_member:
+        title: "Não tenho uma conta"
   institution:
     created: Instituição criada com sucesso.
     deleted: "Instituição removida com sucesso"
@@ -56,6 +50,9 @@ pt-br:
       title: "Comunidades na instituição %{name}"
     users:
       title: "Usuários na instituição %{name}"
+  frontpage:
+    sign_in_and_title:
+      headline: "Portal do serviço de conferência web"
   layouts:
     footer:
       about_service:
@@ -97,11 +94,23 @@ pt-br:
     form:
       no_organization: "<nenhuma organização atribuída>"
   sessions:
+    login_form:
+      email_or_login: "E-mail"
+    login_form_area:
+      login: "Entrar"
+      title: "Já tenho uma conta"
+      member:
+        email_or_username: "E-mail"
+        non_federated_click: "Minha conta não é federada"
+        non_federated_title: "Acessar usando uma conta local"
+        password: "Senha"
+        shibboleth:
+          click_here: "Entrar"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Autenticação federada"
       local_authentication: "Autenticação local"
-      sign_in_federation: "(clique aqui para entrar)"
+      sign_in_federation: "Entrar"
   simple_form:
     hints:
       institution:

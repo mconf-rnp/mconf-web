@@ -2,29 +2,4 @@
   %h2= t(".headline")
 
 #content
-
-  #login-box.form-area
-    %h3= t('.local_auth.title')
-
-    .form-area-content
-      = render :partial => 'sessions/login_form'
-      .action-links
-        %ul
-          %li= link_to t('.login.lost_password'), new_user_password_path
-
-  - if current_site.shib_enabled?
-
-    #federation-box.form-area
-      %h3= t('.login.title')
-
-      .form-area-content
-        = link_to shibboleth_path do
-          = image_tag "logos/shib_federation_big.jpg", :size => "390x60", :class => "sign-in-cafe", :alt => t('.login.cafe_alt')
-          %div= t('.login.click_here')
-
-  - if current_site.registration_enabled?
-    %ul#login-options
-      - if devise_mapping.registerable? && controller_name != 'registrations'
-        %li= link_to t('devise.shared.links.register'), register_path
-      - if devise_mapping.confirmable? && controller_name != 'confirmations'
-        %li= link_to t("devise.shared.links.resend_confirmation_email"), new_confirmation_path(resource_name)
+  = render 'sessions/login_form_area', autofocus: false

@@ -609,6 +609,34 @@ describe UsersController do
       it { should redirect_to login_path }
     end
 
+    context "create recent activity after admin updated approved=true" do
+      let!(:admin) { FactoryGirl.create(:superuser) }
+      let!(:user) { FactoryGirl.create(:user, approved: false) }
+
+      before(:each) do
+        PublicActivity.with_tracking do
+          Site.current.update_attributes(require_registration_approval: true)
+
+          sign_in admin
+
+          expect {
+            put :update, id: user.to_param, user: { approved: true }
+          }.to change{ PublicActivity::Activity.count }.by(1)
+          user.reload
+        end
+      end
+
+      subject { RecentActivity.where(key: 'user.approved').last }
+      it { response.status.should == 302 }
+      it { response.should redirect_to edit_user_path(user) }
+      it { user.approved.should be(true) }
+
+      it { subject.should_not be_nil }
+      it { subject.owner.should eql admin }
+      it { subject.trackable.should eql user}
+      it { subject.notified.should be_falsey }
+    end
+
     describe "with institutions" do
       describe "setting :can_record" do
         before(:each) { @institution = FactoryGirl.create(:institution, :can_record_limit => 1) }
@@ -745,7 +773,7 @@ describe UsersController do
             sign_in @admin
           end
 
-          context "cannot set it for users of his institution" do
+          context "can set it for users of his institution" do
             before(:each) do
               @user = FactoryGirl.create(:user, approved: true)
               @institution.add_member!(@user)
@@ -754,7 +782,7 @@ describe UsersController do
 
             it { should redirect_to edit_user_path(@user) }
             it { should set_flash.to(I18n.t('user.updated')) }
-            it { @user.reload.approved.should be(true) }
+            it { @user.reload.approved.should be(false) }
           end
         end
       end
@@ -783,8 +811,8 @@ describe UsersController do
           end
         end
       end
-
     end
+
   end
 
   describe "#destroy" do
@@ -1265,15 +1293,11 @@ describe UsersController do
         it("confirms the user") { user.reload.confirmed?.should be(true) }
 
         context "skips the confirmation email" do
-          let(:user) { FactoryGirl.create(:unconfirmed_user) }
-          before(:each) {
-            Site.current.update_attributes(:require_registration_approval => true)
-          }
           it {
-            user.confirmed?.should be(false) # just to make sure wasn't already confirmed
+            user.should_not be_confirmed # just to make sure wasn't already confirmed
             expect {
               post :approve, id: user.to_param
-              user.reload.confirmed?.should be(true)
+              user.reload.should be_confirmed
             }.not_to change{ ActionMailer::Base.deliveries }
           }
         end
@@ -1289,8 +1313,7 @@ describe UsersController do
 
       context "but the user's approval fails" do
         before {
-          User.any_instance.should_receive(:approve!).and_return(false)
-          user.institution.update_attributes(:user_limit => 1)
+          user.institution.update_attributes(:user_limit => 0)
         }
         before(:each) {
           post :approve, :id => user.to_param
@@ -1305,37 +1328,7 @@ describe UsersController do
       context "and the institution's limit was reached" do
         before { user.institution.update_attributes(:user_limit => 0) }
 
-        context "but the current user can still approve users" do
-          before(:each) {
-            post :approve, :id => user.to_param
-          }
-          it { should respond_with(:redirect) }
-          it { should set_flash.to(I18n.t('users.approve.approved', :name => user.name)) }
-          it { should redirect_to(referer) }
-          it("approves the user") { user.reload.approved?.should be(true) }
-          it("confirms the user") { user.reload.confirmed?.should be(true) }
-
-          context "skips the confirmation email" do
-            let(:user) { FactoryGirl.create(:unconfirmed_user) }
-            before(:each) {
-              Site.current.update_attributes(:require_registration_approval => true)
-            }
-            it {
-              user.confirmed?.should be(false) # just to make sure wasn't already confirmed
-              expect {
-                post :approve, :id => user.to_param
-                user.reload.confirmed?.should be(true)
-              }.not_to change{ ActionMailer::Base.deliveries }
-            }
-          end
-        end
-
         context "and the current user cannot approve users" do
-          before {
-            controller.should_receive(:can?)
-              .with(:approve_when_full, user)
-              .and_return(false)
-          }
           before(:each) {
             post :approve, :id => user.to_param
           }

@@ -1,7 +1,10 @@
+#= require "../sessions/_login_form_area"
+
 container = "#webconf-room-invite-header .room-status"
 
 $ ->
   if isOnPage 'custom_bigbluebutton_rooms', 'invite|invite_userid|auth'
+    mconf.Sessions.LoginFormArea.bind()
     updateStatus()
     setInterval updateStatus, 10000
 

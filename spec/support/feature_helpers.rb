@@ -62,7 +62,7 @@ module FeatureHelpers
     visit(new_user_session_path) if visit_page
     fill_in 'user[login]', with: user_email
     fill_in 'user[password]', with: password
-    click_button I18n.t("sessions.login_form.login")
+    page.find('.local-sign-in-area input[type=submit]').click
   end
 
   def register_with(attrs)

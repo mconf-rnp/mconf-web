@@ -756,7 +756,7 @@ describe User do
     }
     context "sets the user as approved" do
       before { user.approve! }
-      it { user.approved.should be true }
+      it { user.should be_approved }
     end
 
     context "confirms the user if it's not already confirmed" do
@@ -781,27 +781,45 @@ describe User do
         }
         subject { user.approve! }
         it { should be_falsey }
-        it { user.approved.should be_falsey }
+        it { user.should_not be_approved }
       end
 
       context "doesn't approve the user if the user limit is 0" do
         before { user.institution.update_attributes(:user_limit => 0) }
         subject { user.approve! }
         it { should be_falsey }
-        it { user.approved.should be_falsey }
+        it { user.should_not be_approved }
       end
 
       context "ignores empty user limits" do
         before { user.institution.update_attributes(:user_limit => nil) }
         before(:each) { user.approve! }
-        it { user.approved.should be_truthy }
+        it { user.should be_approved }
       end
+    end
 
-      context "ignores the limit if ignore_full is set" do
-        before { user.institution.update_attributes(:user_limit => 0) }
-        before(:each) { user.approve!(true) }
-        it { user.approved.should be_truthy }
-      end
+    context "approve with update_attributes if institution is full" do
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 2)
+        user.update_attributes(approved: true)
+        user.reload
+      }
+
+      it { user.should be_approved }
+      it { user.errors[:approved].should be_blank }
+    end
+
+    context "approve with update_attributes if institution is full" do
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 1)
+        user.update_attributes(approved: true)
+        user.reload
+      }
+
+      it { user.should_not be_approved }
+      it { user.errors[:approved].should be_present }
     end
   end
 
