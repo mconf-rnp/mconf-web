@@ -8,7 +8,7 @@ pt-br:
         force_shib_login: Somente login via federação
         identifier: Identificador
         name: Nome
-        recordings_disk_quota: Quota de disco para gravações
+        recordings_disk_quota_human: Quota de disco para gravações
         recordings_disk_used: Espaço ocupado por gravações
         require_space_approval: "Moderação de comunidades"
         secret: "Chave de acesso ao servidor de webconferência"
@@ -119,7 +119,7 @@ pt-br:
         forbid_user_space_creation: "Apenas os administradores da instituição poderão criar comunidades"
         force_shib_login: "Quando habilitado o usuário só poderá se logar através da federação"
         identifier: "Identificador usado para encontrar os usuários que pertencerão a esta instituição. Você pode usar múltiplos valores, um por linha, como expressões regulares. As comparações são \"case-insensitive\" e espaços são removidos do início e fim. Se um usuário é identificado por \"eu@sub.instituicao.org\", por exemplo, um dos valores para localizar este usuário seria \"(.*\\.)?instituicao\\.org\", que funcionaria para qualquer subdomínio de uma instituição."
-        recordings_disk_quota: "Limite máximo de espaço no servidor que pode ser ocupado por gravações desta instituição (e.g. '100 GB', '200 GiB', '1500000000')."
+        recordings_disk_quota_human: "Limite máximo de espaço no servidor que pode ser ocupado por gravações desta instituição (e.g. '100 GB', '200 GiB', '1500000000')."
         recordings_disk_used: "Espaço em disco atualmente ocupado por gravações dessa instituição."
         require_space_approval: "Se selecionado, comunidades precisam ser aprovadas por um administrador da instituição para que possam ser vistas e utilizadas por outros usuários"
         secret: "Chave de acesso que deve ser utilizada ao fazer chamadas da API ao servidor de webconferência. Se vazio, usará a chave padrão do servidor."

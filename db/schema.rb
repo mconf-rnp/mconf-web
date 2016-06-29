@@ -204,11 +204,11 @@ ActiveRecord::Schema.define(version: 20160610205353) do
     t.integer  "user_limit"
     t.integer  "can_record_limit"
     t.text     "identifier"
-    t.boolean  "force_shib_login",           default: false
-    t.boolean  "require_space_approval",     default: true
-    t.boolean  "forbid_user_space_creation", default: true
-    t.string   "recordings_disk_used",       default: "0"
-    t.string   "recordings_disk_quota",      default: "0"
+    t.boolean  "force_shib_login",                     default: false
+    t.boolean  "require_space_approval",               default: true
+    t.boolean  "forbid_user_space_creation",           default: true
+    t.integer  "recordings_disk_used",       limit: 8, default: 0
+    t.integer  "recordings_disk_quota",      limit: 8, default: 0
     t.string   "secret"
   end
 
