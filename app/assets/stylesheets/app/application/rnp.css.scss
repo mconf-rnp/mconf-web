@@ -1,0 +1,291 @@
+@import "compass/css3";
+@import "compass/typography/links";
+@import "definitions";
+
+#main-logo {
+  margin-top: 4px;
+  margin-right: 15px;
+
+  img {
+    width: 70px;
+    height: 34px;
+  }
+}
+
+#navbar {
+  ul#navbar-left-links, #navbar-right-links {
+    .user-info-dropdown {
+      padding: 9px 10px 7px 10px;
+    }
+
+    li {
+      margin-top: 14px;
+    }
+  }
+}
+
+#footer {
+  h3 {
+    margin-top: 0;
+  }
+
+  .link-group.footer-languages {
+    float: right;
+    text-align: right;
+    margin-right: 0;
+
+    ul {
+      margin-right: 0;
+      float: none;
+      text-align: center;
+    }
+  }
+
+  .link-group {
+    margin-right: 50px;
+  }
+
+  #copyright {
+    clear: both;
+    padding-top: 15px;
+    color: #888;
+    float: left;
+  }
+
+  .current-version {
+    float: right;
+    clear: none;
+    padding-top: 15px;
+    color: #888;
+  }
+}
+
+/* Notifications */
+.noty_bar .noty_message {
+  @include font-size($font-medium);
+  padding: 8px 35px 8px 14px;
+  text-shadow: none;
+}
+.noty_bar.noty_alert {
+  $notif-notice-bg: $rnp-warning-color;
+  background-color: $notif-notice-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-notice-bg, 5);
+}
+.noty_bar.noty_error {
+  $notif-error-bg: $rnp-danger-color;
+  background-color: $notif-error-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-error-bg, 5);
+}
+.noty_bar.noty_success {
+  $notif-success-bg: darken($rnp-success-color, 10);
+  background-color: $notif-success-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-color: darken($notif-success-bg, 5);
+}
+
+
+/* Custom frontpage, sign in and meeting invite pages */
+body.frontpage, body.sessions.create, body.sessions.new,
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
+  $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
+
+  #page-header {
+    text-align: center;
+  }
+
+  .form-area {
+    border: 1px solid #ddd;
+    @include border-radius(2px);
+    width: $form-area-width;
+    @include mconf-clearfix;
+    margin-top: 30px;
+
+    h3 {
+      margin: 0;
+      background: #f6f6f6;
+      padding: 15px;
+      text-align: center;
+      color: #404040;
+    }
+
+    .form-area-content {
+      position: relative;
+    }
+
+    .input input {
+      width: 70%;
+    }
+
+    #user_remember_me {
+      width: auto;
+      float: right;
+      margin-left: 5px;
+    }
+
+    .action-links {
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+    }
+
+    .form-actions {
+      margin-bottom: 0;
+    }
+
+    form {
+      float: none;
+      padding-top: 10px;
+
+      .input {
+        margin-top: 8px;
+        margin-bottom: 15px;
+        padding: 0 15px;
+      }
+    }
+
+    .sign-in-cafe {
+      width: 267px;
+      height: 100px;
+      opacity: 0.9;
+      @include transition(all 0.2s ease-in);
+      margin: 18px 0;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .btn-sign-in-cafe {
+      padding: 7px 20px;
+      display: inline-block;
+    }
+  }
+
+  .secondary-box {
+    float: right;
+  }
+
+  .primary-box {
+    float: left;
+    text-align: center;
+  }
+
+  #login-options {
+    clear: both;
+    float: right;
+    margin-top: 20px;
+  }
+
+  #footer #copyright {
+    padding-top: 30px;
+  }
+}
+
+body.frontpage, body.sessions.create, body.sessions.new,
+body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
+  .form-area {
+    margin-top: 0;
+  }
+
+  .form-area.secondary-box {
+    .form-area-content {
+      padding-top: 25px;
+    }
+
+    .form-actions {
+      margin-top: 37px;
+    }
+
+    h4 {
+      text-align: center;
+      font-weight: normal;
+    }
+
+    .input input {
+      width: 97%;
+    }
+  }
+
+  .primary-box {
+    h4 {
+      text-align: center;
+      font-weight: normal;
+      margin-top: 0;
+      padding-top: 15px;
+    }
+
+    .local-sign-in-area {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s linear;
+
+      &.open {
+        opacity: 1;
+      }
+    }
+
+    .form-actions {
+      position: relative;
+
+      &.open {
+        border-bottom: 1px solid #ddd;
+      }
+    }
+
+    .local-sign-in-trigger {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      padding: 10px 10px 14px 10px;
+      margin-left: 10px;
+      @include border-radius(10px 10px 0 0);
+      border: 1px solid #f6f6f6;
+
+      &.open {
+        background: white;
+        border: 1px solid #ddd;
+        border-bottom: 1px solid #fff;
+      }
+    }
+  }
+
+  #webconf-room-invite .form-area {
+    margin: 0 auto 0 auto;
+    .input input {
+      width: 97%;
+    }
+  }
+
+  #webconf-room-invite-header {
+    .room-status, .room-type {
+      padding-left: 135px;
+    }
+  }
+
+  .form-actions .btn {
+    padding: 6px 12px !important;
+  }
+
+  .login-options {
+    @include mconf-clearfix;
+    text-align: right;
+    margin: 10px 20px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    padding-right: 10px;
+  }
+}
+
+body.frontpage, body.sessions.create, body.sessions.new {
+  .primary-box {
+    float: none;
+    margin: 0 auto;
+  }
+}

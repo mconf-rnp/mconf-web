@@ -12,6 +12,7 @@ require './lib/mconf/approval_module'
 class User < ActiveRecord::Base
   include PublicActivity::Common
   include Mconf::ApprovalModule
+  include Mconf::DisableModule
 
   # TODO: block :username from being modified after registration
 
@@ -82,6 +83,9 @@ class User < ActiveRecord::Base
 
   after_create :set_institution
   after_update :set_institution
+
+  # Before approving via user update, check if institution isn't full
+  before_update :check_if_can_approve, if: -> { require_approval? && approved_changed? && approved? }
 
   before_destroy :before_disable_and_destroy, prepend: true
 
@@ -186,15 +190,6 @@ class User < ActiveRecord::Base
     Space.public_spaces.order('name') - spaces
   end
 
-  def disable
-    before_disable_and_destroy
-    update_attribute(:disabled, true)
-  end
-
-  def enable
-    self.update_attribute(:disabled,false)
-  end
-
   def fellows(name=nil, limit=nil)
     limit = limit || 5            # default to 5
     limit = 50 if limit.to_i > 50 # no more than 50
@@ -218,9 +213,9 @@ class User < ActiveRecord::Base
   end
 
   def events
-    ids = MwebEvents::Event.where(:owner_type => 'User', :owner_id => id).ids
-    ids += permissions.where(:subject_type => 'MwebEvents::Event').pluck(:subject_id)
-    MwebEvents::Event.where(:id => ids)
+    ids = Event.where(:owner_type => 'User', :owner_id => id).ids
+    ids += permissions.where(:subject_type => 'Event').pluck(:subject_id)
+    Event.where(:id => ids)
   end
 
   def has_events_in_this_space?(space)
@@ -236,21 +231,6 @@ class User < ActiveRecord::Base
     rooms += Space.public_spaces.map(&:bigbluebutton_room)
     rooms.uniq!
     rooms
-  end
-
-  # Returns the number of unread private messages for this user
-  def unread_private_messages
-    PrivateMessage.inbox(self).select{|msg| !msg.checked}
-  end
-
-  # Sets the user as approved and skips confirmation
-  def approve!(ignore_full = false)
-    if institution_is_full? && !ignore_full
-      false
-    else
-      skip_confirmation! unless confirmed?
-      update_attributes(approved: true)
-    end
   end
 
   # Overrides a method from devise, see:
@@ -269,15 +249,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  # Method used by MwebEvents
-  def admin?
-    superuser
-  end
-
-  def enabled?
-    !disabled?
-  end
-
   # Return the list of spaces in which the user has a pending join request or invitation.
   def pending_spaces
     requests = JoinRequest.where(:candidate_id => self, :processed_at => nil, :group_type => 'Space')
@@ -290,9 +261,9 @@ class User < ActiveRecord::Base
   after_create :new_activity_user_created
   def new_activity_user_created
     if created_by.present?
-      create_activity 'created_by_admin', owner: created_by, notified: false
+      create_activity 'created_by_admin', owner: created_by, notified: false, recipient: self
     else
-      create_activity 'created', owner: self, notified: !require_approval?
+      create_activity 'created', owner: self, notified: !require_approval?, recipient: self
     end
   end
 
@@ -347,6 +318,18 @@ class User < ActiveRecord::Base
 
   protected
 
+  # User model specific code for approval module
+  def check_if_can_approve
+    if institution_is_full?
+      self.errors.add(:approved, I18n.t('users.approve.institution_full', name: institution.name, limit: institution.user_limit))
+      false
+    else
+      # Also confirm user if necessary
+      skip_confirmation! unless confirmed?
+      true
+    end
+  end
+
   def before_disable_and_destroy
     # All the spaces the user is an admin of
     admin_in = self.permissions
@@ -363,6 +346,11 @@ class User < ActiveRecord::Base
     admin_in.each do |space|
       space.disable if space.admins.empty?
     end
+  end
+
+  # For the disable module
+  def before_disable
+    before_disable_and_destroy
   end
 
   def init

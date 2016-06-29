@@ -26,9 +26,17 @@ describe User do
 
   it { should have_many(:posts) }
 
-  it { should validate_presence_of(:email) }
+  describe 'model validations' do
+    subject { FactoryGirl.create(:user) } # Trying to solve the bug 2 lines below
 
-  it { should validate_uniqueness_of(:email) }
+    it { should validate_presence_of(:email) }
+
+    # Not working because of conflict with devise, see https://github.com/thoughtbot/shoulda-matchers/issues/836
+    skip { should validate_uniqueness_of(:email) }
+
+    # Needs a matcher
+    # skip { should validate_email }
+  end
 
   # Make sure it's being tested in the controller
   # [ :email, :password, :password_confirmation,
@@ -170,7 +178,7 @@ describe User do
   describe "#username" do
     it { should validate_presence_of(:username) }
     it { should validate_uniqueness_of(:username).case_insensitive }
-    it { should ensure_length_of(:username).is_at_least(1) }
+    it { should validate_length_of(:username).is_at_least(1) }
     it { should_not allow_value("123 321").for(:username) }
     it { should_not allow_value("").for(:username) }
     it { should_not allow_value("ab@c").for(:username) }
@@ -481,20 +489,22 @@ describe User do
 
   describe "#events", :events => true do
     let(:user) { FactoryGirl.create(:user) }
-    let(:other_user) { FactoryGirl.create(:user)}
+    let(:other_user) { FactoryGirl.create(:user) }
+    let(:another_one) { FactoryGirl.create(:user) }
 
     before(:each) do
       @events = [
       FactoryGirl.create(:event, :owner => user),
       FactoryGirl.create(:event, :owner => user),
-      FactoryGirl.create(:event, :owner => nil)
+      FactoryGirl.create(:event, :owner => other_user)
       ]
     end
 
     it { user.events.size.should eql(2) }
     it { user.events.should include(@events[0], @events[1]) }
     it { user.events.should_not include(@events[2]) }
-    it { other_user.events.should be_empty }
+    it { other_user.events.should include(@events[2]) }
+    it { another_one.events.should be_empty }
   end
 
   skip "#has_events_in_this_space?"
@@ -746,7 +756,7 @@ describe User do
     }
     context "sets the user as approved" do
       before { user.approve! }
-      it { user.approved.should be true }
+      it { user.should be_approved }
     end
 
     context "confirms the user if it's not already confirmed" do
@@ -771,27 +781,45 @@ describe User do
         }
         subject { user.approve! }
         it { should be_falsey }
-        it { user.approved.should be_falsey }
+        it { user.should_not be_approved }
       end
 
       context "doesn't approve the user if the user limit is 0" do
         before { user.institution.update_attributes(:user_limit => 0) }
         subject { user.approve! }
         it { should be_falsey }
-        it { user.approved.should be_falsey }
+        it { user.should_not be_approved }
       end
 
       context "ignores empty user limits" do
         before { user.institution.update_attributes(:user_limit => nil) }
         before(:each) { user.approve! }
-        it { user.approved.should be_truthy }
+        it { user.should be_approved }
       end
+    end
 
-      context "ignores the limit if ignore_full is set" do
-        before { user.institution.update_attributes(:user_limit => 0) }
-        before(:each) { user.approve!(true) }
-        it { user.approved.should be_truthy }
-      end
+    context "approve with update_attributes if institution is full" do
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 2)
+        user.update_attributes(approved: true)
+        user.reload
+      }
+
+      it { user.should be_approved }
+      it { user.errors[:approved].should be_blank }
+    end
+
+    context "approve with update_attributes if institution is full" do
+      before {
+        FactoryGirl.create(:user, :institution => user.institution)
+        user.institution.update_attributes(:user_limit => 1)
+        user.update_attributes(approved: true)
+        user.reload
+      }
+
+      it { user.should_not be_approved }
+      it { user.errors[:approved].should be_present }
     end
   end
 
@@ -802,7 +830,9 @@ describe User do
     context "creates a recent activity" do
       before {
         expect {
-          user.create_approval_notification(approver)
+          PublicActivity.with_tracking do
+            user.create_approval_notification(approver)
+          end
         }.to change{ PublicActivity::Activity.count }.by(1)
       }
       subject { PublicActivity::Activity.last }
@@ -875,20 +905,6 @@ describe User do
         let(:user) { FactoryGirl.create(:user, :approved => false) }
         it { user.inactive_message.should be(:inactive) }
       end
-    end
-  end
-
-  describe "#admin?" do
-    let(:user) { FactoryGirl.create(:user) }
-
-    context "if the user is a superuser" do
-      before { user.update_attributes(superuser: true) }
-      it { user.admin?.should be(true) }
-    end
-
-    context "if the user is not a superuser" do
-      before { user.update_attributes(superuser: false) }
-      it { user.admin?.should be(false) }
     end
   end
 
@@ -1206,44 +1222,92 @@ describe User do
         it { should be_able_to_do_everything_to(:all) }
       end
 
-      context "cannot edit the password if the account was created by shib" do
-        before {
-          Site.current.update_attributes(local_auth_enabled: true)
-          FactoryGirl.create(:shib_token, user: target, new_account: true)
-        }
-        it { should_not be_able_to(:update_password, target) }
+      context "over a normal user" do
+        context "cannot edit the password if the account was created by shib" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:shib_token, user: target, new_account: true)
+          }
+          it { should_not be_able_to(:update_password, target) }
+        end
+
+        context "can edit the password if the account was not created by shib" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:shib_token, user: target, new_account: false)
+          }
+          it { should be_able_to(:update_password, target) }
+        end
+
+        context "cannot edit the password if the account was created by LDAP" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:ldap_token, user: target, new_account: true)
+          }
+          it { should_not be_able_to(:update_password, target) }
+        end
+
+        context "can edit the password if the account was not created by LDAP" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:ldap_token, user: target, new_account: false)
+          }
+          it { should be_able_to(:update_password, target) }
+        end
+
+        context "cannot edit the password if the site has local auth disabled" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: false)
+            FactoryGirl.create(:shib_token, user: target, new_account: false)
+          }
+          it { should_not be_able_to(:update_password, target) }
+        end
       end
 
-      context "can edit the password if the account was not created by shib" do
+      context "over a superuser" do
         before {
-          Site.current.update_attributes(local_auth_enabled: true)
-          FactoryGirl.create(:shib_token, user: target, new_account: false)
+          target.update_attributes(superuser: true)
         }
-        it { should be_able_to(:update_password, target) }
-      end
 
-      context "cannot edit the password if the account was created by LDAP" do
-        before {
-          Site.current.update_attributes(local_auth_enabled: true)
-          FactoryGirl.create(:ldap_token, user: target, new_account: true)
-        }
-        it { should_not be_able_to(:update_password, target) }
-      end
+        context "cannot edit the password if the account was created by shib" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:shib_token, user: target, new_account: true)
+          }
+          it { should_not be_able_to(:update_password, target) }
+        end
 
-      context "can edit the password if the account was not created by LDAP" do
-        before {
-          Site.current.update_attributes(local_auth_enabled: true)
-          FactoryGirl.create(:ldap_token, user: target, new_account: false)
-        }
-        it { should be_able_to(:update_password, target) }
-      end
+        context "can edit the password if the account was not created by shib" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:shib_token, user: target, new_account: false)
+          }
+          it { should be_able_to(:update_password, target) }
+        end
 
-      context "cannot edit the password if the site has local auth disabled" do
-        before {
-          Site.current.update_attributes(local_auth_enabled: false)
-          FactoryGirl.create(:shib_token, user: target, new_account: false)
-        }
-        it { should_not be_able_to(:update_password, target) }
+        context "cannot edit the password if the account was created by LDAP" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:ldap_token, user: target, new_account: true)
+          }
+          it { should_not be_able_to(:update_password, target) }
+        end
+
+        context "can edit the password if the account was not created by LDAP" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: true)
+            FactoryGirl.create(:ldap_token, user: target, new_account: false)
+          }
+          it { should be_able_to(:update_password, target) }
+        end
+
+        context "can edit the password even if the site has local auth disabled" do
+          before {
+            Site.current.update_attributes(local_auth_enabled: false)
+            FactoryGirl.create(:shib_token, user: target, new_account: false)
+          }
+          it { should be_able_to(:update_password, target) }
+        end
       end
     end
 

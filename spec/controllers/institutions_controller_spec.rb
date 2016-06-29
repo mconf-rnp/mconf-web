@@ -76,7 +76,7 @@ describe InstitutionsController do
 
       describe "sets the flash with a success message" do
         before(:each) { post :create, :institution => {:name => institution.name} }
-        it { should set_the_flash.to(I18n.t('institution.created')) }
+        it { should set_flash.to(I18n.t('institution.created')) }
       end
     end
 
@@ -111,7 +111,7 @@ describe InstitutionsController do
 
     let(:allowed_params) {
       [ :acronym, :name, :user_limit, :can_record_limit, :identifier, :force_shib_login,
-      :require_space_approval, :forbid_user_space_creation, :recordings_disk_quota_human ]
+      :require_space_approval, :forbid_user_space_creation, :recordings_disk_quota_human, :secret ]
     }
 
     before {

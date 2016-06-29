@@ -1,48 +1,36 @@
 #footer-wrapper
   #footer
-    #footer-logo
-      = link_to current_site.name, "/", :class => 'title'
-      %span= t('.copyright', site: current_site.name, year: Time.now.year)
     .link-group
       %h3= t('.links.title')
       %ul
         - unless current_site.external_help.blank?
-          %li= link_to(t('.links.help'), current_site.external_help)
+          %li= link_to(t('.links.user_guide'), current_site.external_help)
+        %li= link_to(t('.links.check'), "https://wiki.rnp.br/pages/viewpage.action?pageId=89112372#ManualdoUsuáriodoserviçodeconferênciaweb-Requisitosdeuso")
         - if user_signed_in?
           %li= link_to t('.links.feedback'), main_app.new_feedback_path, :id => "feedback_link", :class => "open-modal"
-        %li= link_to(t('.links.statistics'), main_app.show_statistics_path )
+        -# %li= link_to(t('.links.statistics'), main_app.show_statistics_path )
     .link-group
-      %h3= t('.find_us')
+      %h3= t('.about_service.title')
       %ul
-        %li= link_to t('.project_website'), "http://www.inf.ufrgs.br/prav/gtmconf"
-        %li= link_to t('.github'), "https://github.com/mconf"
-        %li= link_to t('.wiki'), "https://github.com/mconf/wiki/wiki"
-        %li= link_to t('.issues'), "http://dev.mconf.org"
+        %li= link_to t('.about_service.service_page'), "https://www.rnp.br/servicos/servicos-avancados/conferencia-web"
+        %li= link_to t('.about_service.mconf_tec'), "http://mconf.com"
     .link-group.footer-languages
       %h3
-        = link_to 'https://github.com/mconf/mconf-web/wiki/Mconf-Web-Localization' do
-          = icon_info t('.translate.help_us'), :class => 'help-translate-icon'
         = t('.translate.change')
       - available_locales.each_slice(3) do |locales|
         %ul
           - locales.each do |locale|
             %li
-              - flag = image_tag("flags/" + locale.to_s + ".png", :title => locale.to_s)
-              - text = t('locales.' + locale.to_s)
-              - link = link_to(text, main_app.session_locale_path(:l => locale.to_s), :method => :post)
+              - flag = image_tag("flags/" + locale.to_s + ".png", title: locale.to_s)
+              - name = locale_i18n(locale)
+              - link = link_to(name, main_app.session_locale_path(l: locale.to_s), method: :post)
               = (flag + " " + link).html_safe
-    .link-group.footer-sponsors
-      %h3= t('.sponsors.title')
-      %ul
-        %li
-          = image_tag("logos/rnp_small.jpg")
-          = link_to t('.sponsors.rnp').html_safe, "http://www.rnp.br"
-        %li
-          = image_tag("logos/prav_small.png")
-          = link_to t('.sponsors.prav').html_safe, "http://www.inf.ufrgs.br/prav"
-    .current-version
-      = t('.current_version') + ": "
-      = application_version
-      = "&#149;".html_safe
-      = link_to github_link_to_revision(application_revision) do
-        = application_revision
+    #copyright
+      = t('.copyright', year: 2016, site: "Serviço de conferência web (Mconf)")
+    - if user_signed_in? && current_user.superuser?
+      .current-version
+        = t('.current_version') + ": "
+        = application_version
+        = "&#149;".html_safe
+        = link_to github_link_to_revision(application_revision) do
+          = application_revision

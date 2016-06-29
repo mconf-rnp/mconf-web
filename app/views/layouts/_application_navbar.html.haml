@@ -1,6 +1,7 @@
 #main-logo
   - url = user_signed_in? ? main_app.my_home_path : main_app.root_path
-  %a.title{:href => url}= current_site.name
+  %a.title{:href => url}
+    = image_tag "rnp/logo-inverted.png", size: "70x34"
 
 %ul#navbar-left-links
   - if user_signed_in?
@@ -8,16 +9,9 @@
       = link_to main_app.my_home_path do
         = t('home.my')
     %li
-      = link_to main_app.messages_path do
-        = t('.inbox')
-        - if current_user.unread_private_messages.size > 0
-          .label.label-important= current_user.unread_private_messages.size
-        - else
-          .label.label-success= 0
-    %li
       = link_to t('space.all'), main_app.spaces_path
     - if mod_enabled?("events")
-      %li= link_to t('.events'), mweb_events.events_path
+      %li= link_to t('.events'), events_path
     - if current_user.superuser?
       %li
         = link_to main_app.site_path do
@@ -32,7 +26,7 @@
     -# for anonymous users
     %li= link_to t('space.all'), main_app.spaces_path
     - if mod_enabled?("events")
-      %li= link_to t('.events'), mweb_events.events_path
+      %li= link_to t('.events'), events_path
 
 -# the right menu is not shown in the home page
 - if at_home?
@@ -73,7 +67,10 @@
                   = link_to t('edit'), main_app.edit_user_profile_path(current_user)
 
     - else
-      - if current_site.local_auth_enabled? || current_site.ldap_enabled?
-        %li.last= link_to t('.login'), main_app.login_path
-      - if current_site.registration_enabled?
-        %li= link_to t('.register'), main_app.register_path
+      - on_invite = params[:controller] == 'custom_bigbluebutton_rooms' && ['invite', 'invite_userid'].include?(params[:action])
+      - on_login = ['frontpage', 'sessions'].include?(params[:controller])
+      - unless on_login || on_invite
+        - if current_site.local_auth_enabled? || current_site.ldap_enabled?
+          %li.last= link_to t('.login'), main_app.login_path
+        - if current_site.registration_enabled?
+          %li= link_to t('.register'), main_app.register_path

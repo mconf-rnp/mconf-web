@@ -54,6 +54,25 @@ Rails.application.config.to_prepare do
     def invitation_url
       Rails.application.routes.url_helpers.join_webconf_url(self, host: Site.current.domain)
     end
+
+    # Selects always the default server, but sets on it the shared secret of the institution that
+    # owns this room, if any.
+    def select_server(api_method=nil)
+      server = BigbluebuttonServer.default
+
+      meeting = self.get_current_meeting
+      if meeting.present? && !meeting.server_secret.blank? && !meeting.ended?
+        Rails.logger.info "#select_server: selected the secret from the meeting for #{self.meetingid}, #{self.create_time}"
+        server.secret = meeting.server_secret
+      elsif self.owner && self.owner.institution && !self.owner.institution.secret.blank?
+        Rails.logger.info "#select_server: selected the secret from the institution for #{self.meetingid}, #{self.create_time}"
+        server.secret = self.owner.institution.secret
+      else
+        Rails.logger.info "#select_server: selected the secret from the server for #{self.meetingid}, #{self.create_time}"
+      end
+
+      server
+    end
   end
 
   BigbluebuttonServer.instance_eval do
@@ -67,13 +86,20 @@ Rails.application.config.to_prepare do
   end
 
   BigbluebuttonMeeting.instance_eval do
-    include PublicActivity::Common
-  end
+    include PublicActivity::Model
 
-  BigbluebuttonMeeting.class_eval do
-    after_create {
-      self.create_activity :create, :owner => self.room unless self.errors.any?
-    }
+    tracked only: [:create], owner: :room,
+      recipient: -> (ctrl, model) { model.room.owner },
+      params: {
+        creator_id: -> (ctrl, model) {
+          model.try(:creator_id)
+        },
+        creator_username: -> (ctrl, model) {
+          id = model.try(:creator_id)
+          user = User.find_by(id: id)
+          user.try(:username)
+        }
+      }
   end
 
   BigbluebuttonRecording.instance_eval do

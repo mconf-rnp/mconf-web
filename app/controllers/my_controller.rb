@@ -48,11 +48,10 @@ class MyController < ApplicationController
   end
 
   def home
-    @user_spaces = current_user.spaces
+    @user_spaces = current_user.spaces.limit(15)
     @user_pending_spaces = current_user.pending_spaces
     @contents_per_page = 15
-    @all_contents = RecentActivity.user_activity(current_user).limit(@contents_per_page).order('updated_at DESC')
-    @private_messages = current_user.unread_private_messages
+    @all_contents = RecentActivity.user_activity(current_user).limit(@contents_per_page).order('created_at DESC')
   end
 
   def approval_pending
@@ -66,7 +65,7 @@ class MyController < ApplicationController
   def activity
     @contents_per_page = params[:per_page] || 20
 
-    @all_contents = RecentActivity.user_activity(current_user).order('updated_at DESC')
+    @all_contents = RecentActivity.user_activity(current_user).order('created_at DESC')
       .paginate(:page => params[:page], :per_page => @contents_per_page.to_i)
   end
 
@@ -147,11 +146,11 @@ class MyController < ApplicationController
   def load_events
     unless @user_spaces.empty?
       # TODO: move these methods to the model
-      @today_events = MwebEvents::Event.
+      @today_events = Event.
         within(DateTime.now.beginning_of_day, DateTime.now.end_of_day).
         where(:owner_id => @user_spaces, :owner_type => "Space").
         order("start_on ASC").all
-      @upcoming_events = MwebEvents::Event.where(:owner_id => @user_spaces, :owner_type => "Space").
+      @upcoming_events = Event.where(:owner_id => @user_spaces, :owner_type => "Space").
         where('end_on >= ?', DateTime.now.end_of_day).
         limit(5).order("start_on ASC").all
     end

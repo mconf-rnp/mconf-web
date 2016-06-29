@@ -7,36 +7,50 @@
 
 require "digest/sha1"
 
-class UsersController < ApplicationController
+class UsersController < InheritedResources::Base
   include Mconf::ApprovalControllerModule # for approve and disapprove
+  include Mconf::DisableControllerModule # for enable, disable
+  include Mconf::SelectControllerModule # for select
 
+  respond_to :html, except: [:select, :current, :fellows]
+  respond_to :json, only: [:select, :current, :fellows]
+  respond_to :xml, only: [:current]
+
+  defaults finder: :find_by_permalink!
   load_and_authorize_resource :find_by => :username, :except => [:enable, :index, :destroy]
   before_filter :load_and_authorize_with_disabled, :only => [:enable, :destroy]
-
-  # #index is nested in spaces
-  load_and_authorize_resource :space, find_by: :permalink, only: [:index]
-  load_and_authorize_resource through: :space, only: [:index]
-  before_filter :webconf_room!, only: [:index]
 
   # Rescue username not found rendering a 404
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
-  respond_to :html, :except => [:select, :current, :fellows]
-  respond_to :js, :only => [:select, :current, :fellows]
-  respond_to :xml, :only => [:current]
+  layout :set_layout
+  def set_layout
+    if [:index].include?(action_name.to_sym)
+      'spaces_show'
+    elsif [:edit].include?(action_name.to_sym)
+      'no_sidebar'
+    else
+      'application'
+    end
+  end
 
   def index
-    @users = @space.users.sort {|x,y| x.name <=> y.name }
-    respond_to do |format|
-      format.html { render :layout => 'spaces_show' }
-    end
+    @space = Space.find_by_permalink!(params[:space_id])
+    webconf_room!
+
+    authorize! :show, @space
+
+    @users = @space.users.joins(:profile)
+      .order("profiles.full_name ASC")
+      .paginate(:page => params[:page], :per_page => 10)
+    @userCount = @space.users.count
   end
 
   def show
     @user_spaces = @user.spaces
 
     # Show activity only in spaces where the current user is a member
-    in_spaces = current_user.present? ? current_user.spaces : []
+    in_spaces = current_user.present? ? current_user.space_ids : []
     @recent_activities = RecentActivity.user_public_activity(@user, in_spaces: in_spaces)
     @recent_activities = @recent_activities.order('updated_at DESC').page(params[:page])
 
@@ -51,7 +65,6 @@ class UsersController < ApplicationController
       shib = Mconf::Shibboleth.new(session)
       @shib_provider = shib.get_identity_provider
     end
-    render :layout => 'no_sidebar'
   end
 
   def update
@@ -102,71 +115,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    @user.destroy
-    respond_to do |format|
-      format.html {
-        flash[:notice] = t('user.deleted')
-        redirect_to manage_users_path
-      }
-    end
-  end
-
-  def disable
-    @user.disable
-
-    if current_user == @user
-      # the same message devise users when removing a registration
-      flash[:notice] = t('devise.registrations.destroyed')
-    else
-      flash[:notice] = t('user.disabled', :username => @user.username)
-    end
-
-    respond_to do |format|
-      format.html {
-        if current_user.superuser?
-          redirect_to manage_users_path
-        else
-          redirect_to root_path
-        end
-      }
-    end
-  end
-
-  def enable
-    unless @user.disabled?
-      flash[:notice] = t('user.error.enabled', :name => @user.username)
-    else
-      @user.enable
-      flash[:success] = t('user.enabled')
-    end
-    respond_to do |format|
-      format.html { redirect_to manage_users_path }
-    end
-  end
-
-  # Finds users by id (params[:i]) or by name, username or email (params[:q]) and returns
-  # a list of a few selected attributes
-  # TODO: This is used in a lot of places, but not all want all the filters and all the
-  #  results. We could make it configurable.
-  def select
-    words = params[:q].try(:split, /\s+/)
-    id = params[:i]
-    limit = params[:limit] || 5   # default to 5
-    limit = 50 if limit.to_i > 50 # no more than 50
-    query = User
-    if id
-      @users = query.find_by_id(id)
-    elsif query.nil?
-      @users = query.limit(limit)
-    else
-      @users = query
-        .search_by_terms(words, can?(:manage, User))
-        .limit(limit)
-    end
-
-    respond_with @users do |format|
-      format.json
-    end
+    destroy! { manage_users_path }
   end
 
   # Returns fellows users - users that a members of spaces
@@ -175,19 +124,12 @@ class UsersController < ApplicationController
   #   for fellows too
   def fellows
     @users = current_user.fellows(params[:q], params[:limit])
-
-    respond_with @users do |format|
-      format.json
-    end
   end
 
   # Returns info of the current user
   def current
     @user = current_user
-    respond_with @user do |format|
-      format.xml
-      format.json
-    end
+    respond_with(@user)
   end
 
   # Confirms a user's account
@@ -199,41 +141,14 @@ class UsersController < ApplicationController
     redirect_to :back
   end
 
-  # TODO: #1650 these methods are now in a separate module, customize them there
-  def approve
-    if current_site.require_registration_approval?
-      ignore_full = can?(:approve_when_full, @user)
-      if @user.approve!(ignore_full)
-        @user.create_approval_notification(current_user)
-        flash[:notice] = t('users.approve.approved', :name => @user.name)
-      else
-        flash[:error] = t('users.approve.institution_full', :name => @user.institution.name, :limit => @user.institution.user_limit)
-      end
-    else
-      flash[:error] = t('users.approve.not_enabled')
-    end
-    redirect_to :back
-  end
-  def disapprove
-    if current_site.require_registration_approval?
-      @user.disapprove!
-      flash[:notice] = t('users.disapprove.disapproved', :name => @user.name)
-    else
-      flash[:error] = t('users.disapprove.not_enabled')
-    end
-    redirect_to :back
-  end
-
   # Methods to let admins create new users
   def new
-    @user = User.new
     respond_to do |format|
       format.html { render layout: !request.xhr? }
     end
   end
 
   def create
-    @user = User.new(user_params)
     @user.created_by = current_user
     @user.skip_confirmation_notification!
 
@@ -251,7 +166,7 @@ class UsersController < ApplicationController
 
     if @user.save
       @user.confirm
-      @user.approve!(can?(:approve_when_full, @user))
+      @user.approve!
       flash[:success] = t("users.create.success")
       respond_to do |format|
         format.html { redirect_to manage_users_path }
@@ -281,6 +196,23 @@ class UsersController < ApplicationController
 
   def require_approval?
     current_site.require_registration_approval?
+  end
+
+  def disable_notice
+    if current_user == @user
+      # the same message devise users when removing a registration
+      t('devise.registrations.destroyed')
+    else
+      t('flash.users.disable.notice', :username => @user.username)
+    end
+  end
+
+  def disable_back_path
+    if current_user.superuser?
+      manage_users_path
+    else
+      root_path
+    end
   end
 
   allow_params_for :user

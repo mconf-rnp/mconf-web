@@ -11,8 +11,6 @@ require './lib/mconf/modules'
 module ApplicationHelper
   include Mconf::Modules # so the views can access it too
 
-  include MwebEvents::EventsHelper if Mconf::Modules.mod_loaded?('events')
-
   def copyable_field(id, content, opt={})
     opt[:label] ||= id
     content_tag :div, :class => 'input-append copyable-field' do
@@ -41,7 +39,7 @@ module ApplicationHelper
     end
   end
 
-  # Ex: asset_exists?('news/edit', 'css')
+  # Ex: asset_exists?('posts/edit', 'css')
   def asset_exists?(asset_name, default_ext)
     !Mconf::Application.assets.find_asset(asset_name + '.' + default_ext).nil?
   end
@@ -145,6 +143,21 @@ module ApplicationHelper
   # Retrieves max upload size from website or uses a default value
   def max_upload_size
     current_site.max_upload_size
+  end
+
+  # Includes elements in the page to disable the autocomplete of an input
+  # In some browsers, such as Firefox, setting the attribute 'autocomplete=false' in
+  # the input is not enough to disable its autocomplete, usually for username and
+  # password inputs, so we have to do this workaround.
+  def disable_autocomplete_for(name, type='text')
+    attrs = {
+      type: type,
+      name: name,
+      disabled: true,
+      class: 'input-disable-autocomplete disabled',
+      style: 'display:none;'
+    }
+    content_tag :input, nil, attrs
   end
 
   # Includes elements in the page to disable the autocomplete of an input

@@ -1,0 +1,154 @@
+pt-br:
+  activerecord:
+    attributes:
+      institution:
+        acronym: Sigla
+        can_record_limit: Usuários que podem gravar
+        forbid_user_space_creation: "Proibir que usuários criem comunidades"
+        force_shib_login: Somente login via federação
+        identifier: Identificador
+        name: Nome
+        recordings_disk_quota_human: Quota de disco para gravações
+        recordings_disk_used: Espaço ocupado por gravações
+        require_space_approval: "Moderação de comunidades"
+        secret: "Chave de acesso ao servidor de webconferência"
+        user_limit: Máximo de membros
+      space:
+        institution_id: "Instituição"
+        institution_name: "Instituição"
+      user:
+        institution_id: "Instituição"
+        institution_name: "Instituição"
+        password: "Senha"
+    models:
+      institution: Instituição
+  bigbluebutton_rails:
+    server_configs:
+      layouts:
+        reuniao: "Reunião"
+        video_chat: "Vídeo chat"
+        webconferencia: "Webconferência"
+        webinar: "Webinar"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      non_member:
+        title: "Não tenho uma conta"
+  institution:
+    created: Instituição criada com sucesso.
+    deleted: "Instituição removida com sucesso"
+    duplicate: Esta instituição é uma duplicata
+    updated: "Instituição atualizada com sucesso"
+  institutions:
+    form:
+      new: Nova instituição
+    edit:
+      title: Editar instituição
+    new:
+      title: Criar instituição
+      button: Criar
+    spaces:
+      title: "Comunidades na instituição %{name}"
+    users:
+      title: "Usuários na instituição %{name}"
+  frontpage:
+    sign_in_and_title:
+      headline: "Portal do serviço de conferência web"
+  layouts:
+    footer:
+      about_service:
+        mconf_tec: "Mconf Tecnologia"
+        service_page: "Página do serviço"
+        title: "Mais sobre o serviço"
+      links:
+        check: "Checar requisitos de uso"
+        user_guide: "Manual do usuário"
+  manage:
+    institution:
+      can_record_users:
+        zero: 0 membros podem gravar
+        one: 1 membro pode gravar
+        other: "%{count} membros podem gravar"
+      can_record_limit: "máximo: %{limit}"
+      destroy: "Remover instituição"
+      destroy_confirm: "Você tem certeza que deseja remover a instituição %{name}?"
+      disk_used: "%{used} de %{quota} ocupados para gravações"
+      disk_used_no_quota: "%{used} ocupados para gravações (sem quota)"
+      no_user_limit: "sem limite"
+      spaces:
+        zero: 0 comunidades
+        one: 1 comunidade
+        other: "%{count} comunidades"
+      users:
+        zero: 0 membros
+        one: 1 membro
+        other: "%{count} membros"
+      user_limit: "máximo: %{limit}"
+    institutions:
+      create: "Criar uma nova instituição"
+    menu:
+      institutions: Instituições
+      my_institution: "Minha instituição"
+    users:
+      create_without_record: "Usuário criado com sucesso, porém não existiam mais vagas para gravação, portanto este usuário não poderá gravar reuniões."
+  profiles:
+    form:
+      no_organization: "<nenhuma organização atribuída>"
+  sessions:
+    login_form:
+      email_or_login: "E-mail"
+    login_form_area:
+      login: "Entrar"
+      title: "Já tenho uma conta"
+      member:
+        email_or_username: "E-mail"
+        non_federated_click: "Minha conta não é federada"
+        non_federated_title: "Acessar usando uma conta local"
+        password: "Senha"
+        shibboleth:
+          click_here: "Entrar"
+    new:
+      cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+      federated_authentication: "Autenticação federada"
+      local_authentication: "Autenticação local"
+      sign_in_federation: "Entrar"
+  simple_form:
+    hints:
+      institution:
+        acronym: "Adicionar uma sigla ajuda os usuários a encontrarem a instituição correta ao se registrar."
+        can_record_limit: "Opcional. Informe um número caso deseje limitar o número de membros que podem gravar reuniões nesta instituição. Deixe em branco para não limitar o número de membros."
+        forbid_user_space_creation: "Apenas os administradores da instituição poderão criar comunidades"
+        force_shib_login: "Quando habilitado o usuário só poderá se logar através da federação"
+        identifier: "Identificador usado para encontrar os usuários que pertencerão a esta instituição. Você pode usar múltiplos valores, um por linha, como expressões regulares. As comparações são \"case-insensitive\" e espaços são removidos do início e fim. Se um usuário é identificado por \"eu@sub.instituicao.org\", por exemplo, um dos valores para localizar este usuário seria \"(.*\\.)?instituicao\\.org\", que funcionaria para qualquer subdomínio de uma instituição."
+        recordings_disk_quota_human: "Limite máximo de espaço no servidor que pode ser ocupado por gravações desta instituição (e.g. '100 GB', '200 GiB', '1500000000')."
+        recordings_disk_used: "Espaço em disco atualmente ocupado por gravações dessa instituição."
+        require_space_approval: "Se selecionado, comunidades precisam ser aprovadas por um administrador da instituição para que possam ser vistas e utilizadas por outros usuários"
+        secret: "Chave de acesso que deve ser utilizada ao fazer chamadas da API ao servidor de webconferência. Se vazio, usará a chave padrão do servidor."
+        user_limit: "Opcional. Informe um número caso deseje limitar o número de usuários que podem fazer parte desta instituição. Deixe em branco para não limitar o número de membros."
+  shibboleth:
+    create_association:
+      institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
+  spaces:
+    edit:
+      institution_placeholder: "Selecione uma instituição"
+  user:
+    institution: Institution
+    index:
+      user_list:
+        header_spaces: "Usuários nesta comunidade: %{count}"
+        header_institutions: "Usuários nesta instituição: %{count}"
+    institutional_admin: Administrador de instituição
+  users:
+    approve:
+      institution_full: "O usuário não pode ser aprovado porque a instituição %{name} tem um limite de %{limit} membros"
+    edit:
+      change_institution: Mudar instituição do usuário
+      institution_placeholder: "Selecione uma instituição"
+    registrations:
+      shibboleth:
+        error:
+          force_shib_registration: "Desculpe, você não pode se registrar localmente, sua instituição só permite login via federação. Você deve utilizar o CAFe para o login."
+      signup_form:
+        institution_hint: Escolha uma ou digite para buscar.
+    update:
+      can_record_reached_limit: "A instituição deste usuário chegou no limite de usuários que podem gravar reuniões"
+      error:  "Houve um erro atualizando o usuário"

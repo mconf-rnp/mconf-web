@@ -21,5 +21,6 @@ FactoryGirl.define do
     r.external false
     r.record_meeting false
     r.duration 0
+    r.create_time { Time.now.to_i + rand(999999) }
   end
 end

@@ -22,9 +22,6 @@
     - if can?(:users, Institution) && current_user.institution
       %li{ :class => "#{'selected' if params[:controller] == 'institutions'}" }
         = link_to t('.my_institution'), institution_path(current_user.institution)
-    - if can?(:spam, :manage)
-      %li{ :class => "#{'selected' if params[:controller] == 'manage' && params[:action] == 'spam'}" }
-        = link_to t('.spam'), manage_spam_path
 
     - if can?(:manage, BigbluebuttonServer) && can?(:manage, BigbluebuttonRoom)
       - webconf_controllers = ['custom_bigbluebutton_servers', 'custom_bigbluebutton_rooms', 'custom_bigbluebutton_recordings']

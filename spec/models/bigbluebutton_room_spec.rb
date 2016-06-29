@@ -20,12 +20,122 @@ describe BigbluebuttonRoom do
       it "false if it was another user that created the current meeting running in the room"
       it "true if the current meeting running in the room was created by the user informed"
     end
+
+    describe "#select_server" do
+      let(:server) { FactoryGirl.create(:bigbluebutton_server, secret: "default-secret") }
+      before {
+        BigbluebuttonServer.stub(:default).and_return(server)
+      }
+
+      context "if there's a current meeting" do
+        let!(:room) { FactoryGirl.create(:bigbluebutton_room) }
+        let!(:meeting) {
+          FactoryGirl.create(:bigbluebutton_meeting, room: room,
+                             create_time: room.create_time, ended: false,
+                             running: true, server_secret: "secret-on-meeting")
+        }
+
+        context "not ended with a secret, uses its secret" do
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("secret-on-meeting") }
+        end
+
+        context "not running but not ended, uses its secret" do
+          before { meeting.update_attributes(running: false) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("secret-on-meeting") }
+        end
+
+        context "not ended but without a secret, doesn't use it" do
+          before { meeting.update_attributes(server_secret: nil) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+
+        context "not ended but with a blank secret, doesn't use it" do
+          before { meeting.update_attributes(server_secret: '') }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+
+        context "with a secret but already ended, doesn't use it" do
+          before { meeting.update_attributes(ended: true) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+      end
+
+      context "if there's no current meeting" do
+        let!(:institution) { FactoryGirl.create(:institution, secret: "institution-secret") }
+        let!(:space) { FactoryGirl.create(:space, institution: institution) }
+        let!(:room) { FactoryGirl.create(:bigbluebutton_room, owner: space) }
+
+        context "if the room has an institution, uses its secret" do
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("institution-secret") }
+        end
+
+        context "if the room has no owner, uses the default salt" do
+          before { room.update_attributes(owner: nil) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+
+        context "if the room's owner has no institution, uses the default salt" do
+          before { room.owner.update_attributes(institution: nil) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+
+        context "if the room has an institution that doesn't have a secret, uses the default salt" do
+          before { institution.update_attributes(secret: nil) }
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("default-secret") }
+        end
+      end
+
+      context "if it changes the secret, doesn't save the server" do
+        let!(:room) { FactoryGirl.create(:bigbluebutton_room) }
+        let!(:meeting) {
+          FactoryGirl.create(:bigbluebutton_meeting, room: room,
+                             create_time: room.create_time, ended: false,
+                             running: true, server_secret: "secret-on-meeting")
+        }
+
+        context "not ended with a secret, uses its secret" do
+          subject { room.select_server }
+          it { subject.name.should eql(server.name) }
+          it { subject.url.should eql(server.url) }
+          it { subject.secret.should eql("secret-on-meeting") }
+          it { subject.secret_changed?.should be(true) }
+          it { subject.reload.secret.should eql("default-secret") }
+        end
+      end
+    end
   end
 
   # This is a model from BigbluebuttonRails, but we have permissions set in cancan for it,
   # so we test them here.
   describe "abilities", :abilities => true do
-    set_custom_ability_actions([ :end, :join_options, :create_meeting, :fetch_recordings,
+    set_custom_ability_actions([ :end, :create_meeting, :fetch_recordings,
                                  :invite, :invite_userid, :running, :join, :join_mobile,
                                  :record_meeting, :invitation, :send_invitation ])
 
@@ -121,7 +231,7 @@ describe BigbluebuttonRoom do
 
       context "in his own room" do
         let(:target) { user.bigbluebutton_room }
-        let(:allowed) { [:end, :join_options, :create_meeting, :fetch_recordings,
+        let(:allowed) { [:end, :create_meeting, :fetch_recordings,
                          :invite, :invite_userid, :running, :join,
                          :join_mobile, :update, :invitation, :send_invitation] }
         it { should_not be_able_to_do_anything_to(target).except(allowed) }
@@ -203,7 +313,7 @@ describe BigbluebuttonRoom do
 
         context "he belongs to" do
           before { space.add_member!(user) }
-          let(:allowed) { [:join_options, :create_meeting, :fetch_recordings,
+          let(:allowed) { [:create_meeting, :fetch_recordings,
                            :invite, :invite_userid, :running, :join, :join_mobile,
                            :invitation, :send_invitation] }
           it { should_not be_able_to_do_anything_to(target).except(allowed) }
@@ -271,7 +381,7 @@ describe BigbluebuttonRoom do
 
         context "he belongs to and is an admin" do
           before { space.add_member!(user, "Admin") }
-          let(:allowed) { [:end, :join_options, :create_meeting, :fetch_recordings,
+          let(:allowed) { [:end, :create_meeting, :fetch_recordings,
                            :invite, :invite_userid, :running, :join, :join_mobile,
                            :invitation, :send_invitation] }
           it { should_not be_able_to_do_anything_to(target).except(allowed) }
@@ -307,7 +417,7 @@ describe BigbluebuttonRoom do
 
         context "he belongs to" do
           before { space.add_member!(user) }
-          let(:allowed) { [:join_options, :create_meeting, :fetch_recordings,
+          let(:allowed) { [:create_meeting, :fetch_recordings,
                            :invite, :invite_userid, :running, :join, :join_mobile,
                            :invitation, :send_invitation] }
           it { should_not be_able_to_do_anything_to(target).except(allowed) }
@@ -375,7 +485,7 @@ describe BigbluebuttonRoom do
 
         context "he belongs to and is an admin" do
           before { space.add_member!(user, "Admin") }
-          let(:allowed) { [:end, :join_options, :create_meeting, :fetch_recordings,
+          let(:allowed) { [:end, :create_meeting, :fetch_recordings,
                            :invite, :invite_userid, :running, :join, :join_mobile,
                            :invitation, :send_invitation] }
           it { should_not be_able_to_do_anything_to(target).except(allowed) }

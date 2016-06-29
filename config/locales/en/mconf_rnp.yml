@@ -1,0 +1,154 @@
+en:
+  activerecord:
+    attributes:
+      institution:
+        acronym: Acronym
+        can_record_limit: Users that can record
+        forbid_user_space_creation: "Forbid users from creating spaces"
+        force_shib_login: Force login only via federation
+        identifier: Identifier
+        name: Name
+        recordings_disk_quota_human: Disk quota for recordings
+        recordings_disk_used: Disk space used by recordings
+        require_space_approval: "Moderate spaces"
+        secret: "Web conference server shared secret"
+        user_limit: Maximum of members
+      space:
+        institution_id: "Institution"
+        institution_name: "Institution"
+      user:
+        institution_id: "Institution"
+        institution_name: "Institution"
+        password: "Password"
+    models:
+      institution: Institution
+  bigbluebutton_rails:
+    server_configs:
+      layouts:
+        reuniao: "Meeting"
+        video_chat: "Video chat"
+        webconferencia: "Web Conference"
+        webinar: "Webinar"
+  custom_bigbluebutton_rooms:
+    invite_userid:
+      non_member:
+        title: "I don't have an account"
+  institution:
+    created: Institution created successfully.
+    deleted: "Institution removed successfully"
+    duplicate: This institution is a duplicate
+    updated: "Institution updated successfully"
+  institutions:
+    form:
+      new: New institution
+    edit:
+      title: Edit institution
+    new:
+      title: Create institution
+      button: Create
+    spaces:
+      title: "Spaces in the institution %{name}"
+    users:
+      title: "Users in the institution %{name}"
+  frontpage:
+    sign_in_and_title:
+      headline: "Web conference service portal"
+  layouts:
+    footer:
+      about_service:
+        mconf_tec: "Mconf Tecnologia"
+        service_page: "Service page"
+        title: "More about the service"
+      links:
+        check: "Check software requirements"
+        user_guide: "User manual"
+  manage:
+    institution:
+      can_record_users:
+        zero: 0 members can record
+        one: 1 member can record
+        other: "%{count} members can record"
+      can_record_limit: "maximum: %{limit}"
+      destroy: "Remove institution"
+      destroy_confirm: "Are you sure you want to remove the institution %{name}?"
+      disk_used: "%{used} used of %{quota} for recordings"
+      disk_used_no_quota: "%{used} used for recordings (no quota)"
+      no_user_limit: "no maximum"
+      spaces:
+        zero: 0 spaces
+        one: 1 space
+        other: "%{count} spaces"
+      users:
+        zero: 0 members
+        one: 1 member
+        other: "%{count} members"
+      user_limit: "maximum: %{limit}"
+    institutions:
+      create: "Create a new institution"
+    menu:
+      institutions: Institutions
+      my_institution: "My Institution"
+    users:
+      create_without_record: "User created successfully, but there were no more free recording slots, so this user will not be able to record meetings."
+  profiles:
+    form:
+      no_organization: "<no organization set>"
+  sessions:
+    login_form:
+      email_or_login: "Email"
+    login_form_area:
+      login: "Login"
+      title: "I already have an account"
+      member:
+        email_or_username: "Email"
+        non_federated_click: "My account is not federated"
+        non_federated_title: "Access using a local account"
+        password: "Password"
+        shibboleth:
+          click_here: "Login"
+    new:
+      cafe_alt: "CAFe: Comunidade Acadêmica Federada"
+      federated_authentication: "Federated authentication"
+      local_authentication: "Local authentication"
+      sign_in_federation: "Login"
+  shibboleth:
+    create_association:
+      institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
+  simple_form:
+    hints:
+      institution:
+        acronym: "Adding an acronym will help users find the right institution when registering."
+        can_record_limit: "Optional. Enter a number to limit how many users can record meetings in this intitution. Leave it empty to set no limits."
+        forbid_user_space_creation: "Only administrators of the institution will be able to create spaces"
+        force_shib_login: "When enabled the user will only be allowed to login via federation"
+        identifier: "Identifier to match users that will belong to this institution. You can use multiple values, one per line, as regular expression. The comparisons are case-insensitive and the strings are trimmed. If a user is identified in the federation as \"user@sub.institution.org\", for example, one possible value to match this user would be \"(.*\\.)?institution\\.org\", that would match any subdomain of an institution."
+        recordings_disk_quota_human: "Maximum disk space that can be used by recordings from this institution (e.g. '100 GB', '200 GiB', '1500000000')."
+        recordings_disk_used: "Current disk space being used by recordings from this institution."
+        require_space_approval: "When checked, spaces have to be approved by an administrator of the institution before other users can see and use them"
+        secret: "The shared secret to use when making API calls to the web conference server. If empty, will use the default secret."
+        user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
+  spaces:
+    edit:
+      institution_placeholder: "Select an institution"
+  user:
+    institution: Institution
+    index:
+      user_list:
+        header_spaces: "Users in this space: %{count}"
+        header_institutions: "Users in this institution: %{count}"
+    institutional_admin: Institutional Admin
+  users:
+    approve:
+      institution_full: "User can't be approved because the institution %{name} has a user limit of %{limit}"
+    edit:
+      change_institution: Change user institution
+      institution_placeholder: "Select an institution"
+    registrations:
+      shibboleth:
+        error:
+          force_shib_registration: "Sorry, you can't register locally 'cause your institution only allow login via federation. You must use the CAFe to login."
+      signup_form:
+        institution_hint: Choose one or type to search.
+    update:
+      can_record_reached_limit: "This user's institution has reached its limit of users that can record meetings"
+      error:  "There was an error updating the user"

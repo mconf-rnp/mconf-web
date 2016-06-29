@@ -3,7 +3,7 @@
     - if can?(:edit, institution)
       = link_to icon_edit(:alt => t('_other.edit'), :title => t('_other.edit')), edit_institution_path(institution), :class => 'open-modal'
     - if can?(:destroy, institution)
-      = link_to institution_path(institution), :confirm => t('are_you_sure'), :method => :delete do
+      = link_to institution_path(institution), :method => :delete, :data => { :confirm => t('.destroy_confirm', name: institution.name) } do
         = icon_delete(:alt => t('disable'), :title => t('.destroy'))
 
   .thread-content
@@ -16,19 +16,24 @@
           = '(' + t('.user_limit', :limit => institution.user_limit) + ')'
         - else
           = '(' + t('.no_user_limit') + ')'
-        = ' - '
+        %br
         = t('.can_record_users', :count => institution.users_that_can_record.count).capitalize
         - if institution.can_record_limit
           = '(' + t('.can_record_limit', :limit => institution.can_record_limit) + ')'
+        - else
+          = '(' + t('.no_user_limit') + ')'
       .institution-spaces
         = link_to t('.spaces', :count => institution.spaces.count).capitalize, spaces_institution_path(institution)
 
-      - if institution.recordings_disk_quota.to_i != 0
-        .institution-disk
-
-          = t('.recordings_disk_used')
-          %p.progress-label
-            = t('.disk_used', used: human_file_size(institution.recordings_disk_used), quota: human_file_size(institution.recordings_disk_quota))
-
-          .progress.short-progress
-            .bar{role: 'progressbar', :'aria-valuemin' => '0', :'aria-valuemax' => '1.0', :'aria-valuenow' => institution.disk_usage_ratio, style: "width: #{(institution.disk_usage_ratio * 100)}%;"}
+    .institution-disk
+      %p.progress-label
+        - if institution.recordings_disk_quota.to_i != 0
+          = t('.disk_used', used: human_file_size(institution.recordings_disk_used), quota: human_file_size(institution.recordings_disk_quota))
+        - else
+          = t('.disk_used_no_quota', used: human_file_size(institution.recordings_disk_used))
+      - if institution.disk_usage_ratio > 0.8
+        - cls = "progress-danger"
+      - elsif institution.disk_usage_ratio > 0.6
+        - cls = "progress-warning"
+      .progress{ class: cls }
+        .bar{role: 'progressbar', :'aria-valuemin' => '0', :'aria-valuemax' => '1.0', :'aria-valuenow' => institution.disk_usage_ratio, style: "width: #{(institution.disk_usage_ratio * 100)}%;"}

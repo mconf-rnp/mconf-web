@@ -1,5 +1,5 @@
-#= require "../registrations/_signup_form"
+#= require "../sessions/_login_form_area"
 
 $ ->
   if isOnPage 'frontpage', 'show'
-    mconf.SignupForm.setup()
+    mconf.Sessions.LoginFormArea.bind()
