@@ -49,7 +49,7 @@ describe BigbluebuttonRoom do
 
       context "for a user room" do
         before {
-          target.update_attributes(owner: FactoryGirl.create(:user))
+          target.update_attributes(owner: FactoryGirl.create(:user, institution: nil))
         }
 
         it {
@@ -63,7 +63,7 @@ describe BigbluebuttonRoom do
 
       context "for a space room" do
         before {
-          target.update_attributes(owner: FactoryGirl.create(:space))
+          target.update_attributes(owner: FactoryGirl.create(:space, institution: nil))
         }
 
         it {
@@ -78,13 +78,67 @@ describe BigbluebuttonRoom do
       context "works with HTTPS" do
         before {
           Site.current.update_attributes(ssl: true)
-          target.update_attributes(owner: FactoryGirl.create(:space))
+          target.update_attributes(owner: FactoryGirl.create(:space, institution: nil))
         }
 
         it {
           expected = {
             "mconfweb-url" => "https://#{Site.current.domain}/",
             "mconfweb-room-type" => "Space"
+          }
+          target.dynamic_metadata.should eql(expected)
+        }
+      end
+
+      context "for a user room with an institution" do
+        let(:institution) { FactoryGirl.create(:institution) }
+        let(:user) { FactoryGirl.create(:user, institution: institution) }
+        before {
+          target.update_attributes(owner: user)
+        }
+
+        it {
+          expected = {
+            "mconfweb-url" => "http://#{Site.current.domain}/",
+            "mconfweb-room-type" => "User",
+            "mconfweb-institution-name" => institution.name,
+            "mconfweb-institution-acronym" => institution.acronym,
+          }
+          target.dynamic_metadata.should eql(expected)
+        }
+      end
+
+      context "for a space room with an institution" do
+        let(:institution) { FactoryGirl.create(:institution) }
+        let(:space) { FactoryGirl.create(:space, institution: institution) }
+        before {
+          target.update_attributes(owner: space)
+        }
+
+        it {
+          expected = {
+            "mconfweb-url" => "http://#{Site.current.domain}/",
+            "mconfweb-room-type" => "Space",
+            "mconfweb-institution-name" => institution.name,
+            "mconfweb-institution-acronym" => institution.acronym,
+          }
+          target.dynamic_metadata.should eql(expected)
+        }
+      end
+
+      context "for a space room with an institution without acronym" do
+        let(:institution) { FactoryGirl.create(:institution, acronym: nil) }
+        let(:space) { FactoryGirl.create(:space, institution: institution) }
+        before {
+          target.update_attributes(owner: space)
+        }
+
+        it {
+          expected = {
+            "mconfweb-url" => "http://#{Site.current.domain}/",
+            "mconfweb-room-type" => "Space",
+            "mconfweb-institution-name" => institution.name,
+            "mconfweb-institution-acronym" => "",
           }
           target.dynamic_metadata.should eql(expected)
         }

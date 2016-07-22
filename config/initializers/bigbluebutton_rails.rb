@@ -56,10 +56,19 @@ Rails.application.config.to_prepare do
     end
 
     def dynamic_metadata
-      {
+      meta = {
         "mconfweb-url" => Rails.application.routes.url_helpers.root_url(host: Site.current.domain_with_protocol),
         "mconfweb-room-type" => self.try(:owner).try(:class).try(:name)
       }
+
+      institution = self.try(:owner).try(:institution)
+      if institution.present?
+        name = institution.try(:name) || ""
+        acronym = institution.try(:acronym) || ""
+        meta.merge!({ "mconfweb-institution-name" => name, "mconfweb-institution-acronym" => acronym })
+      end
+
+      meta
     end
 
     # Selects always the default server, but sets on it the shared secret of the institution that
