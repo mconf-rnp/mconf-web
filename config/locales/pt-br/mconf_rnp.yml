@@ -124,6 +124,10 @@ pt-br:
         require_space_approval: "Se selecionado, comunidades precisam ser aprovadas por um administrador da instituição para que possam ser vistas e utilizadas por outros usuários"
         secret: "Chave de acesso que deve ser utilizada ao fazer chamadas da API ao servidor de webconferência. Se vazio, usará a chave padrão do servidor."
         user_limit: "Opcional. Informe um número caso deseje limitar o número de usuários que podem fazer parte desta instituição. Deixe em branco para não limitar o número de membros."
+  shared:
+    recording_list:
+      unpublish: Remover
+      unpublish_confirm: "Você tem certeza que deseja remover esta gravação?"
   shibboleth:
     create_association:
       institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."

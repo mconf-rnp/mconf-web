@@ -111,6 +111,10 @@ en:
       federated_authentication: "Federated authentication"
       local_authentication: "Local authentication"
       sign_in_federation: "Login"
+  shared:
+    recording_list:
+      unpublish: Remove
+      unpublish_confirm: "Are you sure you want to remove this recording?"
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
