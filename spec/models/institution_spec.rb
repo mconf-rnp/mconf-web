@@ -300,6 +300,25 @@ describe Institution do
 
       it { target.recordings_disk_used.to_i.should eq(0) }
     end
+
+    context "doesn't consider unpublished recordings" do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 2),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 3),
+        FactoryGirl.create(:bigbluebutton_recording, published: false, size: 4),
+        FactoryGirl.create(:bigbluebutton_recording, published: false, size: 5),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 6)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target)
+      ]}
+
+      it { target.recordings_disk_used.to_i.should eq(11) }
+    end
   end
 
   describe "#add_member!" do
