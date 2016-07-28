@@ -22,6 +22,7 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
+  after_initialize :init
   before_validation :validate_and_adjust_recordings_disk_quota
 
   def self.roles
@@ -140,6 +141,12 @@ class Institution < ActiveRecord::Base
 
   private
 
+  def init
+    if self.new_record?
+      self[:secret] ||= random_secret
+    end
+  end
+
   def validate_and_adjust_recordings_disk_quota
     if !recordings_disk_quota_human.nil?
       if self.recordings_disk_quota_human.blank?
@@ -161,6 +168,16 @@ class Institution < ActiveRecord::Base
 
   def is_filesize? n
     Filesize.parse(n)[:type].present?
+  end
+
+  def random_secret(length=32)
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    text = ""
+    length.times do
+      pos = (rand() * chars.length).floor
+      text += chars[pos]
+    end
+    text
   end
 
 end

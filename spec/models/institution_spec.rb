@@ -7,6 +7,37 @@ describe Institution do
     FactoryGirl.build(:institution).should be_valid
   end
 
+  context "initializes" do
+    context "#secret" do
+      context "if the institution is a new record" do
+        subject { Institution.new }
+        it { subject.secret.should_not be_nil }
+        it { subject.secret.length.should eql(32) }
+        it("is valid") {
+          valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+          subject.secret.each_char do |c|
+            valid_chars.should include(c)
+          end
+        }
+      end
+
+      context "if the institution is not a new record" do
+        context "and has a secret set" do
+          let(:secret) { "my-very-secret-test-secret" }
+          let(:target) { FactoryGirl.create(:institution, secret: secret) }
+          subject { Institution.find(target.id) }
+          it { subject.secret.should eql(secret) }
+        end
+
+        context "and has a blank secret" do
+          let(:target) { FactoryGirl.create(:institution, secret: nil) }
+          subject { Institution.find(target.id) }
+          it { subject.secret.should be_nil }
+        end
+      end
+    end
+  end
+
   it { should have_many(:permissions).dependent(:destroy) }
   it { should have_many(:spaces) }
   it { should have_many(:users) }
