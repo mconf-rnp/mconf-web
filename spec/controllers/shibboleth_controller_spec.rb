@@ -7,6 +7,7 @@
 require "spec_helper"
 
 describe ShibbolethController do
+
   # set the default values usually used to get data from Shibboleth
   before {
     Site.current.update_attributes(:shib_name_field => "Shib-inetOrgPerson-cn",
@@ -36,12 +37,17 @@ describe ShibbolethController do
 
   shared_examples_for "a caller of #associate_with_new_account" do
     let(:attrs) { FactoryGirl.attributes_for(:user) }
+    let(:referer) { "/any" }
+    before {
+      request.env["HTTP_REFERER"] = referer
+    }
 
-    context "redirects to /secure if the user already has a valid token" do
+    context "if the user already has a valid token" do
       let(:user) { FactoryGirl.create(:user) }
       before { ShibToken.create!(:identifier => user.email, :user => user) }
       before(:each) { run_route }
       it { should redirect_to(shibboleth_path) }
+
       context "creates a RecentActivity" do
         subject { RecentActivity.where(key: 'shibboleth.user.created').last }
         it("should exist") { subject.should_not be_nil }
@@ -54,8 +60,7 @@ describe ShibbolethController do
     end
 
     context "if there's no valid token yet" do
-
-      context "creates a new token with the correct information and goes back to /secure" do
+      context "creates a new token with the correct information" do
         before(:each) {
           expect { run_route }.to change{ ShibToken.count }.by(1)
         }
@@ -75,7 +80,7 @@ describe ShibbolethController do
         it { RecentActivity.where(owner: subject, trackable: subject.user, key: 'shibboleth.user.created').should_not be_nil }
       end
 
-      context "if fails to create the new user, goes to /secure with an error message" do
+      context "if fails to create the new user" do
         before {
           @user = FactoryGirl.build(:user)
           @user.errors.add(:name, "can't be blank") # any fake error
@@ -84,17 +89,17 @@ describe ShibbolethController do
         before(:each) {
           expect { run_route }.not_to change{ ShibToken.count }
         }
-        it { controller.should redirect_to(shibboleth_path) }
+        it { controller.should redirect_to(referer) }
         it { controller.should set_flash.to(I18n.t('shibboleth.create_association.error_saving_user', :errors => @user.errors.full_messages.join(', '))) }
         it { RecentActivity.where(trackable: @user, key: 'shibboleth.user.created').should be_empty }
       end
 
-      context "if there's already a user with the target email, goes to /secure with an error message" do
+      context "if there's already a user with the target email" do
         before { FactoryGirl.create(:user, :email => attrs[:email]) }
         before(:each) {
           expect { run_route }.not_to change{ ShibToken.count + RecentActivity.count }
         }
-        it { controller.should redirect_to(shibboleth_path) }
+        it { controller.should redirect_to(referer) }
         it { controller.should set_flash.to(I18n.t('shibboleth.create_association.existent_account', :email => attrs[:email])) }
       end
     end
