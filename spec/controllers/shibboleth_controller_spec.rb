@@ -503,8 +503,10 @@ describe ShibbolethController do
           it { controller.should set_flash.to(I18n.t('shibboleth.create_association.account_created', :url => new_user_password_path)) }
         end
 
-        context "if fails to create the new user, goes to /secure with an error message" do
+        context "if fails to create the new user" do
+          let(:referer) { "/any" }
           before {
+            request.env["HTTP_REFERER"] = referer
             @user = FactoryGirl.build(:user)
             @user.errors.add(:name, "can't be blank") # any fake error
             Mconf::Shibboleth.any_instance.should_receive(:create_user).and_return(@user)
@@ -514,18 +516,22 @@ describe ShibbolethController do
               post :create_association, :new_account => true
             }.not_to change{ ShibToken.count }
           }
-          it { controller.should redirect_to(shibboleth_path) }
+          it { controller.should redirect_to(referer) }
           it { controller.should set_flash.to(I18n.t('shibboleth.create_association.error_saving_user', :errors => @user.errors.full_messages.join(', '))) }
         end
 
-        context "if there's already a user with the target email, goes to /secure with an error message" do
-          before { FactoryGirl.create(:user, :email => attrs[:email]) }
+        context "if there's already a user with the target email" do
+          let(:referer) { "/any" }
+          before {
+            request.env["HTTP_REFERER"] = referer
+            FactoryGirl.create(:user, :email => attrs[:email])
+          }
           before(:each) {
             expect {
               post :create_association, :new_account => true
             }.not_to change{ ShibToken.count }
           }
-          it { controller.should redirect_to(shibboleth_path) }
+          it { controller.should redirect_to(referer) }
           it { controller.should set_flash.to(I18n.t('shibboleth.create_association.existent_account', :email => attrs[:email])) }
         end
       end
