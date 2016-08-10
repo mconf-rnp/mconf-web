@@ -108,12 +108,12 @@ describe Institution do
 
     context "false if the user limit is nil" do
       before { target.update_attributes(:user_limit => nil) }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "false if the user limit is an empty string" do
       before { target.update_attributes(:user_limit => "") }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "false if the number of approved users has not reached the limit yet" do
@@ -121,7 +121,7 @@ describe Institution do
         FactoryGirl.create(:user, :institution => target)
         target.update_attributes(:user_limit => 2)
       }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "true if the number of approved users is equal the limit" do
@@ -318,6 +318,25 @@ describe Institution do
       ]}
 
       it { target.recordings_disk_used.to_i.should eq(11) }
+    end
+
+    context "doesn't consider unavailable recordings" do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: true, size: 2),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 3),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 4),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 5),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: true, size: 6)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target)
+      ]}
+
+      it { target.recordings_disk_used.to_i.should eq(8) }
     end
   end
 

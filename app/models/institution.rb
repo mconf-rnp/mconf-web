@@ -107,7 +107,7 @@ class Institution < ActiveRecord::Base
   # Call this to query all recordings belonging to this institution (users and spaces)
   # and get a sum of their sizes in the 'recordings_disk_used' field
   def update_recordings_disk_used!
-    size = self.recordings.where(published: true).sum(:size)
+    size = self.recordings.where(published: true, available: true).sum(:size)
     update_attribute(:recordings_disk_used, size)
   end
 
