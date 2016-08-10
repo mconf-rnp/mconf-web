@@ -125,6 +125,8 @@ pt-br:
   shibboleth:
     create_association:
       institution_not_registered: "Desculpe, mas você não pode acessar esta aplicação porque a sua instituição ainda não aderiu ao Mconf."
+      error_saving_user: "Não foi possível criar seu usuário. Os errors encontrados foram: %{errors}. Entre em contato com o service desk da RNP (sd@rnp.br ou 0800 722 0216) para resolver o problema."
+      existent_account: "Já existe um usuário cadastrado com seu e-mail (\"%{email}\"). Entre em contato com o service desk da RNP (sd@rnp.br ou 0800 722 0216) para resolver o problema."
   spaces:
     edit:
       institution_placeholder: "Selecione uma instituição"

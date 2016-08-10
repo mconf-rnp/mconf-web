@@ -113,6 +113,8 @@ en:
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
+      error_saving_user: "It was not possible to create your new user. The errors encountered were: %{errors}. Contact the service desk (sd@rnp.br or 0800 722 0216) to solve the problem."
+      existent_account: "There is already a user with your email (\"%{email}\"). Contact the service desk (sd@rnp.br or 0800 722 0216) to solve the problem."
   simple_form:
     hints:
       institution:
