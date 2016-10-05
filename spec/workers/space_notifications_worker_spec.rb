@@ -65,9 +65,9 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(2) }
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity1.id, admin_ids) }
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity2.id, admin_ids) }
+          it { expect(queue).to have_queue_size_of(2) }
+          it { expect(queue).to have_queued(paramsNA, activity1.id, admin_ids) }
+          it { expect(queue).to have_queued(paramsNA, activity2.id, admin_ids) }
         end
 
         context "for multiple spaces some with institutions, some don't" do
@@ -94,9 +94,9 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(2) }
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity1.id, institution.admin_ids) }
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity2.id, global_admin_ids) }
+          it { expect(queue).to have_queue_size_of(2) }
+          it { expect(queue).to have_queued(paramsNA, activity1.id, institution.admin_ids) }
+          it { expect(queue).to have_queued(paramsNA, activity2.id, global_admin_ids) }
         end
 
         context "ignores space not approved but that already had their notification sent" do
@@ -224,12 +224,12 @@ describe SpaceNotificationsWorker, type: :worker do
         before(:each) {
           institution.add_member!(FactoryGirl.create(:user), 'Admin')
           space1.new_activity('create', space_admin)
-          space2.new_activity('create', space_admin)  
+          space2.new_activity('create', space_admin)
 
           worker.perform
         }
 
-        it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(0) }
+        it { expect(queue).to have_queue_size_of(0) }
       end
 
       context "does notify global admins when institution needs approval" do
@@ -253,9 +253,9 @@ describe SpaceNotificationsWorker, type: :worker do
           worker.perform
         }
 
-        it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(2) }
-        it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity1.id, admin_ids) }
-        it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity2.id, admin_ids) }
+        it { expect(queue).to have_queue_size_of(2) }
+        it { expect(queue).to have_queued(paramsNA, activity1.id, admin_ids) }
+        it { expect(queue).to have_queued(paramsNA, activity2.id, admin_ids) }
       end
 
       context "notifies space admins of approval if institution is moderated" do
@@ -282,9 +282,9 @@ describe SpaceNotificationsWorker, type: :worker do
           worker.perform
         }
 
-        it { expect(SpaceApprovedSenderWorker).to have_queue_size_of_at_least(2) }
-        it { expect(SpaceApprovedSenderWorker).to have_queued(activity1.id) }
-        it { expect(SpaceApprovedSenderWorker).to have_queued(activity2.id) }
+        it { expect(queue).to have_queue_size_of_at_least(2) }
+        it { expect(queue).to have_queued(paramsA, activity1.id) }
+        it { expect(queue).to have_queued(paramsA, activity2.id) }
       end
 
     end

@@ -31,8 +31,8 @@ describe UserNotificationsWorker, type: :worker do
 
         before(:each) { worker.perform }
 
-          it { expect(queue).to have_queue_size_of(1) }
-          it { expect(queue).to have_queued(paramsRBA, activity.id) }
+        it { expect(queue).to have_queue_size_of(1) }
+        it { expect(queue).to have_queued(paramsRBA, activity.id) }
       end
     end
 
@@ -73,9 +73,9 @@ describe UserNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(UserNeedsApprovalSenderWorker).to have_queue_size_of(2) }
-          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user1.id, user1.institution.admin_ids) }
-          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user2.id, user2.institution.admin_ids) }
+          it { expect(queue).to have_queue_size_of(2) }
+          it { expect(queue).to have_queued(paramsNA, user1.id, user1.institution.admin_ids) }
+          it { expect(queue).to have_queued(paramsNA, user2.id, user2.institution.admin_ids) }
         end
 
         context "for institution admins and global when institution has no admin" do
@@ -93,9 +93,9 @@ describe UserNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(UserNeedsApprovalSenderWorker).to have_queue_size_of(2) }
-          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user1.id, user1.institution.admin_ids) }
-          it { expect(UserNeedsApprovalSenderWorker).to have_queued(user2.id, global_admins) }
+          it { expect(queue).to have_queue_size_of(2) }
+          it { expect(queue).to have_queued(paramsNA, user1.id, user1.institution.admin_ids) }
+          it { expect(queue).to have_queued(paramsNA, user2.id, global_admins) }
         end
 
         context "ignores users not approved but that already had their notification sent" do

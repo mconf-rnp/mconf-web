@@ -80,6 +80,7 @@ describe Devise::Strategies::LdapAuthenticatable do
 
           context "and the user information is valid" do
             before {
+              Mconf::LDAP.any_instance.stub(:set_signed_in)
               Mconf::LDAP.any_instance.should_receive(:validate_user)
                 .with(ldap_user1, Site.current).and_return(nil)
             }
@@ -98,7 +99,6 @@ describe Devise::Strategies::LdapAuthenticatable do
               }
 
               it("calls and returns #success!(user)") {
-                Mconf::LDAP.any_instance.stub(:set_signed_in)
                 target.should_receive(:success!).with(@user).and_return("return of success!")
                 target.authenticate!.should eq("return of success!")
               }
