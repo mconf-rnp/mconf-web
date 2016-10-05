@@ -2,15 +2,269 @@
 @import "compass/typography/links";
 @import "definitions";
 
-#main-logo {
-  margin-top: 4px;
-  margin-right: 15px;
+
+/*
+ * General
+ */
+
+a {
+  transition: color .2s, background .2s, border .2s;
+}
+
+.btn {
+  transition: color .2s, background .2s, border .2s;
+}
+
+.btn-transp {
+  transition: color .2s, background .2s, border .2s;
+  background: none;
+  border: 1px solid #fff;
+  color: #fff;
+  text-shadow: none;
+
+  &:hover, &:focus {
+    background: $rnp-blue-3;
+    color: #fff;
+  }
+}
+
+
+
+
+/*
+ * Layout components
+ */
+
+#navbar-wrapper {
+  background: $rnp-blue-1;
+}
+
+#navbar {
+  width: 100%;
+}
+
+#navbar-logo {
+  margin: 13px 10px;
+  float: right;
 
   img {
     width: 70px;
     height: 34px;
   }
 }
+
+#navbar-menu {
+  float: left;
+  padding: 20px 10px;
+
+  img {
+    width: 29px;
+    height: 20px;
+  }
+}
+
+#navbar-title {
+  padding: 15px 0;
+  text-align: center;
+
+  img {
+    width: 211px;
+    height: 30px;
+  }
+}
+
+#footer-wrapper {
+  background: $rnp-gray-1;
+  border: 0;
+  padding-top: 30px; /* because of footer-pusher */
+  margin: 0;
+}
+
+
+/*
+ * Frontpage
+ */
+
+body.frontpage {
+  #page-header-wrapper {
+    display: none;
+    height: 0;
+    opacity: 0;
+  }
+
+  #content {
+    margin: 0;
+    padding: 0;
+    width: auto;
+  }
+
+  #content-wrapper {
+    padding: 0;
+  }
+
+  #footer-wrapper {
+    margin: 0;
+  }
+
+  .section-1 {
+    background: image-url("rnp/site_foto_1.png") no-repeat center top $rnp-blue-1;
+    background-size: cover;
+    text-align: center;
+    padding: 190px 0;
+
+    .headline {
+      font-size: 52px;
+      color: #fff;
+      width: 60%;
+      margin: 0 auto;
+      margin-bottom: 60px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .btn {
+      font-size: 30px !important;
+      line-height: 36px;
+      padding: 10px 120px;
+    }
+  }
+
+  .section-2 {
+    background: $rnp-blue-3;
+    text-align: center;
+    padding: 100px 0;
+
+    .headline {
+      font-size: 23px;
+      line-height: 30px;
+      color: #fff;
+      width: 60%;
+      margin: 0 auto;
+      padding-top: 60px;
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+
+  .section-3 {
+    background: image-url("rnp/site_foto_2.png") no-repeat center top;
+    background-size: cover;
+    text-align: center;
+    padding: 230px 0;
+
+    .feature-block {
+      width: 348px;
+      height: 558px;
+      margin: 20px 40px 20px 0;
+      display: inline-block;
+      vertical-align: middle;
+      position: relative;
+
+      .content {
+        color: white;
+        font-size: 21px;
+        line-height: 25px;
+        padding: 250px 40px 0 40px;
+      }
+
+      .title {
+        font-style: italic;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 32px;
+        line-height: 38px;
+      }
+
+      &.feature-block-1 {
+        background: image-url("rnp/site_img_fundo_1.png");
+      }
+      &.feature-block-2 {
+        background: image-url("rnp/site_img_fundo_2.png");
+      }
+      &.feature-block-3 {
+        background: image-url("rnp/site_img_fundo_3.png");
+      }
+    }
+  }
+
+  .section-4 {
+    background: $rnp-gray-1;
+    text-align: center;
+    padding: 60px 0 20px 0;
+
+    li {
+      display: inline-block;
+      padding: 10px 25px;
+      border-right: 1px solid $rnp-blue-2;
+      margin: 0;
+
+      &:last-child {
+        border: 0;
+      }
+    }
+
+    a {
+      color: $rnp-blue-1;
+      font-size: 14px;
+      width: 80px;
+      display: inline-block;
+
+      &:hover {
+        color: $rnp-blue-3;
+      }
+    }
+  }
+
+  #footer {
+    text-align: center;
+
+    #copyright {
+      display: inline-block;
+      font-size: 14px;
+      float: none;
+      margin: 0;
+      padding: 0;
+      color: $rnp-gray-3;
+      margin-right: 30px;
+    }
+
+    #languages {
+      display: inline-block;
+      font-size: 14px;
+      color: $rnp-gray-3;
+
+      a {
+        border-right: 1px solid $rnp-gray-3;
+        padding-right: 10px;
+        margin-right: 5px;
+
+        &:last-child {
+          border: 0;
+          padding: 0;
+        }
+      }
+    }
+
+    .government-bar {
+      margin-top: 40px;
+
+      img  {
+        width: 980px;
+        height: 81px;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+//
+// old design
+//
+
 
 #navbar {
   ul#navbar-left-links, #navbar-right-links {
@@ -88,204 +342,4 @@
   color: #fff;
   @include box-shadow(none);
   border-color: darken($notif-success-bg, 5);
-}
-
-
-/* Custom frontpage, sign in and meeting invite pages */
-body.frontpage, body.sessions.create, body.sessions.new,
-body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
-  $form-area-width: 48%; //$contents-width - $login-box-width - 40px;
-
-  #page-header {
-    text-align: center;
-  }
-
-  .form-area {
-    border: 1px solid #ddd;
-    @include border-radius(2px);
-    width: $form-area-width;
-    @include mconf-clearfix;
-    margin-top: 30px;
-
-    h3 {
-      margin: 0;
-      background: #f6f6f6;
-      padding: 15px;
-      text-align: center;
-      color: #404040;
-    }
-
-    .form-area-content {
-      position: relative;
-    }
-
-    .input input {
-      width: 70%;
-    }
-
-    #user_remember_me {
-      width: auto;
-      float: right;
-      margin-left: 5px;
-    }
-
-    .action-links {
-      position: absolute;
-      bottom: 5px;
-      left: 0;
-    }
-
-    .form-actions {
-      margin-bottom: 0;
-    }
-
-    form {
-      float: none;
-      padding-top: 10px;
-
-      .input {
-        margin-top: 8px;
-        margin-bottom: 15px;
-        padding: 0 15px;
-      }
-    }
-
-    .sign-in-cafe {
-      width: 267px;
-      height: 100px;
-      opacity: 0.9;
-      @include transition(all 0.2s ease-in);
-      margin: 18px 0;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-
-    .btn-sign-in-cafe {
-      padding: 7px 20px;
-      display: inline-block;
-    }
-  }
-
-  .secondary-box {
-    float: right;
-  }
-
-  .primary-box {
-    float: left;
-    text-align: center;
-  }
-
-  #login-options {
-    clear: both;
-    float: right;
-    margin-top: 20px;
-  }
-
-  #footer #copyright {
-    padding-top: 30px;
-  }
-}
-
-body.frontpage, body.sessions.create, body.sessions.new,
-body.custom_bigbluebutton_rooms.invite, body.custom_bigbluebutton_rooms.invite_userid {
-  .form-area {
-    margin-top: 0;
-  }
-
-  .form-area.secondary-box {
-    .form-area-content {
-      padding-top: 25px;
-    }
-
-    .form-actions {
-      margin-top: 37px;
-    }
-
-    h4 {
-      text-align: center;
-      font-weight: normal;
-    }
-
-    .input input {
-      width: 97%;
-    }
-  }
-
-  .primary-box {
-    h4 {
-      text-align: center;
-      font-weight: normal;
-      margin-top: 0;
-      padding-top: 15px;
-    }
-
-    .local-sign-in-area {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.2s linear;
-
-      &.open {
-        opacity: 1;
-      }
-    }
-
-    .form-actions {
-      position: relative;
-
-      &.open {
-        border-bottom: 1px solid #ddd;
-      }
-    }
-
-    .local-sign-in-trigger {
-      position: absolute;
-      left: 0;
-      bottom: -1px;
-      padding: 10px 10px 14px 10px;
-      margin-left: 10px;
-      @include border-radius(10px 10px 0 0);
-      border: 1px solid #f6f6f6;
-
-      &.open {
-        background: white;
-        border: 1px solid #ddd;
-        border-bottom: 1px solid #fff;
-      }
-    }
-  }
-
-  #webconf-room-invite .form-area {
-    margin: 0 auto 0 auto;
-    .input input {
-      width: 97%;
-    }
-  }
-
-  #webconf-room-invite-header {
-    .room-status, .room-type {
-      padding-left: 135px;
-    }
-  }
-
-  .form-actions .btn {
-    padding: 6px 12px !important;
-  }
-
-  .login-options {
-    @include mconf-clearfix;
-    text-align: right;
-    margin: 10px 20px;
-    border-top: 1px solid #eee;
-    padding-top: 8px;
-    padding-right: 10px;
-  }
-}
-
-body.frontpage, body.sessions.create, body.sessions.new {
-  .primary-box {
-    float: none;
-    margin: 0 auto;
-  }
 }

@@ -51,6 +51,27 @@ pt-br:
     users:
       title: "Usuários na instituição %{name}"
   frontpage:
+    show:
+      links:
+        mconf_tec: "Tecnologia Mconf"
+        requirements: "Requisitos de uso"
+        service_page: "Mais sobre este serviço"
+        user_guide: "Manual do usuário"
+      section-1:
+        headline: "Seja bem-vindo ao portal do serviço de <b>conferência web</b> da RNP"
+        login: "entrar"
+      section-2:
+        headline: "O conferência web é um serviço de comunicação e colaboração da RNP que promove encontros virtuais entre dois ou mais participantes. O serviço possibilita que, mesmo distantes geograficamente, os participantes compartilhem áudio, vídeo, texto, imagens, quadro branco e a tela de seus computadores."
+      section-3:
+        block-security:
+          title: "Ambiente seguro"
+          text: "As salas de conferência web podem ser públicas ou privadas. Além disso, toda comunicação entre os componentes do serviço é feita de forma segura através de certificados digitais ICPEdu"
+        block-spaces:
+          title: "Comunidades"
+          text: "Agrega um grupo de usuários com um objetivo em comum. Ideal para reunir colaboradores em um projeto, ideia ou trabalho específico"
+        block-scheduling:
+          title: "Fácil agendamento"
+          text: "Fácil sistema de agendamento de conferências web e disparo de convites"
     sign_in_and_title:
       headline: "Portal do serviço de conferência web"
   layouts:

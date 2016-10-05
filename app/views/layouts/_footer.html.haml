@@ -1,36 +1,11 @@
 #footer-wrapper
   #footer
-    .link-group
-      %h3= t('.links.title')
-      %ul
-        - unless current_site.external_help.blank?
-          %li= link_to(t('.links.user_guide'), current_site.external_help)
-        %li= link_to(t('.links.check'), "https://wiki.rnp.br/pages/viewpage.action?pageId=89112372#ManualdoUsuáriodoserviçodeconferênciaweb-Requisitosdeuso")
-        - if user_signed_in?
-          %li= link_to t('.links.feedback'), main_app.new_feedback_path, :id => "feedback_link", :class => "open-modal"
-        -# %li= link_to(t('.links.statistics'), main_app.show_statistics_path )
-    .link-group
-      %h3= t('.about_service.title')
-      %ul
-        %li= link_to t('.about_service.service_page'), "https://www.rnp.br/servicos/servicos-avancados/conferencia-web"
-        %li= link_to t('.about_service.mconf_tec'), "http://mconf.com"
-    .link-group.footer-languages
-      %h3
-        = t('.translate.change')
-      - available_locales.each_slice(3) do |locales|
-        %ul
-          - locales.each do |locale|
-            %li
-              - flag = image_tag("flags/" + locale.to_s + ".png", title: locale.to_s)
-              - name = locale_i18n(locale)
-              - link = link_to(name, main_app.session_locale_path(l: locale.to_s), method: :post)
-              = (flag + " " + link).html_safe
     #copyright
       = t('.copyright', year: 2016, site: "Serviço de conferência web (Mconf)")
-    - if user_signed_in? && current_user.superuser?
-      .current-version
-        = t('.current_version') + ": "
-        = application_version
-        = "&#149;".html_safe
-        = link_to github_link_to_revision(application_revision) do
-          = application_revision
+    #languages
+      = "Languages:"
+      = link_to(locale_i18n("en") + " (en)", main_app.session_locale_path(l: "en"), method: :post)
+      = link_to(locale_i18n("pt-br") + " (pt-br)", main_app.session_locale_path(l: "pt-br"), method: :post)
+
+    .government-bar
+      = image_tag "rnp/site_logo_barra_governo.png", size: "980x81"
