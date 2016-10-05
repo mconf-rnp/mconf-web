@@ -49,6 +49,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Add some stack trace info to production log
+  def log_stack_trace exception
+    Rails.logger.info "#{exception.class.name} (#{exception.message}):"
+    st = "  " + exception.backtrace.first(15).join("\n  ")
+    Rails.logger.info st
+  end
+
   # Splits a comma separated list of emails into a list of emails without trailing spaces
   def split_emails email_string
     email_string.split(/[\s,;]/).select { |e| !e.empty? }
@@ -223,6 +230,22 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Returns a boolean value denoting if the captcha in the form was filled in
+  # correctly. The form has to have the 'captcha_tags' method called in them.
+  # It also tries to set the errors in the model so you can do
+  # 'if verify_captche && model.save!' in your controller
+  def verify_captcha
+    site = Site.current
+
+    # only verify captcha for logged out users
+    if current_user.blank? && site.captcha_enabled?
+
+      # verify and try to add errors to the model
+      model = instance_variable_get("@#{controller_name.singularize}")
+      verify_recaptcha(private_key: site.recaptcha_private_key, model: model)
+    end
+  end
+
   private
 
   def set_time_zone
@@ -241,6 +264,7 @@ class ApplicationController < ActionController::Base
     unless Rails.application.config.consider_all_requests_local
       @exception = exception
       render_error_page 404
+      log_stack_trace exception
     else
       raise exception
     end
@@ -251,6 +275,7 @@ class ApplicationController < ActionController::Base
       @exception = exception
       ExceptionNotifier.notify_exception exception
       render_error_page 500
+      log_stack_trace exception
     else
       raise exception
     end

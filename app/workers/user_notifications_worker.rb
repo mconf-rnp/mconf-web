@@ -8,7 +8,6 @@
 # Finds all Invitation objects not sent yet and ready to be sent and schedules a
 # worker to send them.
 class UserNotificationsWorker < BaseWorker
-  @queue = :user_notifications
 
   def self.perform
     notify_users_account_created
@@ -45,7 +44,7 @@ class UserNotificationsWorker < BaseWorker
         end
 
         if recipients.any?
-          Resque.enqueue(UserNeedsApprovalSenderWorker, activity.id, recipients)
+          Queue::High.enqueue(UserNeedsApprovalSenderWorker, :perform, activity.id, recipients)
         end
       end
     end
@@ -61,7 +60,7 @@ class UserNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where(trackable_type: 'User', notified: [nil, false], key: keys)
     activities.each do |activity|
-      Resque.enqueue(UserRegisteredSenderWorker, activity.id)
+      Queue::High.enqueue(UserRegisteredSenderWorker, :perform, activity.id)
     end
   end
 
@@ -71,7 +70,7 @@ class UserNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where(trackable_type: 'User', notified: [nil, false], key: 'user.created_by_admin')
     activities.each do |activity|
-      Resque.enqueue(UserRegisteredByAdminSenderWorker, activity.id)
+      Queue::High.enqueue(UserRegisteredByAdminSenderWorker, :perform, activity.id)
     end
   end
 
@@ -81,7 +80,7 @@ class UserNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where trackable_type: 'User', key: 'user.approved', notified: [nil, false]
     activities.each do |activity|
-      Resque.enqueue(UserApprovedSenderWorker, activity.id)
+      Queue::High.enqueue(UserApprovedSenderWorker, :perform, activity.id)
     end
   end
 

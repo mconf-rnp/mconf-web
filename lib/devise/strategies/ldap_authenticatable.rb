@@ -88,7 +88,7 @@ module Devise
                   # We don't check authentication here, let devise find out about an
                   # unapproved user later and show the errors there
                   ldap_helper.set_user_institution(user, ldap_user.first, configs)
-                  ldap_helper.sign_user_in(user)
+                  ldap_helper.set_signed_in(user, user.ldap_token)
                   success!(user)
                 end
               end

@@ -91,11 +91,6 @@ class User < ActiveRecord::Base
 
   default_scope { where(disabled: false) }
 
-  # constants for the receive_digest attribute
-  RECEIVE_DIGEST_NEVER = 0
-  RECEIVE_DIGEST_DAILY = 1
-  RECEIVE_DIGEST_WEEKLY = 2
-
   scope :search_by_terms, -> (words, include_private=false) {
     query = joins(:profile).includes(:profile).order("profiles.full_name")
 
@@ -120,6 +115,9 @@ class User < ActiveRecord::Base
   alias_attribute :permalink, :username
 
   delegate :full_name, :logo, :organization, :city, :country, :logo_image, :logo_image_url, :to => :profile
+
+  # set to true when the user signs in via an external authentication method (e.g. LDAP)
+  attr_accessor :signed_in_via_external
 
   # In case the profile is accessed before it is created, we build one on the fly.
   # Important specially because we have method delegated to the profile.
@@ -355,6 +353,14 @@ class User < ActiveRecord::Base
 
   def init
     @created_by = nil
+  end
+
+  # This overrides the method from Devise::Models::Trackable
+  def update_tracked_fields(request)
+    super (request)
+    unless signed_in_via_external
+      self.current_local_sign_in_at = self.current_sign_in_at
+    end
   end
 
   # Remove the user from his institution (if any) and add him to the institution

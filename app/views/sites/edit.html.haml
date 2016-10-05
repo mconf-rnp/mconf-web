@@ -1,6 +1,6 @@
 = render :partial => 'manage/menu'
 
-= simple_form_for @site, :html => { :id => "form-edit-site", :method => :put, :multipart => true, :class => 'single-column' } do |f|
+= simple_form_for @site, :html => { :id => "form-edit-site", :method => :put, :multipart => true, :class => 'single-column', autocomplete: 'off'} do |f|
   .left-column
     = f.input :name
     = f.input :description, :as => :text, :input_html => { :rows => 5 }
@@ -25,7 +25,9 @@
     = f.input :ldap_enabled, :as => :boolean
     = f.input :ldap_host
     = f.input :ldap_port
+    = disable_autocomplete_for('site[ldap_user]')
     = f.input :ldap_user
+    = disable_autocomplete_for('site[ldap_user_password]', 'password')
     = f.input :ldap_user_password, :as => :showable_password
     = f.input :ldap_user_treebase
     = f.input :ldap_username_field
@@ -49,6 +51,9 @@
     = f.input :presence_domain
     = f.input :xmpp_server
     = f.input :external_help
+    = f.input :captcha_enabled
+    = f.input :recaptcha_public_key
+    = f.input :recaptcha_private_key
     = f.input :room_dial_number_pattern, as: :string
     = f.input :registration_enabled, :as => :boolean
     = f.input :require_registration_approval, :as => :boolean
@@ -56,5 +61,6 @@
     = f.input :require_space_approval, :as => :boolean
     = f.input :forbid_user_space_creation, :as => :boolean
     = f.input :events_enabled, :as => :boolean
+    = f.input :use_gravatar, :as => :boolean
     = f.input :max_upload_size, as: :string, input_html: { value: @site.formatted_max_upload_size }
   = f.button :wrapped, :cancel => site_path, :value => t("_other.save")

@@ -8,10 +8,11 @@ require 'spec_helper'
 
 describe SpaceNotificationsWorker, type: :worker do
   let(:worker) { SpaceNotificationsWorker }
-
-  it "uses the queue :space_notifications" do
-    worker.instance_variable_get(:@queue).should eql(:space_notifications)
-  end
+  let(:senderNA) { SpaceNeedsApprovalSenderWorker }
+  let(:senderA) { SpaceApprovedSenderWorker}
+  let(:queue) { Queue::High }
+  let(:paramsNA) {{"method"=>:perform, "class"=>senderNA.to_s}}
+  let(:paramsA) {{"method"=>:perform, "class"=>senderA.to_s}}
 
   describe "#perform" do
 
@@ -38,8 +39,8 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(1) }
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queued(activity.id, admin_ids) }
+          it { expect(queue).to have_queue_size_of(1) }
+          it { expect(queue).to have_queued(paramsNA, activity.id, admin_ids) }
         end
 
         context "for multiple spaces with institutions" do
@@ -114,7 +115,7 @@ describe SpaceNotificationsWorker, type: :worker do
           }
           before(:each) { worker.perform }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(0) }
+          it { expect(queue).to have_queue_size_of(0) }
         end
 
         context "ignores spaces that were already approved" do
@@ -130,7 +131,7 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(0) }
+          it { expect(queue).to have_queue_size_of(0) }
         end
 
         context "when the target space cannot be found" do
@@ -146,7 +147,7 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(0) }
+          it { expect(queue).to have_queue_size_of(0) }
         end
       end
 
@@ -171,9 +172,9 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceApprovedSenderWorker).to have_queue_size_of_at_least(2) }
-          it { expect(SpaceApprovedSenderWorker).to have_queued(activity1.id) }
-          it { expect(SpaceApprovedSenderWorker).to have_queued(activity2.id) }
+          it { expect(queue).to have_queue_size_of_at_least(2) }
+          it { expect(queue).to have_queued(paramsA, activity1.id) }
+          it { expect(queue).to have_queued(paramsA, activity2.id) }
         end
 
         context "ignores spaces that were not approved yet" do
@@ -186,7 +187,7 @@ describe SpaceNotificationsWorker, type: :worker do
             worker.perform
           }
 
-          it { expect(SpaceApprovedSenderWorker).to have_queue_size_of(0) }
+          it { expect(queue).to have_queue_size_of(0) }
         end
 
       end
@@ -210,7 +211,7 @@ describe SpaceNotificationsWorker, type: :worker do
           worker.perform
         }
 
-        it { expect(SpaceNeedsApprovalSenderWorker).to have_queue_size_of(0) }
+        it { expect(queue).to have_queue_size_of(0) }
       end
 
       context "doesn't notify insitutional admins when spaces don't need approval" do

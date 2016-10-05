@@ -110,7 +110,9 @@ class SpacesController < InheritedResources::Base
         }
       end
     else
-      format.json { render json: { success: false } }
+      respond_to do |format|
+        format.json { render json: { success: false } }
+      end
     end
   end
 

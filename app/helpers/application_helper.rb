@@ -145,6 +145,11 @@ module ApplicationHelper
     current_site.max_upload_size
   end
 
+  # Returns an array with all image extensions supported by the application
+  def supported_image_formats
+    ['.jpg', '.jpeg', '.png']
+  end
+
   # Includes elements in the page to disable the autocomplete of an input
   # In some browsers, such as Firefox, setting the attribute 'autocomplete=false' in
   # the input is not enough to disable its autocomplete, usually for username and
@@ -206,6 +211,14 @@ module ApplicationHelper
   # First 'size' characters of a text
   def first_words(text, size)
     truncate(text, :length => size)
+  end
+
+  def captcha_tags
+    if current_site.captcha_enabled?
+      content_tag :div, class: 'captcha' do
+        recaptcha_tags public_key: current_site.recaptcha_public_key, hl: I18n.locale
+      end
+    end
   end
 
   private

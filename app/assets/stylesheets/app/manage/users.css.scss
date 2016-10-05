@@ -65,6 +65,7 @@ body.manage.users {
   .thread {
     .user-name, .user-email {
       display: inline-block;
+      white-space: nowrap;
     }
 
     .user-category {

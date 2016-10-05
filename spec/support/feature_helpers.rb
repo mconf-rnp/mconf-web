@@ -65,7 +65,7 @@ module FeatureHelpers
     page.find('.local-sign-in-area input[type=submit]').click
   end
 
-  def register_with(attrs)
+  def register_with(attrs, visit=true)
     name = attrs[:username] || (attrs[:_full_name].downcase.gsub(/\s/, '-') if attrs[:_full_name])
     password_confirmation = attrs[:password_confirmation] || attrs[:password]
 
@@ -73,14 +73,20 @@ module FeatureHelpers
     # provided. To force an empty institution, set `:institution_id` to nil.
     institution_id = attrs.has_key?(:institution_id) ? attrs[:institution_id] : FactoryGirl.create(:institution).id
 
-    visit register_path
+    visit register_path if visit
     fill_in "user[email]", with: attrs[:email]
     fill_in "user[_full_name]", with: attrs[:_full_name]
     fill_in "user[username]", with: name
     fill_in "user[password]", with: attrs[:password]
-    fill_in "user[password_confirmation]", with: password_confirmation
+    fill_in "user[password_confirmation]", with: attrs[:password_confirmation] || attrs[:password]
     fill_in "user[institution_id]", with: institution_id
     click_button I18n.t("registrations.signup_form.register")
+  end
+
+  def register_with_error(attrs, visit=true)
+    new_attrs = attrs.clone
+    new_attrs[:password_confirmation] = attrs[:password_confirmation] + "-wrong" # force error
+    register_with(new_attrs, visit)
   end
 
   def has_success_message message=nil

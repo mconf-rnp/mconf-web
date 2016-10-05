@@ -7,7 +7,6 @@
 
 # Mostly for space approvals, find the newly created spaces and prepare notification objects
 class SpaceNotificationsWorker < BaseWorker
-  @queue = :space_notifications
 
   def self.perform
     notify_admins_of_spaces_pending_approval
@@ -37,7 +36,7 @@ class SpaceNotificationsWorker < BaseWorker
         end
 
         if recipients.any?
-          Resque.enqueue(SpaceNeedsApprovalSenderWorker, activity.id, recipients)
+          Queue::High.enqueue(SpaceNeedsApprovalSenderWorker, :perform, activity.id, recipients)
         end
       end
     end
@@ -48,7 +47,7 @@ class SpaceNotificationsWorker < BaseWorker
     activities = RecentActivity
       .where trackable_type: 'Space', key: 'space.approved', notified: [nil, false]
     activities.each do |activity|
-      Resque.enqueue(SpaceApprovedSenderWorker, activity.id)
+      Queue::High.enqueue(SpaceApprovedSenderWorker, :perform, activity.id)
     end
   end
 
