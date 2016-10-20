@@ -83,6 +83,13 @@ en:
       links:
         check: "Check software requirements"
         user_guide: "User manual"
+    rnp_sidenav:
+      compatibility: "Is my device compatible?"
+      login: "Login"
+      mconf_tec: "Mconf Technology"
+      requirements: "Usage requirements"
+      service_page: "More about this service"
+      user_guide: "User manuals"
   manage:
     institution:
       can_record_users:

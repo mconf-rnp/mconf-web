@@ -1,0 +1,22 @@
+.sidenav
+  .header
+    = "Menu"
+    = image_tag "rnp/site_ico_x_branco.png", size: "28x23", class: "close"
+  = link_to login_path, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_login.png", size: "28x19"
+    %span= t('.login')
+  = link_to current_site.external_help, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_manual.png", size: "28x19"
+    %span= t('.user_guide')
+  = link_to service_page_url, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_mais_informacoes.png", size: "28x24"
+    %span= t('.service_page')
+  = link_to mconf_tec_url, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_tecnologia.png", size: "28x21"
+    %span= t('.mconf_tec')
+  = link_to requirements_url, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_requisitos.png", size: "28x20"
+    %span= t('.requirements')
+  = link_to compatibility_url, class: "sidenav-item" do
+    = image_tag "rnp/site_ico_compatibilidade.png", size: "28x19"
+    %span= t('.compatibility')

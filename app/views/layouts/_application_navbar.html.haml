@@ -1,5 +1,5 @@
 #navbar-menu
-  = image_tag "rnp/site_ico_menu.png", size: "29x20"
+  = image_tag "rnp/site_ico_menu.png", size: "29x20", class: "sidenav-trigger"
 
 #navbar-logo
   - url = user_signed_in? ? main_app.my_home_path : main_app.root_path
@@ -8,6 +8,8 @@
 
 #navbar-title
   = image_tag "rnp/site_logo_conferencia_web_pq.png", size: "211x30"
+
+= render :partial => 'layouts/rnp_sidenav'
 
 -# %ul#navbar-left-links
 -#   - if user_signed_in?

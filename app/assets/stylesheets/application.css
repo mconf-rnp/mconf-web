@@ -34,5 +34,6 @@
  *= require ./app/feedback/_new
  *
  * RNP
+ *= require ./app/application/sidenav
  *= require ./app/application/rnp
  */

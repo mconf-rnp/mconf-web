@@ -83,6 +83,13 @@ pt-br:
       links:
         check: "Checar requisitos de uso"
         user_guide: "Manual do usuário"
+    rnp_sidenav:
+      compatibility: "Meu dispositivo é compatível?"
+      login: "Login"
+      mconf_tec: "Tecnologia Mconf"
+      requirements: "Requisitos de uso"
+      service_page: "Mais sobre este serviço"
+      user_guide: "Manual do usuário"
   manage:
     institution:
       can_record_users:
