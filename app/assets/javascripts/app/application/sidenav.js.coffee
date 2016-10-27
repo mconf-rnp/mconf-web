@@ -20,15 +20,29 @@ class mconf.Sidenav
       $(".sidenav").removeClass("open")
       $('.sidenav-backdrop').remove()
 
-    $(document).on "click.mconfSidenav", ".sidenav-trigger", ->
+    # button that opens the sidenav
+    $(document).on "click.mconfSidenav", ".sidenav-trigger", (e) ->
       open()
-      false
-    $(document).on "click.mconfSidenav", ".sidenav-backdrop", ->
+      e.preventDefault()
+
+    # clicking on the back closes the sidenav
+    $(document).on "click.mconfSidenav", ".sidenav-backdrop", (e) ->
       close()
-    $(document).on "click.mconfSidenav", ".sidenav .close", ->
-      close()
+      e.preventDefault()
+
+    # pressing ESC closes the sidenav
     $(document).on "keyup", (e) ->
       close() if e.keyCode is 27
+      e.preventDefault()
+
+    # the close button closes the sidenav
+    $(document).on "click.mconfSidenav", ".sidenav .close", (e) ->
+      close()
+      e.preventDefault()
+
+    # clicking in an item in the sidenav closes it before triggering the action
+    $(document).on "click.mconfSidenav", "a.sidenav-item", (e) ->
+      close()
 
     hoverIn = ->
       $(this).prev().addClass("hover-sibling")

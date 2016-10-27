@@ -2,10 +2,24 @@
 @import "compass/typography/links";
 @import "definitions";
 
+/* this is now in the sidenav, must be included in all pages */
+@import "app/custom_bigbluebutton_rooms/invitation_form";
+
 
 /*
  * General
  */
+
+/* fix overall dimensions, cannot be totally responsive right now */
+body {
+  min-width: 1000px;
+}
+@media (max-width: 767px) {
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 
 a {
   transition: color .2s, background .2s, border .2s;
@@ -27,7 +41,6 @@ a {
     color: #fff;
   }
 }
-
 
 
 
@@ -76,9 +89,53 @@ a {
 #footer-wrapper {
   background: $rnp-gray-1;
   border: 0;
-  padding-top: 30px; /* because of footer-pusher */
   margin: 0;
+
+  /* need to be adjusted according to footer-pusher */
+  padding-bottom: 0;
+  padding-top: 40px;
 }
+
+#footer {
+  text-align: center;
+
+  #copyright {
+    display: inline-block;
+    font-size: 14px;
+    float: none;
+    margin: 0;
+    padding: 0;
+    color: $rnp-gray-3;
+    margin-right: 20px;
+  }
+
+  #languages {
+    display: inline-block;
+    font-size: 14px;
+    color: $rnp-gray-3;
+
+    a {
+      border-right: 1px solid $rnp-gray-3;
+      padding-right: 10px;
+      margin-right: 5px;
+
+      &:last-child {
+        border: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  .government-bar {
+    margin-top: 40px;
+
+    img  {
+      width: 980px;
+      height: 81px;
+    }
+  }
+}
+
 
 
 /*
@@ -214,46 +271,6 @@ body.frontpage {
       }
     }
   }
-
-  #footer {
-    text-align: center;
-
-    #copyright {
-      display: inline-block;
-      font-size: 14px;
-      float: none;
-      margin: 0;
-      padding: 0;
-      color: $rnp-gray-3;
-      margin-right: 30px;
-    }
-
-    #languages {
-      display: inline-block;
-      font-size: 14px;
-      color: $rnp-gray-3;
-
-      a {
-        border-right: 1px solid $rnp-gray-3;
-        padding-right: 10px;
-        margin-right: 5px;
-
-        &:last-child {
-          border: 0;
-          padding: 0;
-        }
-      }
-    }
-
-    .government-bar {
-      margin-top: 40px;
-
-      img  {
-        width: 980px;
-        height: 81px;
-      }
-    }
-  }
 }
 
 
@@ -275,42 +292,6 @@ body.frontpage {
     li {
       margin-top: 14px;
     }
-  }
-}
-
-#footer {
-  h3 {
-    margin-top: 0;
-  }
-
-  .link-group.footer-languages {
-    float: right;
-    text-align: right;
-    margin-right: 0;
-
-    ul {
-      margin-right: 0;
-      float: none;
-      text-align: center;
-    }
-  }
-
-  .link-group {
-    margin-right: 50px;
-  }
-
-  #copyright {
-    clear: both;
-    padding-top: 15px;
-    color: #888;
-    float: left;
-  }
-
-  .current-version {
-    float: right;
-    clear: none;
-    padding-top: 15px;
-    color: #888;
   }
 }
 

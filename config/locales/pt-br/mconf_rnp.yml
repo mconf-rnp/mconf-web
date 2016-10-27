@@ -85,10 +85,19 @@ pt-br:
         user_guide: "Manual do usuário"
     rnp_sidenav:
       compatibility: "Meu dispositivo é compatível?"
+      home: "Página inicial"
+      invite: "Enviar convite de reunião"
       login: "Login"
+      logout: "Sair"
       mconf_tec: "Tecnologia Mconf"
+      manage: "Gerenciar"
+      menu: "Menu"
+      my_room: "Sala pessoal"
+      recordings: "Ver gravações"
       requirements: "Requisitos de uso"
       service_page: "Mais sobre este serviço"
+      spaces: "Comunidades"
+      start_meeting: "Começar uma reunião"
       user_guide: "Manual do usuário"
   manage:
     institution:

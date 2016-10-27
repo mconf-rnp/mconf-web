@@ -35,6 +35,7 @@
     line-height: 26px;
     padding: 20px;
     color: #fff;
+    margin-top: -1px; /* eat the border from the previous element */
   }
 
   .sidenav-item {
@@ -49,10 +50,7 @@
     transition: all .2s ease;
 
     img {
-      min-width: 29px;
-      min-height: 19px;
-      margin-right: 10px;
-      float: left;
+      margin-right: 5px;
     }
 
     &:hover, &.hover-sibling {

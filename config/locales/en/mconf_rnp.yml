@@ -85,10 +85,19 @@ en:
         user_guide: "User manual"
     rnp_sidenav:
       compatibility: "Is my device compatible?"
+      home: "Home"
+      invite: "Send a meeting invitation"
       login: "Login"
+      logout: "Logout"
       mconf_tec: "Mconf Technology"
+      manage: "Manage"
+      menu: "Menu"
+      my_room: "My room"
+      recordings: "See recordings"
       requirements: "Usage requirements"
       service_page: "More about this service"
+      spaces: "Spaces"
+      start_meeting: "Start a meeting"
       user_guide: "User manuals"
   manage:
     institution:
