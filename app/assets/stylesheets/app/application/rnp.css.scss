@@ -98,6 +98,7 @@ a {
 
 #footer {
   text-align: center;
+  width: auto;
 
   #copyright {
     display: inline-block;
@@ -130,8 +131,10 @@ a {
     margin-top: 40px;
 
     img  {
-      width: 980px;
-      height: 81px;
+      max-width: 980px;
+      width: 100%;
+      max-height: 81px;
+      height: auto;
     }
   }
 }
@@ -143,6 +146,8 @@ a {
  */
 
 body.frontpage {
+  min-width: auto;
+
   #page-header-wrapper {
     display: none;
     height: 0;
@@ -272,6 +277,169 @@ body.frontpage {
     }
   }
 }
+
+
+
+
+
+/*
+ * Login
+ */
+
+body.sessions.new, body.sessions.create {
+  min-width: auto;
+
+  #site {
+    background-image:image-url("rnp/site_foto_1.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-x: center;
+  }
+
+  #page-header-wrapper {
+    display: none;
+    height: 0;
+    opacity: 0;
+  }
+
+  #content {
+    margin: 0;
+    padding: 0;
+    width: auto;
+  }
+
+  #content-wrapper {
+    padding: 0;
+  }
+
+  #footer-wrapper {
+    margin: 0;
+  }
+
+  .section-1 {
+    text-align: center;
+    padding: 150px 20px;
+
+    #login-box {
+      background: $rnp-gray-1;
+      max-width: 700px;
+      min-width: 400px;
+      margin: 0 auto;
+
+      .header {
+        height: 40px;
+        font-size: 20px;
+        line-height: 38px;
+        text-align: left;
+        padding: 0 20px;
+        background: $rnp-blue-2;
+        color: #fff;
+      }
+
+      .content {
+        padding: 20px;
+        overflow: hidden;
+
+        .title {
+          color: $rnp-blue-2;
+          font-size: 20px;
+        }
+
+        .cafe {
+          margin: 40px auto 40px auto;
+          display: block;
+        }
+
+        .btn-submit {
+          display: inline-block;
+          font-size: 20px !important;
+          line-height: 26px;
+          padding: 10px;
+          width: 60%;
+          margin-bottom: 40px;
+          color: $rnp-blue-2;
+          border-color: $rnp-blue-2;
+          background: $transparent;
+
+          &:hover {
+            /* background: $rnp-blue-3; */
+            /* color: #fff; */
+            /* text-shadow: none; */
+            background: #fff;
+          }
+        }
+
+        .box-shibboleth, .box-local {
+          position: absolute;
+          opacity: 0;
+          height: 0;
+          z-index: 1;
+          top: 0;
+          left: 0;
+
+          &.open {
+            position: relative;
+            opacity: 1;
+            height: auto;
+            z-index: 999;
+            transition: all .5s ease;
+          }
+        }
+
+        .box-local {
+          form {
+            margin: 20px 0 0 0;
+          }
+
+          .input, .extra-options {
+            width: 60%;
+            margin: 0 auto;
+
+            input[type="text"], input[type="password"] {
+              box-sizing: border-box;
+              font-size: 16px !important;
+              border: 0;
+              padding: 8px 15px;
+              width: 100%;
+              margin-bottom: 20px;
+              height: auto;
+            }
+
+            a {
+              float: right;
+            }
+          }
+
+          .user_remember_me {
+            float: left;
+            width: 50%;
+            text-align: left;
+
+            .checkbox {
+              display: inline-block;
+              width: auto;
+            }
+
+            input[type="checkbox"] {
+              margin-top: 1px;
+              margin-right: 8px;
+            }
+          }
+
+          .btn-submit {
+            margin-top: 40px;
+          }
+        }
+      }
+    }
+
+  }
+}
+
+
+
+
+
 
 
 

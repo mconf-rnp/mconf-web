@@ -134,15 +134,18 @@ en:
     login_form:
       email_or_login: "Email"
     login_form_area:
+      email_or_username: "Email"
+      local:
+        subtitle: "Sign in using a non-federated account"
+        title: "Local account"
+        toggle: "Back to the federated sign in"
       login: "Login"
-      title: "I already have an account"
-      member:
-        email_or_username: "Email"
-        non_federated_click: "My account is not federated"
-        non_federated_title: "Access using a local account"
-        password: "Password"
-        shibboleth:
-          click_here: "Login"
+      password: "Password"
+      remember_me: "Remember me"
+      shibboleth:
+        title: "I have an account"
+        toggle: "My account is not federated"
+      title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Federated authentication"

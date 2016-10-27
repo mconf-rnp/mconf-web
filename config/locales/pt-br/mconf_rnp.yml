@@ -134,15 +134,18 @@ pt-br:
     login_form:
       email_or_login: "E-mail"
     login_form_area:
+      email_or_username: "E-mail"
+      local:
+        subtitle: "Acessar usando uma conta local"
+        title: "Conta não federada"
+        toggle: "Voltar para conta federada"
       login: "Entrar"
-      title: "Já tenho uma conta"
-      member:
-        email_or_username: "E-mail"
-        non_federated_click: "Minha conta não é federada"
-        non_federated_title: "Acessar usando uma conta local"
-        password: "Senha"
-        shibboleth:
-          click_here: "Entrar"
+      password: "Senha"
+      remember_me: "Permanecer conectado"
+      shibboleth:
+        title: "Já tenho uma conta"
+        toggle: "Minha conta não é federada"
+      title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Autenticação federada"
