@@ -1,25 +1,4 @@
 #login-box
   .header= t(".title")
   .content
-
-    .box-shibboleth.open
-      .title= t(".shibboleth.title")
-      = link_to shibboleth_path do
-        = image_tag "rnp/cafe.png", size: "267x100", class: "cafe"
-      = link_to shibboleth_path, class: 'btn btn-submit' do
-        = t(".login")
-      .local-sign-in-trigger
-        = link_to "&gt;&gt; #{t('.shibboleth.toggle')}".html_safe, '#'
-
-    .box-local
-      .title= t(".local.title")
-      = t(".local.subtitle")
-      = simple_form_for "user", :url => user_session_path do |f|
-        = f.input :login, label: false, placeholder: t('.email_or_username'), required: true
-        = f.input :password, label: false, placeholder: t('.password'), required: true
-        .extra-options
-          = f.input :remember_me, as: :boolean, label: t('.remember_me')
-          = link_to t('devise.shared.links.lost_password'), new_password_path('user')
-        = f.submit value: t(".login"), class: 'btn btn-submit'
-      .shib-sign-in-trigger
-        = link_to "&gt;&gt; #{t('.local.toggle')}".html_safe, '#'
+    = render 'sessions/login_form'

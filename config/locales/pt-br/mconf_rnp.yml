@@ -30,7 +30,14 @@ pt-br:
         webconferencia: "Webconferência"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite_header:
+      footer: "Para participar, faça login abaixo"
+      meeting_type: "Esta é uma conferência <b>%{type}</b>. O estado atual da reunião é:"
+      private: "privada"
+      public: "pública"
+      title: "Seja bem-vindo à sala de reuniões: <b>%{name}</b>"
     invite_userid:
+      login_title: "Login"
       non_member:
         title: "Não tenho uma conta"
   institution:
@@ -51,12 +58,13 @@ pt-br:
     users:
       title: "Usuários na instituição %{name}"
   frontpage:
-    show:
+    footer_guides:
       links:
         mconf_tec: "Tecnologia Mconf"
         requirements: "Requisitos de uso"
         service_page: "Mais sobre este serviço"
         user_guide: "Manual do usuário"
+    show:
       section-1:
         headline: "Seja bem-vindo ao portal do serviço de <b>conferência web</b> da RNP"
         login: "entrar"
@@ -133,7 +141,7 @@ pt-br:
   sessions:
     login_form:
       email_or_login: "E-mail"
-    login_form_area:
+    login_form:
       email_or_username: "E-mail"
       local:
         subtitle: "Acessar usando uma conta local"
@@ -145,6 +153,7 @@ pt-br:
       shibboleth:
         title: "Já tenho uma conta"
         toggle: "Minha conta não é federada"
+    login_form_area:
       title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"

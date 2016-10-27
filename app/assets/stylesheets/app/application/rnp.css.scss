@@ -139,6 +139,34 @@ a {
   }
 }
 
+#footer-guides {
+  background: $rnp-gray-1;
+  text-align: center;
+  padding: 60px 0 20px 0;
+
+  li {
+    display: inline-block;
+    padding: 10px 25px;
+    border-right: 1px solid $rnp-blue-2;
+    margin: 0;
+
+    &:last-child {
+      border: 0;
+    }
+  }
+
+  a {
+    color: $rnp-blue-1;
+    font-size: 14px;
+    width: 80px;
+    display: inline-block;
+
+    &:hover {
+      color: $rnp-blue-3;
+    }
+  }
+}
+
 
 
 /*
@@ -248,34 +276,6 @@ body.frontpage {
       }
     }
   }
-
-  .section-4 {
-    background: $rnp-gray-1;
-    text-align: center;
-    padding: 60px 0 20px 0;
-
-    li {
-      display: inline-block;
-      padding: 10px 25px;
-      border-right: 1px solid $rnp-blue-2;
-      margin: 0;
-
-      &:last-child {
-        border: 0;
-      }
-    }
-
-    a {
-      color: $rnp-blue-1;
-      font-size: 14px;
-      width: 80px;
-      display: inline-block;
-
-      &:hover {
-        color: $rnp-blue-3;
-      }
-    }
-  }
 }
 
 
@@ -319,120 +319,288 @@ body.sessions.new, body.sessions.create {
   .section-1 {
     text-align: center;
     padding: 150px 20px;
+  }
+}
 
-    #login-box {
-      background: $rnp-gray-1;
-      max-width: 700px;
-      min-width: 400px;
-      margin: 0 auto;
 
-      .header {
-        height: 40px;
-        font-size: 20px;
-        line-height: 38px;
-        text-align: left;
-        padding: 0 20px;
-        background: $rnp-blue-2;
-        color: #fff;
+/*
+ * Conference join
+ */
+
+body.custom_bigbluebutton_rooms.invite_userid,
+body.custom_bigbluebutton_rooms.invite,
+body.custom_bigbluebutton_rooms.auth {
+  min-width: auto;
+
+  #site {
+    background-image:image-url("rnp/site_foto_1.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-x: center;
+  }
+
+  #page-header-wrapper {
+    display: none;
+    height: 0;
+    opacity: 0;
+  }
+
+  #content {
+    margin: 0;
+    padding: 0;
+    width: auto;
+  }
+
+  #content-wrapper {
+    padding: 0;
+  }
+
+  #footer-wrapper {
+    margin: 0;
+  }
+
+  #login-box {
+    max-width: 800px;
+    @include mconf-clearfix;
+
+    .content {
+      width: 50%;
+      border-right: 1px solid $rnp-blue-2;
+      margin: 20px 0;
+      float: left;
+      padding: 0;
+
+      input[type="submit"] {
+        float: none;
       }
 
-      .content {
-        padding: 20px;
-        overflow: hidden;
+      .user_remember_me {
+        width: auto;
+        float: none;
+      }
 
-        .title {
-          color: $rnp-blue-2;
-          font-size: 20px;
-        }
+      .extra-options {
+        text-align: left;
 
-        .cafe {
-          margin: 40px auto 40px auto;
-          display: block;
-        }
-
-        .btn-submit {
+        a {
+          float: none;
           display: inline-block;
-          font-size: 20px !important;
-          line-height: 26px;
-          padding: 10px;
-          width: 60%;
-          margin-bottom: 40px;
-          color: $rnp-blue-2;
-          border-color: $rnp-blue-2;
-          background: $transparent;
-
-          &:hover {
-            /* background: $rnp-blue-3; */
-            /* color: #fff; */
-            /* text-shadow: none; */
-            background: #fff;
-          }
-        }
-
-        .box-shibboleth, .box-local {
-          position: absolute;
-          opacity: 0;
-          height: 0;
-          z-index: 1;
-          top: 0;
-          left: 0;
-
-          &.open {
-            position: relative;
-            opacity: 1;
-            height: auto;
-            z-index: 999;
-            transition: all .5s ease;
-          }
-        }
-
-        .box-local {
-          form {
-            margin: 20px 0 0 0;
-          }
-
-          .input, .extra-options {
-            width: 60%;
-            margin: 0 auto;
-
-            input[type="text"], input[type="password"] {
-              box-sizing: border-box;
-              font-size: 16px !important;
-              border: 0;
-              padding: 8px 15px;
-              width: 100%;
-              margin-bottom: 20px;
-              height: auto;
-            }
-
-            a {
-              float: right;
-            }
-          }
-
-          .user_remember_me {
-            float: left;
-            width: 50%;
-            text-align: left;
-
-            .checkbox {
-              display: inline-block;
-              width: auto;
-            }
-
-            input[type="checkbox"] {
-              margin-top: 1px;
-              margin-right: 8px;
-            }
-          }
-
-          .btn-submit {
-            margin-top: 40px;
-          }
+          margin-top: 10px;
         }
       }
     }
 
+    .content-right {
+      width: 47%;
+      float: left;
+      margin: 20px 0 20px 10px;
+
+      .title {
+        color: $rnp-blue-2;
+        font-size: 20px;
+        margin-bottom: 50px;
+      }
+
+      .btn-submit {
+        display: inline-block;
+        font-size: 20px !important;
+        line-height: 26px;
+        padding: 10px;
+        width: 80%;
+        margin-bottom: 40px;
+        color: $rnp-blue-2;
+        border-color: $rnp-blue-2;
+        background: $transparent;
+        float: none;
+
+        &:hover {
+          /* background: $rnp-blue-3; */
+          /* color: #fff; */
+          /* text-shadow: none; */
+          background: #fff;
+        }
+      }
+
+      .input {
+        width: 80%;
+        margin: 0 auto;
+
+        input[type="text"], input[type="password"] {
+          box-sizing: border-box;
+          font-size: 16px !important;
+          border: 0;
+          padding: 8px 15px;
+          width: 100%;
+          margin-bottom: 20px;
+          height: auto;
+        }
+      }
+
+    }
+  }
+
+  #site #webconf-room-invite-header {
+    padding: 30px;
+    border-radius: 0;
+    background: #fff;
+    margin: 0 auto;
+    margin-top: 30px;
+    max-width: 800px;
+    min-width: 400px;
+    box-sizing: border-box;
+
+    .title {
+      font-size: 30px;
+      line-height: 36px;
+      color: $rnp-blue-1;
+    }
+
+    .status-wrapper {
+      font-size: 18px;
+      line-height: 20px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      /* color: $rnp-gray-3; */
+
+      .label {
+        font-size: 22px;
+        padding: 10px 20px;
+        border-radius: 0;
+        text-shadow: none;
+        margin-top: 20px;
+      }
+    }
+
+    .footer {
+      font-size: 16px;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+#login-box {
+  background: $rnp-gray-1;
+  max-width: 700px;
+  min-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+
+  .header {
+    height: 40px;
+    font-size: 20px;
+    line-height: 38px;
+    text-align: left;
+    padding: 0 20px;
+    background: $rnp-blue-2;
+    color: #fff;
+  }
+
+  .content {
+    padding: 20px;
+    overflow: hidden;
+
+    .title {
+      color: $rnp-blue-2;
+      font-size: 20px;
+    }
+
+    .cafe {
+      margin: 40px auto 40px auto;
+    }
+
+    .btn-submit {
+      display: inline-block;
+      font-size: 20px !important;
+      line-height: 26px;
+      padding: 10px;
+      width: 70%;
+      margin-bottom: 40px;
+      color: $rnp-blue-2;
+      border-color: $rnp-blue-2;
+      background: $transparent;
+
+      &:hover {
+        /* background: $rnp-blue-3; */
+        /* color: #fff; */
+        /* text-shadow: none; */
+        background: #fff;
+      }
+    }
+
+    .box-shibboleth, .box-local {
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      z-index: -1;
+      top: 0;
+      left: 0;
+
+      &.open {
+        position: relative;
+        opacity: 1;
+        height: auto;
+        z-index: 999;
+        transition: all .5s ease;
+      }
+    }
+
+    .box-local {
+      form {
+        margin: 20px 0 0 0;
+      }
+
+      .input, .extra-options {
+        width: 70%;
+        margin: 0 auto;
+
+        input[type="text"], input[type="password"] {
+          box-sizing: border-box;
+          font-size: 16px !important;
+          border: 0;
+          padding: 8px 15px;
+          width: 100%;
+          margin-bottom: 20px;
+          height: auto;
+        }
+
+        a {
+          float: right;
+        }
+      }
+
+      .shib-sign-in-trigger, .local-sign-in-trigger {
+        clear: both;
+      }
+
+      .user_remember_me {
+        float: left;
+        width: 50%;
+        text-align: left;
+
+        .checkbox {
+          display: inline-block;
+          width: auto;
+        }
+
+        input[type="checkbox"] {
+          margin-top: 1px;
+          margin-right: 8px;
+        }
+      }
+
+      .btn-submit {
+        margin-top: 40px;
+      }
+    }
   }
 }
 

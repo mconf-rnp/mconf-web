@@ -30,7 +30,14 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite_header:
+      footer: "To participate, sign in below"
+      meeting_type: "This is a <b>%{type}</b> conference. The meeting is currently:"
+      private: "private"
+      public: "public"
+      title: "Welcome to the conference room: <b>%{name}</b>"
     invite_userid:
+      login_title: "Login"
       non_member:
         title: "I don't have an account"
   institution:
@@ -51,12 +58,13 @@ en:
     users:
       title: "Users in the institution %{name}"
   frontpage:
-    show:
+    footer_guides:
       links:
         mconf_tec: "Mconf Technology"
         requirements: "Usage requirements"
         service_page: "More about this service"
         user_guide: "User manuals"
+    show:
       section-1:
         headline: "Welcome to the web portal of RNP's <b>web conference</b> service"
         login: "sign in"
@@ -133,7 +141,7 @@ en:
   sessions:
     login_form:
       email_or_login: "Email"
-    login_form_area:
+    login_form:
       email_or_username: "Email"
       local:
         subtitle: "Sign in using a non-federated account"
@@ -145,6 +153,7 @@ en:
       shibboleth:
         title: "I have an account"
         toggle: "My account is not federated"
+    login_form_area:
       title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
