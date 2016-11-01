@@ -2,6 +2,10 @@
   %p= t('.message.header', sender: @invitation.sender.full_name, email_sender: @invitation.sender.email).html_safe
   = render "shared/invitation_email"
 
+  %p= t('.message.quality_warn')
+  %p= t('.message.user_manual')
+  %p= t('.message.rnp_contact')
+
   - if @invitation.target.dial_number.present?
     .field
       %label= t('.message.dial_number') + ':'

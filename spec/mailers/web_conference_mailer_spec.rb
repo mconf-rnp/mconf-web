@@ -64,6 +64,30 @@ describe WebConferenceMailer do
     it "uses the site's timezone if the receiver and sender don't have a timezone set"
     it "sends an .ics file attached"
 
+    context "sends additional content about usage, manual and support" do
+      before {
+        Site.current.update_attributes(:locale => "en")
+      }
+      it {
+        content = I18n.t('web_conference_mailer.invitation_email.message.quality_warn',
+                         sender: invitation.sender.name,
+                         email_sender: invitation.sender.email, locale: "en")
+        mail.html_part.body.encoded.should match(Regexp.escape(content))
+      }
+      it {
+        content = I18n.t('web_conference_mailer.invitation_email.message.user_manual',
+                         sender: invitation.sender.name,
+                         email_sender: invitation.sender.email, locale: "en")
+        mail.html_part.body.encoded.should match(Regexp.escape(content))
+      }
+      it {
+        content = I18n.t('web_conference_mailer.invitation_email.message.rnp_contact',
+                         sender: invitation.sender.name,
+                         email_sender: invitation.sender.email, locale: "en")
+        mail.html_part.body.encoded.should match(Regexp.escape(content))
+      }
+    end
+
     context "uses the receiver's locale" do
       before {
         Site.current.update_attributes(:locale => "en")
