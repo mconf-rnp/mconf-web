@@ -25,8 +25,13 @@ a {
   transition: color .2s, background .2s, border .2s;
 }
 
-.btn {
+.btn, .btn-group > .btn {
   transition: color .2s, background .2s, border .2s;
+  text-shadow: none;
+}
+
+.btn.btn-small {
+  font-size: 12px !important;
 }
 
 .btn-transp {
@@ -42,7 +47,41 @@ a {
   }
 }
 
+.webconf-join-link {
+  background: $rnp-blue-2;
+  border-color: $rnp-blue-2;
+  color: #ffffff;
 
+  &:hover,
+  &:focus {
+    transition: color .2s, background .2s, border .2s;
+    color: #ffffff;
+    background: $rnp-blue-1;
+    border-color: $rnp-blue-1;
+  }
+}
+
+.webconf-invite-link {
+  background: $rnp-blue-3;
+  border-color: $rnp-blue-3;
+  color: #ffffff;
+
+  &:hover,
+  &:focus {
+    transition: color .2s, background .2s, border .2s;
+    color: #ffffff;
+    background: $rnp-blue-1;
+    border-color: $rnp-blue-1;
+  }
+}
+
+#webconference-room .icon-mconf-in-progress {
+  float: right;
+}
+
+#space-sidebar #sidebar-webconference .buttons {
+  margin: 15px 0 !important;
+}
 
 /*
  * Layout components
