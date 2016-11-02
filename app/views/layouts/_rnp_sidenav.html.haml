@@ -23,18 +23,23 @@
       = image_tag "rnp/site_ico_fechar_azul.png", size: "28x19"
       %span= t('.logout')
 
-    .header
-      = t('.my_room')
-    - room = current_user.bigbluebutton_room
-    = link_to invitation_bigbluebutton_room_path(room), class: "sidenav-item open-modal" do
-      = image_tag "rnp/site_ico_convite.png", size: "28x19"
-      %span= t('.invite')
-    = link_to join_bigbluebutton_room_path(room), class: "sidenav-item webconf-join-link" do
-      = image_tag "rnp/site_ico_comecar_reuniao.png", size: "28x20"
-      %span= t('.start_meeting')
-    = link_to my_recordings_path, class: "sidenav-item" do
-      = image_tag "rnp/site_ico_gravacoes.png", size: "28x21"
-      %span= t('.recordings')
+    - if (sidenav_for_user? || sidenav_for_spaces?) && sidenav_room.present?
+      .subheader
+        - if sidenav_for_user?
+          = t('.my_room')
+        - elsif sidenav_for_spaces?
+          = t('.space_room')
+      - room = sidenav_room
+      = link_to invitation_bigbluebutton_room_path(room), class: "sidenav-item open-modal" do
+        = image_tag "rnp/site_ico_convite.png", size: "28x19"
+        %span= t('.invite')
+      = link_to join_bigbluebutton_room_path(room), class: "sidenav-item webconf-join-link" do
+        = image_tag "rnp/site_ico_comecar_reuniao.png", size: "28x20"
+        %span= t('.start_meeting')
+      - recordings_link = sidenav_for_user? ? my_recordings_path : recordings_space_path(@space)
+      = link_to recordings_link, class: "sidenav-item" do
+        = image_tag "rnp/site_ico_gravacoes.png", size: "28x21"
+        %span= t('.recordings')
 
   - else
     = link_to login_path, class: "sidenav-item" do

@@ -13,11 +13,10 @@ class mconf.Sessions.LoginFormArea
     $('.local-sign-in-trigger a').on "click", (e) ->
       $('.box-shibboleth').removeClass("open")
       $('.box-local').addClass("open")
-      $('.box-local').slideDown(200)
+      $('.box-local input').filter(":visible:first").focus()
       e.preventDefault()
 
     $('.shib-sign-in-trigger a').on "click", (e) ->
       $('.box-local').removeClass("open")
       $('.box-shibboleth').addClass("open")
-      $('.box-shibboleth').slideDown(200)
       e.preventDefault()

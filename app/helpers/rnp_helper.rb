@@ -23,4 +23,19 @@ module RnpHelper
     "http://?????"              # TODO
   end
 
+  def sidenav_for_user?
+    params[:controller] == "my"
+  end
+
+  def sidenav_for_spaces?
+    @space.present?
+  end
+
+  def sidenav_room
+    if sidenav_for_user?
+      current_user.try(:bigbluebutton_room)
+    else
+      @space.try(:bigbluebutton_room)
+    end
+  end
 end
