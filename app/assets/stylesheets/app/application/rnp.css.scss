@@ -83,12 +83,28 @@ a {
   margin: 15px 0 !important;
 }
 
+.noty_bar {
+  transition: opacity 1s;
+  width: 70% !important;
+  top: 0px !important;
+  border-radius: 0px !important;
+  /* min-height: 60px !important; */
+
+  .noty_message {
+    font-size: 16px !important;
+    padding: 22px !important;
+  }
+}
+
+
+
 /*
  * Layout components
  */
 
 #navbar-wrapper {
   background: $rnp-blue-1;
+  padding: 0;
 }
 
 #navbar {
@@ -96,7 +112,7 @@ a {
 }
 
 #navbar-logo {
-  margin: 13px 10px;
+  margin: 13px 20px;
   float: right;
 
   img {
@@ -107,11 +123,11 @@ a {
 
 #navbar-menu {
   float: left;
-  padding: 20px 10px;
 
   img {
     width: 29px;
     height: 20px;
+    padding: 20px;
   }
 }
 
