@@ -86,16 +86,44 @@ a {
 .noty_bar {
   transition: opacity 1s;
   width: 70% !important;
-  top: 0px !important;
+  top: 5px !important;
   border-radius: 0px !important;
   /* min-height: 60px !important; */
 
   .noty_message {
     font-size: 16px !important;
-    padding: 22px !important;
+    padding: 13px !important;
   }
 }
 
+/* Notifications */
+.noty_bar .noty_message {
+  padding: 8px 35px 8px 14px;
+  text-shadow: none;
+}
+.noty_bar.noty_alert {
+  $notif-notice-bg: $rnp-warning-color;
+  background-color: $notif-notice-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-notice-bg, 5);
+}
+.noty_bar.noty_error {
+  $notif-error-bg: $rnp-danger-color;
+  background-color: $notif-error-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-bottom-width: 1px;
+  border-color: darken($notif-error-bg, 5);
+}
+.noty_bar.noty_success {
+  $notif-success-bg: darken($rnp-success-color, 10);
+  background-color: $notif-success-bg;
+  color: #fff;
+  @include box-shadow(none);
+  border-color: darken($notif-success-bg, 5);
+}
 
 
 /*
@@ -684,34 +712,4 @@ body.custom_bigbluebutton_rooms.auth {
       margin-top: 14px;
     }
   }
-}
-
-/* Notifications */
-.noty_bar .noty_message {
-  @include font-size($font-medium);
-  padding: 8px 35px 8px 14px;
-  text-shadow: none;
-}
-.noty_bar.noty_alert {
-  $notif-notice-bg: $rnp-warning-color;
-  background-color: $notif-notice-bg;
-  color: #fff;
-  @include box-shadow(none);
-  border-bottom-width: 1px;
-  border-color: darken($notif-notice-bg, 5);
-}
-.noty_bar.noty_error {
-  $notif-error-bg: $rnp-danger-color;
-  background-color: $notif-error-bg;
-  color: #fff;
-  @include box-shadow(none);
-  border-bottom-width: 1px;
-  border-color: darken($notif-error-bg, 5);
-}
-.noty_bar.noty_success {
-  $notif-success-bg: darken($rnp-success-color, 10);
-  background-color: $notif-success-bg;
-  color: #fff;
-  @include box-shadow(none);
-  border-color: darken($notif-success-bg, 5);
 }
