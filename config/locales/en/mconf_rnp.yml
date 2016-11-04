@@ -30,6 +30,10 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite:
+      back: "Back"
+      confirm: "Confirm"
+      confirmation: "Confirmation"
     invite_header:
       footer: "To participate, sign in below"
       meeting_type: "This is a <b>%{type}</b> conference. The meeting is currently:"

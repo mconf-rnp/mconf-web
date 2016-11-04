@@ -6,6 +6,126 @@
 @import "app/custom_bigbluebutton_rooms/invitation_form";
 
 
+@mixin login-box {
+  background: $rnp-gray-1;
+  max-width: 700px;
+  min-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+
+  .header {
+    height: 40px;
+    font-size: 20px;
+    line-height: 38px;
+    text-align: left;
+    padding: 0 20px;
+    background: $rnp-blue-2;
+    color: #fff;
+  }
+
+  .content {
+    padding: 20px;
+    overflow: hidden;
+
+    .title {
+      color: $rnp-blue-2;
+      font-size: 20px;
+    }
+
+    .cafe {
+      margin: 40px auto 40px auto;
+    }
+
+    .btn-submit {
+      display: inline-block;
+      font-size: 20px !important;
+      line-height: 26px;
+      padding: 10px;
+      width: 70%;
+      margin-bottom: 40px;
+      color: $rnp-blue-2;
+      border-color: $rnp-blue-2;
+      background: $transparent;
+
+      &:hover {
+        /* background: $rnp-blue-3; */
+        /* color: #fff; */
+        /* text-shadow: none; */
+        background: #fff;
+      }
+    }
+
+    .box-shibboleth, .box-local {
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      z-index: -1;
+      top: 0;
+      left: 0;
+
+      &.open {
+        position: relative;
+        opacity: 1;
+        height: auto;
+        z-index: 9;
+        transition: all .5s ease;
+      }
+    }
+
+    .box-local {
+      form {
+        margin: 20px 0 0 0;
+      }
+
+      .input, .extra-options {
+        width: 70%;
+        margin: 0 auto;
+
+        input[type="text"], input[type="password"] {
+          box-sizing: border-box;
+          font-size: 16px !important;
+          border: 0;
+          padding: 8px 15px;
+          width: 100%;
+          margin-bottom: 20px;
+          height: auto;
+        }
+
+        a {
+          float: right;
+        }
+      }
+
+      .shib-sign-in-trigger, .local-sign-in-trigger {
+        clear: both;
+      }
+
+      .user_remember_me {
+        float: left;
+        width: 50%;
+        text-align: left;
+
+        .checkbox {
+          display: inline-block;
+          width: auto;
+        }
+
+        input[type="checkbox"] {
+          margin-top: 1px;
+          margin-right: 8px;
+        }
+      }
+
+      .btn-submit {
+        margin-top: 40px;
+      }
+    }
+  }
+}
+
+
+
+
 /*
  * General
  */
@@ -442,7 +562,69 @@ body.custom_bigbluebutton_rooms.auth {
     margin: 0;
   }
 
+  #confirmation-box {
+    @include login-box;
+    max-width: 800px;
+    @include mconf-clearfix;
+
+    .content {
+      padding: 20px;
+
+      .subtitle {
+        text-align: left;
+        font-size: 20px;
+        line-height: 22px;
+        color: $rnp-blue-2;
+        margin-bottom: 20px;
+      }
+
+      .btn-submit, .btn-back {
+        margin-bottom: 0;
+        width: auto;
+        padding: 10px 40px;
+        margin-top: 40px;
+      }
+
+      .btn-submit {
+        float: right;
+        background: $rnp-blue-2;
+        color: #fff;
+
+        &:hover {
+          background: $rnp-blue-3;
+          border-color: $rnp-blue-3;
+        }
+      }
+
+      .btn-back {
+        float: left;
+        display: inline-block;
+        font-size: 20px !important;
+        line-height: 26px;
+        color: $rnp-blue-2;
+        border-color: $rnp-blue-2;
+      }
+
+      .input {
+        text-align: left;
+        margin: 0;
+      }
+
+      input[type="text"], input[type="password"] {
+        box-sizing: border-box;
+        border: none;
+        background: #fff;
+        font-size: 16px !important;
+        line-height: 20px;
+        width: 100%;
+        padding: 8px 10px;
+        height: auto;
+      }
+    }
+  }
+
   #login-box {
+    @include login-box;
     max-width: 800px;
     @include mconf-clearfix;
 
@@ -527,7 +709,7 @@ body.custom_bigbluebutton_rooms.auth {
     border-radius: 0;
     background: #fff;
     margin: 0 auto;
-    margin-top: 30px;
+    margin-top: 60px;
     max-width: 800px;
     min-width: 400px;
     box-sizing: border-box;
@@ -558,136 +740,15 @@ body.custom_bigbluebutton_rooms.auth {
       font-size: 16px;
     }
   }
+
+  #footer-guides {
+    margin-top: 60px;
+  }
 }
-
-
-
-
-
-
-
-
-
-
 
 #login-box {
-  background: $rnp-gray-1;
-  max-width: 700px;
-  min-width: 400px;
-  margin: 0 auto;
-  text-align: center;
-
-  .header {
-    height: 40px;
-    font-size: 20px;
-    line-height: 38px;
-    text-align: left;
-    padding: 0 20px;
-    background: $rnp-blue-2;
-    color: #fff;
-  }
-
-  .content {
-    padding: 20px;
-    overflow: hidden;
-
-    .title {
-      color: $rnp-blue-2;
-      font-size: 20px;
-    }
-
-    .cafe {
-      margin: 40px auto 40px auto;
-    }
-
-    .btn-submit {
-      display: inline-block;
-      font-size: 20px !important;
-      line-height: 26px;
-      padding: 10px;
-      width: 70%;
-      margin-bottom: 40px;
-      color: $rnp-blue-2;
-      border-color: $rnp-blue-2;
-      background: $transparent;
-
-      &:hover {
-        /* background: $rnp-blue-3; */
-        /* color: #fff; */
-        /* text-shadow: none; */
-        background: #fff;
-      }
-    }
-
-    .box-shibboleth, .box-local {
-      position: absolute;
-      opacity: 0;
-      height: 0;
-      z-index: -1;
-      top: 0;
-      left: 0;
-
-      &.open {
-        position: relative;
-        opacity: 1;
-        height: auto;
-        z-index: 9;
-        transition: all .5s ease;
-      }
-    }
-
-    .box-local {
-      form {
-        margin: 20px 0 0 0;
-      }
-
-      .input, .extra-options {
-        width: 70%;
-        margin: 0 auto;
-
-        input[type="text"], input[type="password"] {
-          box-sizing: border-box;
-          font-size: 16px !important;
-          border: 0;
-          padding: 8px 15px;
-          width: 100%;
-          margin-bottom: 20px;
-          height: auto;
-        }
-
-        a {
-          float: right;
-        }
-      }
-
-      .shib-sign-in-trigger, .local-sign-in-trigger {
-        clear: both;
-      }
-
-      .user_remember_me {
-        float: left;
-        width: 50%;
-        text-align: left;
-
-        .checkbox {
-          display: inline-block;
-          width: auto;
-        }
-
-        input[type="checkbox"] {
-          margin-top: 1px;
-          margin-right: 8px;
-        }
-      }
-
-      .btn-submit {
-        margin-top: 40px;
-      }
-    }
-  }
+  @include login-box;
 }
-
-
 
 
 

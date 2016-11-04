@@ -30,6 +30,10 @@ pt-br:
         webconferencia: "Webconferência"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite:
+      back: "Voltar"
+      confirm: "Confirmar"
+      confirmation: "Confirmação"
     invite_header:
       footer: "Para participar, faça login abaixo"
       meeting_type: "Esta é uma conferência <b>%{type}</b>. O estado atual da reunião é:"
