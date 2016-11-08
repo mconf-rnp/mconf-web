@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.2.0-rnp1] - 2016-11-08
+
+New design. Changes mostly in the frontpage, sign in page, web conference join
+pages, and headers and footers. Includes a few usability improvements too, not
+only visual changes.
+
 ## [2.2.0] - 2016-07-25
 
 Added support for BigBlueButton 1.0. A few other improvements over 2.1.0, but no
@@ -277,6 +283,7 @@ This is a minor update over 0.8 that was developed in parallel with 2.0.
 * First version in production and documentation on [[how to setup a production server|Deployment]]
 * Several other bugs and features implemented.
 
+[2.2.0-rnp1]: https://github.com/mconf-rnp/mconf-web/compare/v2.2.0...v2.2.0-rnp1
 [2.2.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.2.0
 [2.1.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.1.0
 [2.0.1]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.0.1
