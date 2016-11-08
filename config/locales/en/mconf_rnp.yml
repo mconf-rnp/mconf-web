@@ -30,7 +30,18 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite:
+      back: "Back"
+      confirm: "Confirm"
+      confirmation: "Confirmation"
+    invite_header:
+      footer: "To participate, sign in below"
+      meeting_type: "This is a <b>%{type}</b> conference. The meeting is currently:"
+      private: "private"
+      public: "public"
+      title: "Welcome to the conference room: <b>%{name}</b>"
     invite_userid:
+      login_title: "Login"
       non_member:
         title: "I don't have an account"
   institution:
@@ -51,6 +62,28 @@ en:
     users:
       title: "Users in the institution %{name}"
   frontpage:
+    footer_guides:
+      links:
+        mconf_tec: "Mconf Technology"
+        requirements: "Usage requirements"
+        service_page: "More about this service"
+        user_guide: "User manuals"
+    show:
+      section-1:
+        headline: "Welcome to the web portal of RNP's <b>web conference</b> service"
+        login: "sign in"
+      section-2:
+        headline: "The web conference is a communication and collaboration service of RNP that promotes virtual encounters between two or more participants. The service allows geographically distant participants to share audio, video, text, images, whiteboard and the screen of their computers."
+      section-3:
+        block-security:
+          title: "Safe environment"
+          text: "The web conference rooms can be public or private. Moreover, all the communication between the components of the service is done safely with the use of digital certificates from ICPEdu"
+        block-spaces:
+          title: "Spaces"
+          text: "Bring together groups of users with a common objective. Ideal to unite collaborators of a project, idea or specific job"
+        block-scheduling:
+          title: "Easy scheduling"
+          text: "Easy scheduling system for web conferences and participant invitation"
     sign_in_and_title:
       headline: "Web conference service portal"
   layouts:
@@ -62,6 +95,23 @@ en:
       links:
         check: "Check software requirements"
         user_guide: "User manual"
+    rnp_sidenav:
+      compatibility: "Is my device compatible?"
+      home: "Home"
+      invite: "Send a meeting invitation"
+      login: "Login"
+      logout: "Logout"
+      mconf_tec: "Mconf Technology"
+      manage: "Manage"
+      menu: "Menu"
+      my_room: "My room"
+      recordings: "See recordings"
+      requirements: "Usage requirements"
+      service_page: "More about this service"
+      space_room: "Space's room"
+      spaces: "Spaces"
+      start_meeting: "Start a meeting"
+      user_guide: "User manuals"
   manage:
     institution:
       can_record_users:
@@ -96,16 +146,20 @@ en:
   sessions:
     login_form:
       email_or_login: "Email"
-    login_form_area:
+    login_form:
+      email_or_username: "Email"
+      local:
+        subtitle: "Sign in using a non-federated account"
+        title: "Local account"
+        toggle: "Back to the federated sign in"
       login: "Login"
-      title: "I already have an account"
-      member:
-        email_or_username: "Email"
-        non_federated_click: "My account is not federated"
-        non_federated_title: "Access using a local account"
-        password: "Password"
-        shibboleth:
-          click_here: "Login"
+      password: "Password"
+      remember_me: "Remember me"
+      shibboleth:
+        title: "I have an account"
+        toggle: "My account is not federated"
+    login_form_area:
+      title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Federated authentication"

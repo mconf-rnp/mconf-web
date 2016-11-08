@@ -1005,7 +1005,7 @@ pt-br:
     webconference_room:
       end: "Parar a reunião"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
-      invite: "Convidar outras pessoas"
+      invite: "Enviar convites"
       join: "Entrar na reunião!"
       join_mobile_full: "Entrar a partir de um dispositivo móvel"
       not_running: "Nenhuma reunião em andamento."
@@ -1510,7 +1510,7 @@ pt-br:
     sidebar_webconf_buttons:
       end: "Finalizar"
       end_tooltip: "Esta ação vai finalizar a reunião em andamento!"
-      invite: "Convidar outras pessoas"
+      invite: "Enviar convites"
       join: "Entrar!"
       join_mobile: "Entrar/móvel"
       join_mobile_full: "Entrar a partir de um dispositivo móvel"
@@ -1547,7 +1547,7 @@ pt-br:
     webconference:
       end: "Parar a reunião"
       end_tooltip: "This action will end the current conference!"
-      invite: "Convidar outras pessoas"
+      invite: "Enviar convites"
       webconference:
         attendees:
           all_users: "Todos usuários"

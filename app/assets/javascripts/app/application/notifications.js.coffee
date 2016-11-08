@@ -7,10 +7,10 @@ defaultOpts =
   force: false
   modal: false
   timeout: 6000
-  speed: 200
+  speed: 500
   textAlign: 'center'
   layout: 'topCenter'
-  closeButton: true
+  closeButton: false
 
 class mconf.Notification
 

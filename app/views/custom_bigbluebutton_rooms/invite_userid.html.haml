@@ -4,14 +4,16 @@
 
 #webconf-room-userid
 
-  = render 'sessions/login_form_area', autofocus: false
+  #login-box
+    .header= t(".login_title")
+    .content
+      = render 'sessions/login_form'
 
-  .secondary-box.form-area
-    %h3= t(".non_member.title")
-
-    .form-area-content
+    .content-right
+      .title= t(".non_member.title")
       = simple_form_for @room, :url => invite_bigbluebutton_room_path(@room), :method => "get" do |f|
         .input
-          %label= t(".non_member.name")
-          = text_field_tag "user[name]", "", :required => true
-        = f.button :wrapped, :value => t(".non_member.next")
+          = text_field_tag "user[name]", "", required: true, placeholder: t(".non_member.name")
+        = f.submit value: t(".non_member.next"), class: 'btn btn-submit'
+
+= render 'frontpage/footer_guides'

@@ -11,10 +11,12 @@ class mconf.Sessions.LoginFormArea
 
   bindForm: ->
     $('.local-sign-in-trigger a').on "click", (e) ->
-      $('.local-sign-in-area').fadeToggle(20)
-      $('.local-sign-in-area').toggleClass('open')
-      $(this).parent().parents('.form-actions').toggleClass('open')
-      $(this).parent().toggleClass('open')
-      if $('.local-sign-in-area').is(':visible')
-        $('.local-sign-in-area input[type=text]:first').focus()
+      $('.box-shibboleth').removeClass("open")
+      $('.box-local').addClass("open")
+      $('.box-local input').filter(":visible:first").focus()
+      e.preventDefault()
+
+    $('.shib-sign-in-trigger a').on "click", (e) ->
+      $('.box-local').removeClass("open")
+      $('.box-shibboleth').addClass("open")
       e.preventDefault()

@@ -1,0 +1,62 @@
+.sidenav
+  .header
+    = t('.menu')
+    = image_tag "rnp/site_ico_x_branco.png", size: "28x23", class: "close"
+
+  - if user_signed_in?
+    = link_to my_home_path, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_home.png", size: "28x19"
+      %span= t('.home')
+    = link_to spaces_path, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_comunidades.png", size: "28x19"
+      %span= t('.spaces')
+    = link_to site_path, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_gerenciar.png", size: "28x25"
+      %span= t('.manage')
+    = link_to compatibility_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_compatibilidade.png", size: "28x19"
+      %span= t('.compatibility')
+    = link_to requirements_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_requisitos.png", size: "28x20"
+      %span= t('.requirements')
+    = link_to logout_path, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_fechar_azul.png", size: "28x19"
+      %span= t('.logout')
+
+    - if (sidenav_for_user? || sidenav_for_spaces?) && sidenav_room.present?
+      .subheader
+        - if sidenav_for_user?
+          = t('.my_room')
+        - elsif sidenav_for_spaces?
+          = t('.space_room')
+      - room = sidenav_room
+      = link_to invitation_bigbluebutton_room_path(room), class: "sidenav-item open-modal" do
+        = image_tag "rnp/site_ico_convite.png", size: "28x19"
+        %span= t('.invite')
+      = link_to join_bigbluebutton_room_path(room), class: "sidenav-item webconf-join-link" do
+        = image_tag "rnp/site_ico_comecar_reuniao.png", size: "28x20"
+        %span= t('.start_meeting')
+      - recordings_link = sidenav_for_user? ? my_recordings_path : recordings_space_path(@space)
+      = link_to recordings_link, class: "sidenav-item" do
+        = image_tag "rnp/site_ico_gravacoes.png", size: "28x21"
+        %span= t('.recordings')
+
+  - else
+    = link_to login_path, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_login.png", size: "28x19"
+      %span= t('.login')
+    = link_to current_site.external_help, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_manual.png", size: "28x19"
+      %span= t('.user_guide')
+    = link_to service_page_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_mais_informacoes.png", size: "28x24"
+      %span= t('.service_page')
+    = link_to mconf_tec_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_tecnologia.png", size: "28x21"
+      %span= t('.mconf_tec')
+    = link_to requirements_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_requisitos.png", size: "28x20"
+      %span= t('.requirements')
+    = link_to compatibility_url, class: "sidenav-item" do
+      = image_tag "rnp/site_ico_compatibilidade.png", size: "28x19"
+      %span= t('.compatibility')

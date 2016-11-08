@@ -251,14 +251,23 @@ $rnp-info-color: #049cdb;
 $rnp-warning-color: #f89406;
 $rnp-success-color: #2ecc71;
 
+$rnp-blue-1: #164182;
+$rnp-blue-2: #2861ff;
+$rnp-blue-3: #2095f2;
+$rnp-green-1: #00bea4;
+$rnp-gray-1: #ededed;
+$rnp-gray-2: #d9d9d9;
+$rnp-gray-3: #5d5d5d;
+
+$font-family: Roboto, Arial, sans-serif;
 $link-color: #4078c0; //$rnp-blue; //lighten($rnp-blue, 15); //lighten($main-color, 15);
 $link-color-hover: lighten($link-color, 10); //$second-color;
 $link-color-active: $link-color;
 $navbar-bg-color-dark: $rnp-blue;
 $navbar-bg-color-light: $rnp-blue;
-$navbar-height: 44px;
+$navbar-height: 60px;
 $navbar-font-color: #ddd;
 $navbar-font-color-hover: white;
 $navbar-menu-open-link: $link-color;
 $navbar-menu-open-link-hover: $link-color-hover;
-$footer-height: 140px;
+$footer-height: 170px;
