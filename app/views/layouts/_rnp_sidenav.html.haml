@@ -10,9 +10,14 @@
     = link_to spaces_path, class: "sidenav-item" do
       = image_tag "rnp/site_ico_comunidades.png", size: "28x19"
       %span= t('.spaces')
-    = link_to site_path, class: "sidenav-item" do
-      = image_tag "rnp/site_ico_gerenciar.png", size: "28x25"
-      %span= t('.manage')
+    - if current_user.superuser?
+      = link_to main_app.site_path, class: "sidenav-item" do
+        = image_tag "rnp/site_ico_gerenciar.png", size: "28x25"
+        %span= t('.manage')
+    - elsif can?(:users, :manage)
+      = link_to main_app.manage_users_path, class: "sidenav-item" do
+        = image_tag "rnp/site_ico_gerenciar.png", size: "28x25"
+        %span= t('.manage')
     = link_to compatibility_url, class: "sidenav-item" do
       = image_tag "rnp/site_ico_compatibilidade.png", size: "28x19"
       %span= t('.compatibility')
