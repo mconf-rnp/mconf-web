@@ -20,7 +20,7 @@ module RnpHelper
   end
 
   def compatibility_url
-    "http://?????"              # TODO
+    "https://wiki.rnp.br/pages/viewpage.action?pageId=90402465"
   end
 
   def sidenav_for_user?
