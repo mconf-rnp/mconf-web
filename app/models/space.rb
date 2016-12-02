@@ -70,20 +70,6 @@ class Space < ActiveRecord::Base
   after_update :update_webconf_room
   after_create :create_webconf_room
 
-  # It requires approval if the site globally requires it or
-  # if the creator's institution requires it
-  attr_accessor :created_by # the user trying to create the space
-  def require_approval?
-    # Space institution or creator's institution (when called from create)
-    institution = self.institution || created_by.try(:institution)
-
-    if institution
-      institution.require_space_approval?
-    else
-      Site.current.require_space_approval?
-    end
-  end
-
   validates :description, :presence => true
 
   validates :name, :presence => true,
@@ -126,11 +112,28 @@ class Space < ActiveRecord::Base
   # This scope can be used as a shorthand for spaces marked as public
   scope :public_spaces, -> { where(:public => true) }
 
-  # Used by select controller method
-  # For now keep old behavior and search for only one word in the name
-  scope :search_by_terms, -> (words, include_private=false) {
-    words = words.join(' ') if words.is_a?(Array)
-    where('name LIKE ?', "%#{words}%")
+  # Search spaces based on a list of words
+  # TODO: can_manage is never used, should hide private spaces
+  scope :search_by_terms, -> (words, can_manage=false) {
+    query = Space.with_disabled
+
+    words ||= []
+    words = [words] unless words.is_a?(Array)
+    query_strs = []
+    query_params = []
+
+    words.each do |word|
+      str  = "name LIKE ? OR description LIKE ?"
+      query_strs << str
+      query_params += ["%#{word}%", "%#{word}%"]
+    end
+
+    query.where(query_strs.join(' OR '), *query_params.flatten)
+  }
+
+  # The default ordering for search methods
+  scope :search_order, -> {
+    order("name")
   }
 
   # Finds all the valid user roles for a Space
@@ -177,6 +180,20 @@ class Space < ActiveRecord::Base
     # Use these calculations to set the indexes in the space table
     spaces_with_activities.find_each do |space|
       space.update_attributes last_activity: space.lastActivity, last_activity_count: space.activityCount
+    end
+  end
+
+  # It requires approval if the site globally requires it or
+  # if the creator's institution requires it
+  attr_accessor :created_by # the user trying to create the space
+  def require_approval?
+    # Space institution or creator's institution (when called from create)
+    institution = self.institution || created_by.try(:institution)
+
+    if institution
+      institution.require_space_approval?
+    else
+      Site.current.require_space_approval?
     end
   end
 

@@ -23,6 +23,19 @@
           - if field == 'admin'
             = check_box_tag :users_filter_institutional_admin_true, true, params[:institutional_admin] == 'true', 'data-attr-filter': 'institutional_admin', class: 'resource-filter-field checkbox'
             %label{ for: "users_filter_institutional_admin_true" }= t(".institutional_admin_true")
+      .search-filter-option
+        - ['login_method_shib'].each do |field|
+          .search-filter-option-sign-in
+            = check_box_tag :"users_filter_#{field}_shib", true, params[field] == 'true', 'data-attr-filter': field, class: ' resource-filter-field checkbox'
+            %label{ for: "users_filter_#{field}_shib" }= t(".#{field}")
+        - ['login_method_local'].each do |field|
+          .search-filter-option-sign-in
+            = check_box_tag :"users_filter_#{field}_local", true, params[field] == 'true', 'data-attr-filter': field, class: 'resource-filter-field checkbox'
+            %label{ for: "users_filter_#{field}_local" }= t(".#{field}")
+        - ['login_method_ldap'].each do |field|
+          .search-filter-option-sign-in
+            = check_box_tag :"users_filter_#{field}_ldap", true, params[field] == 'true', 'data-attr-filter': field, class: 'resource-filter-field checkbox'
+            %label{ for: "users_filter_#{field}_ldap" }= t(".#{field}")
 
   #users-list
     = render partial: 'users_list', locals: { :users => @users }

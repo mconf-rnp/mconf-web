@@ -91,23 +91,62 @@ class User < ActiveRecord::Base
 
   default_scope { where(disabled: false) }
 
+  # Search users based on a list of words
   scope :search_by_terms, -> (words, include_private=false) {
-    query = joins(:profile).includes(:profile).order("profiles.full_name")
+    query = joins(:profile).includes(:profile)
 
-    words ||= []
-    words = [words] unless words.is_a?(Array)
-    query_strs = []
-    query_params = []
+    if words.present?
+      words ||= []
+      words = [words] unless words.is_a?(Array)
+      query_strs = []
+      query_params = []
+      query_orders = []
 
-    words.each do |word|
-      str  = "profiles.full_name LIKE ? OR users.username LIKE ?"
-      str += " OR users.email LIKE ?" if include_private
-      query_strs << str
-      query_params += ["%#{word}%", "%#{word}%"]
-      query_params += ["%#{word}%"] if include_private
+      words.each do |word|
+        str  = "profiles.full_name LIKE ? OR users.username LIKE ?"
+        str += " OR users.email LIKE ?" if include_private
+        query_strs << str
+        query_params += ["%#{word}%", "%#{word}%"]
+        query_params += ["%#{word}%"] if include_private
+        query_orders += [
+          "CASE WHEN profiles.full_name LIKE '%#{word}%' THEN 1 ELSE 0 END + \
+           CASE WHEN users.username LIKE '%#{word}%' THEN 1 ELSE 0 END + \
+           CASE WHEN users.email LIKE '%#{word}%' THEN 1 ELSE 0 END"
+        ]
+      end
+      query = query.where(query_strs.join(' OR '), *query_params.flatten)
+                .order(query_orders.join(' + ') + " DESC")
     end
 
-    query.where(query_strs.join(' OR '), *query_params.flatten)
+    query
+  }
+
+  # The default ordering for search methods
+  scope :search_order, -> {
+    order("profiles.full_name")
+  }
+
+  # Returns only the users that have the authentication methods selected.
+  # `auth_methods` is an array with one or more of the following auth methods:
+  # * `:shibboleth`
+  # * `:ldap`
+  # * `:local`
+  scope :with_auth, -> (auth_methods, connector="AND") {
+    arr = []
+
+    arr.push("shib_tokens.id IS NOT NULL") if auth_methods.include?(:shibboleth)
+    arr.push("ldap_tokens.id IS NOT NULL") if auth_methods.include?(:ldap)
+    if auth_methods.include?(:local)
+      arr.push("((ldap_tokens.id IS NULL OR ldap_tokens.new_account = 'false') AND (shib_tokens.id IS NULL OR shib_tokens.new_account = 'false'))")
+    end
+
+    arr = arr.join(" #{connector} ")
+
+    unless arr.empty?
+      joins("LEFT JOIN shib_tokens ON shib_tokens.user_id = users.id")
+        .joins("LEFT JOIN ldap_tokens ON ldap_tokens.user_id = users.id")
+        .where(arr)
+    end
   }
 
   alias_attribute :name, :full_name
@@ -273,8 +312,28 @@ class User < ActiveRecord::Base
     LdapToken.user_created_by_ldap?(self)
   end
 
-  def no_local_auth?
-    created_by_shib? || created_by_ldap?
+  def local_auth?
+    !created_by_shib? && !created_by_ldap?
+  end
+
+  def sign_in_methods
+    {
+      shibboleth: self.shib_token.present?,
+      ldap: self.ldap_token.present?,
+      local: self.local_auth?
+    }
+  end
+
+  def last_sign_in_date
+    current_local_sign_in_at
+  end
+
+  def sign_in_method_name
+    "local"
+  end
+
+  def last_sign_in_method
+    [shib_token, ldap_token, self].reject(&:blank?).sort_by{ |method| method.last_sign_in_date || Time.at(0) }.last.sign_in_method_name
   end
 
   #

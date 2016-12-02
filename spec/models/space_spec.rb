@@ -1102,6 +1102,14 @@ describe Space do
     end
   end
 
+  describe ".search_by_terms" do
+    it "includes disabled spaces"
+    it "searches by name"
+    it "searches by description"
+    it "searches by name and description"
+    it "searches with multiple words"
+  end
+
   describe "#institution=" do
     let(:old_institution) { FactoryGirl.create(:institution) }
     let(:space) { FactoryGirl.create(:space, :institution => old_institution) }

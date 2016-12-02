@@ -103,6 +103,14 @@ a .icon-awesome {
   color: $red;
 }
 
+.icon-mconf-publish {
+  color: $green;
+}
+
+.icon-mconf-unpublish {
+  color: $yellow
+}
+
 .icon-mconf-disable {
   color: $yellow;
 }
@@ -191,6 +199,15 @@ a .icon-awesome {
 
 .icon-mconf-admin-institution {
   color: lighten($red, 20);
+}
+
+.icon-mconf-list {
+  &.enabled{
+    color: #888;
+  }
+  &.disabled{
+    color: #CCC;
+  }
 }
 
 .icon-mconf-event {}

@@ -122,4 +122,41 @@ Rails.application.config.to_prepare do
     include UpdateInstitutionRecordingsDisk
   end
 
+  BigbluebuttonRecording.class_eval do
+
+    # Search recordings based on a list of words
+    scope :search_by_terms, -> (words) {
+      query = joins(:room).includes(:room)
+
+      words ||= []
+      words = [words] unless words.is_a?(Array)
+      query_strs = []
+      query_params = []
+
+      words.each do |word|
+        str  = "bigbluebutton_recordings.name LIKE ? OR bigbluebutton_recordings.description LIKE ?"
+        str += " OR bigbluebutton_recordings.recordid LIKE ? OR bigbluebutton_rooms.name LIKE ?"
+        query_strs << str
+        query_params += ["%#{word}%", "%#{word}%"]
+        query_params += ["%#{word}%", "%#{word}%"]
+      end
+
+      query.where(query_strs.join(' OR '), *query_params.flatten)
+    }
+
+    # The default ordering for search methods
+    scope :search_order, -> {
+      order("bigbluebutton_recordings.start_time DESC")
+    }
+
+    # Filters a query to return only recordings that have at least one playback format
+    scope :has_playback, -> {
+      where(id: BigbluebuttonPlaybackFormat.select(:recording_id).distinct)
+    }
+
+    # Filters a query to return only recordings that have no playback format
+    scope :no_playback, -> {
+      where.not(id: BigbluebuttonPlaybackFormat.select(:recording_id).distinct)
+    }
+  end
 end
