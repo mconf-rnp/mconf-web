@@ -84,7 +84,7 @@ feature 'Behaviour of the flag Site#local_auth_enabled' do
         it { page.should have_content(t('devise.shared.links.lost_password')) }
         it { page.should have_css("input[type='submit'][value='Login']") }
 
-        it "hide 'login' link from navbar if ldap is not enabled" do
+        skip "hide 'login' link from navbar if ldap is not enabled" do # not for RNP
           page.should_not have_css("#navbar a[href='#{login_path}']")
         end
       end

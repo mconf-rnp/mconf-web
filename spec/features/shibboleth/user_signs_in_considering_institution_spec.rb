@@ -17,11 +17,10 @@ feature 'User signs in via shibboleth' do
       setup_shib @attrs[:_full_name], @attrs[:email], @attrs[:email]
     }
 
-    context 'on site frontpage' do
-      before { visit root_path }
+    context 'on the sign in page' do
+      before { visit login_path }
 
       it { should have_link '', :href => shibboleth_path }
-      it { should have_content t('sessions.login_form_area.member.shibboleth.click_here') }
     end
 
     context 'and valid shib data' do
@@ -98,8 +97,8 @@ feature 'User signs in via shibboleth' do
           @new_name = 'Newly created and supersecret name'
           User.last.profile.update_attributes :full_name => @new_name
 
-          visit root_path
-          click_link t('sessions.login_form_area.member.shibboleth.click_here')
+          visit login_path
+          page.find(:css, "[href='#{shibboleth_path}']", match: :first).click
         }
 
         it { current_path.should eq(my_home_path) }

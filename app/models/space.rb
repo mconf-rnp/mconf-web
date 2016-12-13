@@ -115,8 +115,6 @@ class Space < ActiveRecord::Base
   # Search spaces based on a list of words
   # TODO: can_manage is never used, should hide private spaces
   scope :search_by_terms, -> (words, can_manage=false) {
-    query = Space.with_disabled
-
     words ||= []
     words = [words] unless words.is_a?(Array)
     query_strs = []
@@ -128,7 +126,7 @@ class Space < ActiveRecord::Base
       query_params += ["%#{word}%", "%#{word}%"]
     end
 
-    query.where(query_strs.join(' OR '), *query_params.flatten)
+    Space.where(query_strs.join(' OR '), *query_params.flatten)
   }
 
   # The default ordering for search methods

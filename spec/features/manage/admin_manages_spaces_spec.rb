@@ -13,14 +13,15 @@ describe 'Admin manages spaces' do
   context 'with require registration approval disabled' do
 
     let(:admin) { User.first } # admin is already created
+    let(:institution) { FactoryGirl.create(:institution) }
     before {
       Site.current.update_attributes(require_registration_approval: true)
 
       login_as(admin, :scope => :user)
-      @approved_space = FactoryGirl.create(:space, :name => 'Approved', :approved => true, :description => "This space is approved")
-      @not_approved_space = FactoryGirl.create(:space, :name => 'Not Approved', :approved => false, :description => "This space is not approved")
-      @enabled_space = FactoryGirl.create(:space, :name => 'Enabled', :disabled => false, :description => "This space is enabled")
-      @disabled_space =FactoryGirl.create(:space, :name => 'Disabled', :disabled => true, :description => "This space is disabled")
+      @approved_space = FactoryGirl.create(:space, :name => 'Approved', :approved => true, :description => "This space is approved", :institution => institution)
+      @not_approved_space = FactoryGirl.create(:space, :name => 'Not Approved', :approved => false, :description => "This space is not approved", :institution => institution)
+      @enabled_space = FactoryGirl.create(:space, :name => 'Enabled', :disabled => false, :description => "This space is enabled", :institution => institution)
+      @disabled_space =FactoryGirl.create(:space, :name => 'Disabled', :disabled => true, :description => "This space is disabled", :institution => institution)
       @not_approved_space.disapprove!
     }
 
@@ -107,6 +108,7 @@ describe 'Admin manages spaces' do
     context 'with require registration approval enabled' do
       before {
         Site.current.update_attributes(:require_space_approval => true)
+        institution.update_attributes(require_space_approval: true)
         visit manage_spaces_path
       }
 
