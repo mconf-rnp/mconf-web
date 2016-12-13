@@ -317,7 +317,7 @@ describe 'User signs in via shibboleth' do
 
     context "when he was in the frontpage" do
       before {
-        visit root_url
+        visit login_url
         login_link.click
       }
 
@@ -406,4 +406,3 @@ describe 'User signs in via shibboleth' do
 
   end
 end
- 

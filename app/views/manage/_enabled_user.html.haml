@@ -12,8 +12,8 @@
       = link_to confirm_user_path(user), :data => { :confirm => t('.confirm_confirm') },  :method => :post do
         = icon_confirm_user(:alt => t('.confirm'), :title => t('.confirm'))
 
-    - unless user.superuser  # prevent admins from disabling and unapproving themselves
-      - if current_site.require_registration_approval? && can?(:approve, user)
+    - unless user.superuser  # prevent admins from disabling and disapproving themselves
+      - if (user.require_approval? || !user.approved?) && can?(:approve, user)
         = approval_links :user, user
 
       - if can?(:disable, user)
@@ -34,3 +34,13 @@
       %span.institution-name
         = icon_institution
         = link_to user.institution.full_name, users_institution_path(user.institution)
+
+    .current-sign-in
+      = t('.last_sign_in')
+      - if user.current_sign_in_at
+        %span.tooltipped{ title: user.current_sign_in_at }= "#{format_date(user.current_sign_in_at, :long) }"
+        = " #{t('.auth_using')} #{user_last_sign_in_method(user).to_s}"
+      - else
+        %span.tooltipped{ title: t('.never_sign_in') }= "?"
+      - methods = user_sign_in_methods(user).join(", ")
+      = "(#{t('.available_auth')}: #{methods})"

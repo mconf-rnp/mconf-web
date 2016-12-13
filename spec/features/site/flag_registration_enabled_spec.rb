@@ -13,7 +13,7 @@ feature 'Behaviour of the flag Site#registration_enabled' do
   context "when the flag is set" do
     before { Site.current.update_attributes(registration_enabled: true) }
 
-    context "shows links on the login page" do
+    skip "shows links on the login page" do # not for RNP
       before { visit new_user_session_path }
 
       it { page.should have_content(t('devise.shared.links.register')) }
