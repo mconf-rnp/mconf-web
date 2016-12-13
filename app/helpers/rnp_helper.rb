@@ -8,7 +8,8 @@
 module RnpHelper
 
   def requirements_url
-    "https://wiki.rnp.br/pages/viewpage.action?pageId=89112372#ManualdoUsuáriodoserviçodeconferênciaweb-Requisitosdeuso"
+    # "https://wiki.rnp.br/pages/viewpage.action?pageId=89112372#ManualdoUsuáriodoserviçodeconferênciaweb-Requisitosdeuso"
+    check_bigbluebutton_server_url(BigbluebuttonServer.default)
   end
 
   def service_page_url
