@@ -93,6 +93,9 @@ en:
         password: "Access key"
         start: "Start"
         subject: "Subject"
+        quality_warn: "To ensure a good quality of experience it is indispensable to use a headset and to use the browsers Google Chrome or Mozilla Firefox to participate in the web conference. Do not use your notebook's built in microphone and webcam and don't use the browser Internet Explorer."
+        user_manual: "The user manual and system requirements for using the service are available in the link https://wiki.rnp.br/x/oW5jBQ."
+        rnp_contact: "In case of doubt or problems contact RNP's Service Desk at the phone number 0800 722 0216, whatsapp (61) 9 9960 5971 or email sd@rnp.br."
       subject: "Web conference invitation"
   shared:
     invitation_email:

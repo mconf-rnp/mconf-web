@@ -94,6 +94,9 @@ pt-br:
         dial_number: "Número para discagem"
         start: "Início"
         subject: "Assunto"
+        quality_warn: "Para garantir a qualidade da experiência é imprescindivel o uso de um headset para participar de uma conferência web e usar o navegador Google Chrome ou Mozilla Firefox. Não utilize o microfone embutido dos notebooks e câmeras web e nem o navegador Internet Explorer."
+        user_manual: "O manual do usuário e os requisitos para usar o serviço estão disponíveis no link https://wiki.rnp.br/x/oW5jBQ."
+        rnp_contact: "Qualquer dúvida ou problema entre em contato com o Service Desk da RNP através do telefone 0800 722 0216, pelo whatsapp (61) 9 9960 5971 ou pelo e-mail sd@rnp.br."
       subject: "Convite para webconferência"
   shared:
     invitation_email:
