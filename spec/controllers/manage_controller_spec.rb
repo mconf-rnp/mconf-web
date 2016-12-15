@@ -845,6 +845,7 @@ describe ManageController do
       before(:each) { login_as(user) }
       it { should allow_access_to(:users) }
       it { should allow_access_to(:spaces) }
+      it { should allow_access_to(:recordings) }
     end
 
     context "for a normal user", :user => "normal" do
@@ -852,11 +853,13 @@ describe ManageController do
       before(:each) { login_as(user) }
       it { should_not allow_access_to(:users) }
       it { should_not allow_access_to(:spaces) }
+      it { should_not allow_access_to(:recordings) }
     end
 
     context "for an anonymous user", :user => "anonymous" do
       it { should_not allow_access_to(:users) }
       it { should_not allow_access_to(:spaces) }
+      it { should_not allow_access_to(:recordings) }
     end
   end
 
@@ -1040,6 +1043,109 @@ describe ManageController do
 
           it { assigns(:recordings).count.should be(3) }
           it { assigns(:recordings).should include(recordings[0], recordings[3], recordings[4]) }
+        end
+      end
+
+      context "if xhr request" do
+        before(:each) { xhr :get, :recordings }
+        it { should render_template('manage/_recordings_list') }
+        it { should_not render_with_layout }
+      end
+
+      context "not xhr request" do
+        before(:each) { get :recordings }
+        it { should render_template(:recordings) }
+        it { should render_with_layout('no_sidebar') }
+      end
+    end
+
+    describe "if the current user is an institution admin" do
+      let(:institution) { FactoryGirl.create(:institution) }
+      let(:institution_other) { FactoryGirl.create(:institution) }
+      let(:room) { FactoryGirl.create(:bigbluebutton_room) }
+      let(:room_other) { FactoryGirl.create(:bigbluebutton_room) }
+      let(:space) {FactoryGirl.create(:space, :institution => institution, :bigbluebutton_room => room) }
+      let(:space_other) {FactoryGirl.create(:space, :institution => institution_other, :bigbluebutton_room => room_other) }
+      let(:user) { FactoryGirl.create(:user, :institution => institution) }
+      let(:user_other) { FactoryGirl.create(:user, :institution => institution_other) }
+      before { institution.add_member!(user, 'Admin') }
+      before(:each) { sign_in(user) }
+
+      it {
+        get :recordings
+        should respond_with(:success)
+      }
+
+      context "sets @recordings to a list of all recordings, including not available recordings but not the ones in other institution" do
+        before {
+          @s1 = FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room)
+          @s2 = FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room)
+          @s3 = FactoryGirl.create(:bigbluebutton_recording, :room => user_other.bigbluebutton_room)
+          @s4 = FactoryGirl.create(:bigbluebutton_recording, :room => space_other.bigbluebutton_room)
+        }
+        before(:each) { get :recordings }
+        it { assigns(:recordings).count.should be(2) }
+        it { assigns(:recordings).should include(@s1) }
+        it { assigns(:recordings).should include(@s2) }
+      end
+
+      context "orders @recordings by start_time" do
+        before {
+          @s1 = FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room, start_time: DateTime.now - 3.days)
+          @s2 = FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room, start_time: DateTime.now - 2.days)
+          @s3 = FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room, start_time: DateTime.now)
+          @s4 = FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room, start_time: DateTime.now - 1.days)
+        }
+        before(:each) { get :recordings }
+        it { assigns(:recordings).count.should be(4) }
+        it { assigns(:recordings)[0].should eql(@s3) }
+        it { assigns(:recordings)[1].should eql(@s4) }
+        it { assigns(:recordings)[2].should eql(@s2) }
+        it { assigns(:recordings)[3].should eql(@s1) }
+      end
+
+      context "paginates the list of recordings" do
+        before {
+          45.times { FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room) }
+        }
+
+        context "if no page is passed in params" do
+          before(:each) { get :recordings }
+          it { assigns(:recordings).size.should be(20) }
+          it { controller.params[:page].should be_nil }
+        end
+
+        context "if a page is passed in params" do
+          before(:each) { get :recordings, :page => 2 }
+          it { assigns(:recordings).size.should be(20) }
+          it("includes the correct recordings in @recordings") {
+            page = BigbluebuttonRecording.order('start_time DESC').paginate(page: 2, per_page: 20)
+            page.each do |recording|
+              assigns(:recordings).should include(recording)
+            end
+          }
+          it { controller.params[:page].should eql("2") }
+        end
+      end
+
+      context "use params[:q] to filter the results" do
+        let!(:recordings) {[
+          FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room, name: 'published_rec'),
+          FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room, name: 'unpublished_rec'),
+          FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room, name: 'unavailable_rec'),
+          FactoryGirl.create(:bigbluebutton_recording, :room => user.bigbluebutton_room, name: 'no_playback_rec'),
+          FactoryGirl.create(:bigbluebutton_recording, :room => user_other.bigbluebutton_room, name: 'the_ed_rec')
+        ]}
+
+        before {
+          get :recordings, params
+        }
+
+        context "by name" do
+          let(:params) { {q: 'ed_rec'} }
+
+          it { assigns(:recordings).count.should be(2) }
+          it { assigns(:recordings).should include(recordings[0], recordings[1]) }
         end
       end
 

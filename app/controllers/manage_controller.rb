@@ -95,7 +95,17 @@ class ManageController < ApplicationController
 
   def recordings
     words = params[:q].try(:split, /\s+/)
-    query = BigbluebuttonRecording.search_by_terms(words).search_order
+
+    query = if current_user.superuser?
+              BigbluebuttonRecording.search_by_terms(words)
+            else
+              # institutional admins search only inside their institution
+              # can pass "true" to get private data since it's only for users
+              # that belong to the institution
+              current_user.institution.recordings.search_by_terms(words)
+            end
+
+    query = query.search_order
 
     [:published, :available].each do |filter|
       if !params[filter].nil?

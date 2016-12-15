@@ -32,8 +32,8 @@ module Abilities
         user.institution.present? && !user.institution.full?
       end
 
-      # Institutional admins can access the manage lists of spaces and users in their institution
-      can [:users, :spaces], :manage do
+      # Institutional admins can access the manage lists of recordings, spaces and users in their institution
+      can [:users, :spaces, BigbluebuttonRecording, :recordings], :manage do
         !user.institution.nil? && user.institution.admins.include?(user)
       end
 
@@ -46,6 +46,13 @@ module Abilities
       # Institutional admins can edit their institution's users
       can [:show, :edit, :update], Profile do |profile|
         !profile.user.institution.nil? && profile.user.institution.admins.include?(user)
+      end
+
+      # Institutional admins can edit their institution's recordings
+      can [:show, :edit, :update, :manage], BigbluebuttonRecording do |recording|
+        if recording.room.present? && recording.room.owner.present?
+          !recording.room.owner.institution.nil? && recording.room.owner.institution.admins.include?(user)
+        end
       end
 
       # Can create no matter if the site has creation disabled
