@@ -386,5 +386,126 @@ describe CustomBigbluebuttonRecordingsController do
         it { should_not allow_access_to(:play, hash) }
       end
     end
+
+    context "for an institutional admin", :user => "institutionalAdmin" do
+      let(:institution) { FactoryGirl.create(:institution) }
+      let(:institution_other) { FactoryGirl.create(:institution) }
+      let(:room) { FactoryGirl.create(:bigbluebutton_room) }
+      let(:room_other) { FactoryGirl.create(:bigbluebutton_room) }
+      let(:user) { FactoryGirl.create(:user, :institution => institution) }
+      before { institution.add_member!(user, 'Admin') }
+      let(:hash_with_server) { { :server_id => recording.server.id } }
+      let(:hash) { hash_with_server.merge!(:id => recording.to_param) }
+      before(:each) { login_as(user) }
+
+      it { should allow_access_to(:index) }
+
+      # the permissions are always the same, doesn't matter the type of recording, so
+      # we have them all in this common method
+      shared_examples_for "a superuser accessing any webconf recording" do
+        it { should allow_access_to(:show, hash) }
+        it { should allow_access_to(:edit, hash) }
+        it { should allow_access_to(:update, hash).via(:put) }
+        it { should allow_access_to(:destroy, hash).via(:delete) }
+        it { should allow_access_to(:play, hash) }
+        it { should allow_access_to(:publish, hash).via(:post) }
+        it { should allow_access_to(:unpublish, hash).via(:post) }
+      end
+
+      shared_examples_for "a normal user accessing any webconf recording" do
+        it { should_not allow_access_to(:destroy, hash).via(:delete) }
+        it { should_not allow_access_to(:publish, hash).via(:post) }
+        it { should_not allow_access_to(:unpublish, hash).via(:post) }
+      end
+
+      context "in a recording of his room" do
+        let(:recording) {
+          room = user.bigbluebutton_room
+          FactoryGirl.create(:bigbluebutton_recording, :room => room)
+        }
+        it_should_behave_like "a superuser accessing any webconf recording"
+      end
+
+      context "in a recording of another user's room" do
+        let(:recording) {
+          FactoryGirl.create(:bigbluebutton_recording, :room => room_other)
+        }
+        it_should_behave_like "a normal user accessing any webconf recording"
+        it { should_not allow_access_to(:show, hash) }
+        it { should_not allow_access_to(:play, hash) }
+      end
+
+      context "in a recording of a public space not from his institution" do
+        let(:space) { FactoryGirl.create(:space, :institution => institution_other, :bigbluebutton_room => room_other, :public => true) }
+        let(:recording) {
+          FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room)
+        }
+
+        context "he is a member of" do
+          before { space.add_member!(user) }
+          it_should_behave_like "a normal user accessing any webconf recording"
+          it { should_not allow_access_to(:show, hash) }
+          it { should allow_access_to(:play, hash) }
+        end
+
+        context "he is not a member of" do
+          it_should_behave_like "a normal user accessing any webconf recording"
+          it { should_not allow_access_to(:show, hash) }
+          it { should allow_access_to(:play, hash) }
+        end
+      end
+
+      context "in a recording of a private space not from his institution" do
+        let(:space) { FactoryGirl.create(:space, :institution => institution_other, :bigbluebutton_room => room_other, :public => false) }
+        let(:recording) {
+          FactoryGirl.create(:bigbluebutton_recording, :room => room)
+        }
+
+        context "he is a member of" do
+          before { space.add_member!(user) }
+          it_should_behave_like "a normal user accessing any webconf recording"
+          it { should_not allow_access_to(:show, hash) }
+          it { should_not allow_access_to(:play, hash) }  
+        end
+
+        context "he is not a member of" do
+          it_should_behave_like "a normal user accessing any webconf recording"
+          it { should_not allow_access_to(:show, hash) }
+          it { should_not allow_access_to(:play, hash) }
+        end
+      end
+
+      context "in a recording of a public space from his institution" do
+        let(:space) { FactoryGirl.create(:space, :institution => institution, :bigbluebutton_room => room, :public => true) }
+        let(:recording) {
+          FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room)
+        }
+
+        context "he is a member of" do
+          before { space.add_member!(user) }
+          it_should_behave_like "a superuser accessing any webconf recording"
+        end
+
+        context "he is not a member of" do
+          it_should_behave_like "a superuser accessing any webconf recording"
+        end
+      end
+
+      context "in a recording of a private space from his institution" do
+        let(:space) { FactoryGirl.create(:space, :institution => institution, :bigbluebutton_room => room, :public => false) }
+        let(:recording) {
+          FactoryGirl.create(:bigbluebutton_recording, :room => space.bigbluebutton_room)
+        }
+
+        context "he is a member of" do
+          before { space.add_member!(user) }
+          it_should_behave_like "a superuser accessing any webconf recording"
+        end
+
+        context "he is not a member of" do
+          it_should_behave_like "a superuser accessing any webconf recording"
+        end
+      end
+    end
   end
 end
