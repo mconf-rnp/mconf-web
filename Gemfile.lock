@@ -624,3 +624,6 @@ DEPENDENCIES
   yui-compressor
   zip-zip
   zonebie
+
+BUNDLED WITH
+   1.13.1
