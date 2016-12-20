@@ -67,6 +67,10 @@ body.spaces.edit {
     }
   }
 
+  #space_tag_list {
+    display: none;
+  }
+
   .space_institution_id {
     #space_institution_id, .select2-container {
       width: 100%;

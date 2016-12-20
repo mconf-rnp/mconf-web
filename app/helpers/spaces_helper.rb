@@ -94,4 +94,13 @@ module SpacesHelper
       options
   end
 
+  def link_for_tag(options)
+    options.delete(:id) if options.has_key?(:id)
+    if current_page?(manage_spaces_path) && can?(:manage, Space)
+      manage_spaces_path(options)
+    else
+      spaces_path(options)
+    end
+  end
+
 end

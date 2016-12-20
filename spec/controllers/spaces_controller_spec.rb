@@ -350,7 +350,7 @@ describe SpacesController do
 
       let(:space_allowed_params) {
         [ :name, :description, :logo_image, :public, :permalink, :disabled,
-          :repository, :crop_x, :crop_y, :crop_w, :crop_h, :crop_img_w, :crop_img_h,
+          :repository, :crop_x, :crop_y, :crop_w, :crop_h, :crop_img_w, :crop_img_h, :tag_list,
           :institution_id,
           :bigbluebutton_room_attributes =>
             [ :id, :attendee_key, :moderator_key, :default_layout, :private, :welcome_msg ]
@@ -412,6 +412,26 @@ describe SpacesController do
 
       it { RecentActivity.last.key.should eq('space.update') }
       it { RecentActivity.last.parameters[:changed_attributes].should eq(['logo_image']) }
+    end
+
+    context "adding tags" do
+      let(:space_params) { {:tag_list => "one tag, two tags, three tags"} }
+      before(:each) {
+        space.update_attributes(:tag_list => ["one tag", "two tags"])
+        put :update, :id => space.to_param, :space => space_params
+      }
+
+      it { space.reload.tag_list.size.should eql(3) }
+    end
+
+    context "removing tags" do
+      let(:space_params) { {:tag_list => "one tag"} }
+      before(:each) {
+        space.update_attributes(:tag_list => ["one tag", "two tags"])
+        put :update, :id => space.to_param, :space => space_params
+      }
+
+      it { space.reload.tag_list.size.should eql(1) }
     end
   end
 
@@ -829,4 +849,19 @@ describe SpacesController do
     it "should paginate user permission (10 per page)"
 
   end
+
+  context "use params[:q] to filter the results" do
+    context "by name" do
+      before {
+        @s1 = FactoryGirl.create(:space, :name => 'First')
+        @s2 = FactoryGirl.create(:space, :name => 'Second')
+        @s3 = FactoryGirl.create(:space, :name => 'Secondary')
+      }
+      before(:each) { get :index, :q => 'sec' }
+      it { assigns(:spaces).count.should be(2) }
+      it { assigns(:spaces).should include(@s2) }
+      it { assigns(:spaces).should include(@s3) }
+    end
+  end
+
 end
