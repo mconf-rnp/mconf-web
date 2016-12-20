@@ -49,7 +49,10 @@
         = Mconf::Highlighter.highlight(recording.recordid, params[:q].try(:split))
     %div
       = t('.room_name') + ": "
-      = link_to bigbluebutton_room_path(recording.room), :class => 'recording-metadata' do
+      - if can?(:show, recording.room)
+        = link_to bigbluebutton_room_path(recording.room), :class => 'recording-metadata' do
+          = Mconf::Highlighter.highlight(recording.room.name, params[:q].try(:split))
+      - else
         = Mconf::Highlighter.highlight(recording.room.name, params[:q].try(:split))
     - if recording.room.owner.present?
       %div

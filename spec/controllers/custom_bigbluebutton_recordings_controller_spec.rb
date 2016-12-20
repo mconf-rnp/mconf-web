@@ -465,7 +465,7 @@ describe CustomBigbluebuttonRecordingsController do
           before { space.add_member!(user) }
           it_should_behave_like "a normal user accessing any webconf recording"
           it { should_not allow_access_to(:show, hash) }
-          it { should_not allow_access_to(:play, hash) }  
+          it { should_not allow_access_to(:play, hash) }
         end
 
         context "he is not a member of" do
