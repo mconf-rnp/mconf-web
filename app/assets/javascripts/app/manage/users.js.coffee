@@ -2,6 +2,9 @@
 
 $ ->
   if isOnPage 'manage', 'users'
+    url = new URL(window.location)
+    params = mconf.Base.parseQueryString(url.search)
+
     mconf.Resources.addToBind ->
       mconf.Users.New.bind()
 
@@ -48,7 +51,7 @@ $ ->
 
           results: data
 
-    institutions = mconf.Base.getUrlParts(String(window.location)).institutions
+    institutions = params.institutions
     if institutions? and $('#institutions').val() != institutions
       $('#institutions').select2('val', institutions.split(','))
 
@@ -56,13 +59,13 @@ $ ->
       input = $(this)
       baseUrl = $('input.resource-filter').data('load-url')
 
-      params = mconf.Base.getUrlParts(String(window.location))
       if input.val().length > 0
         params.institutions = input.val()
       else
         delete params['institutions']
 
-      history.pushState(params, '', baseUrl + mconf.Base.urlFromParts(params))
+      url.search = mconf.Base.makeQueryString(params)
+      history.pushState(params, '', url.toString())
       $('input.resource-filter').trigger('update-resources')
 
     $('input.resource-filter-field').each ->
