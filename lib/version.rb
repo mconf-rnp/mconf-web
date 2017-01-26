@@ -5,7 +5,7 @@
 # 3 or later. See the LICENSE file.
 
 module Mconf
-  VERSION = "2.2.0-rnp1".freeze
+  VERSION = "2.2.0-rnp2".freeze
 
   # get the current revision from git
   @@revision = nil
