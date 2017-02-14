@@ -60,9 +60,10 @@ module FeatureHelpers
 
   def sign_in_with(user_email, password, visit_page=true)
     visit(new_user_session_path) if visit_page
-    fill_in 'user[login]', with: user_email
-    fill_in 'user[password]', with: password
-    page.find('.local-sign-in-area input[type=submit]').click
+    form = "form[action='#{user_session_path}']"
+    page.find(:css, "#user_login").set(user_email)
+    page.find(:css, "#user_password").set(password)
+    page.find(:css, "form[action='#{user_session_path}'] input[type=submit]").click
   end
 
   def register_with(attrs)

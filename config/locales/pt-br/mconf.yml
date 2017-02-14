@@ -567,6 +567,9 @@ pt-br:
     edit:
       editing_server: "Editando o servidor '%{server}'"
     index:
+      default_server: "Servidor padrão"
+      institution_servers: "Servidores de instituições"
+      institution_servers_tip: "Estes servidores são gerenciados automaticamente quando uma instituição é criada, atualizada ou removida. A URL deles será sempre igual a do servidor padrão. Não os modifique a não ser que você realmente saiba o que está fazendo."
       list_of_servers: "Lista de todos os servidores registrados"
       table:
         links: "Links"

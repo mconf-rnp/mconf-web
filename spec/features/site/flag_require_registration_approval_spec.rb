@@ -44,7 +44,7 @@ feature 'Behaviour of the flag Site#require_registration_approval' do
         it { current_path.should eq(my_approval_pending_path) }
         it { page.should have_link('', :href => spaces_path) }
         it { page.should_not have_link('', :href => events_path) }
-        it { page.should have_content('Sign in') }
+        it { page.should have_content('Login') }
         it { page.should have_content('Pending approval') }
         it { page.should have_content(I18n.t("my.approval_pending.description")) }
       end
@@ -92,7 +92,7 @@ feature 'Behaviour of the flag Site#require_registration_approval' do
 
       context "shows the pending approval page" do
         it { current_path.should eq(my_approval_pending_path) }
-        it { page.should have_content('Sign in') }
+        it { page.should have_content('Login') }
         it { page.should have_content('Pending approval') }
         it { page.should have_content(I18n.t("my.approval_pending.description")) }
       end

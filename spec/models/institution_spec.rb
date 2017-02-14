@@ -101,6 +101,197 @@ describe Institution do
 
   it ".find_or_create_by_name_or_acronym"
 
+  describe "after_create: create server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let(:attrs) { FactoryGirl.attributes_for(:institution, secret: secret) }
+
+    it "creates a server with the institution's secret" do
+      expect {
+        Institution.create(attrs)
+      }.to change{ BigbluebuttonServer.count }.by(1)
+
+      server = BigbluebuttonServer.last
+      server.url.should eql(BigbluebuttonServer.default.url)
+      server.secret.should eql(secret)
+      server.name.should eql(attrs[:name])
+    end
+
+    context "doesn't create a new server if" do
+      it "there is already a server with the target secret" do
+        FactoryGirl.create(:bigbluebutton_server, secret: secret)
+        expect { Institution.create(attrs) }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has no secret" do
+        expect {
+          inst = Institution.new(attrs)
+          inst.secret = nil
+          inst.save
+        }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has an empty secret" do
+        attrs[:secret] = "  "
+        expect { Institution.create(attrs) }.not_to change{ BigbluebuttonServer.count }
+      end
+    end
+  end
+
+  describe "after_update: update server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let(:secret2) { SecureRandom.hex(16) }
+    let!(:target) { FactoryGirl.create(:institution, secret: secret) }
+
+    it "doesn't do anything if the secret didn't change" do
+      previous = BigbluebuttonServer.find_by(secret: secret)
+      previous.should_not be_nil
+      target.update_attributes(name: target.name + "-2")
+      actual = BigbluebuttonServer.find_by(secret: secret)
+      actual.should_not be_nil
+      actual.id.should eql(previous.id)
+    end
+
+    it "destroys the previous server and creates the new one" do
+      previous = BigbluebuttonServer.find_by(secret: secret)
+      previous.should_not be_nil
+      target.update_attributes(secret: secret2)
+      BigbluebuttonServer.find_by(secret: secret).should be_nil
+      actual = BigbluebuttonServer.find_by(secret: secret2)
+      actual.should_not be_nil
+      actual.id.should_not eql(previous.id)
+    end
+  end
+
+  describe "after_destroy: destroy server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let!(:target) { FactoryGirl.create(:institution, secret: secret) }
+
+    it "removes the server with the institution's secret" do
+      expect { target.destroy }.to change{ BigbluebuttonServer.count }.by(-1)
+      BigbluebuttonServer.where(secret: secret).count.should be(0)
+    end
+
+    context "doesn't remove the server if" do
+      it "the institution has no secret" do
+        target.update_attributes(secret: nil)
+        expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has an empty secret" do
+        target.update_attributes(secret: "  ")
+        expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "another institution has the same secret" do
+        FactoryGirl.create(:institution, secret: secret)
+        expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the server found is the default" do
+        BigbluebuttonServer.default.update_attributes(secret: secret)
+        expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
+      end
+    end
+  end
+
+  describe "#server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let!(:server) { FactoryGirl.create(:bigbluebutton_server, secret: secret) }
+    let!(:target) { FactoryGirl.create(:institution, secret: secret) }
+
+    context "returns the server that matches the institution's secret" do
+      it { target.server.should eql(server) }
+    end
+
+    context "returns the default server if" do
+      context "no server matches the institution's secret" do
+        before { BigbluebuttonServer.where(secret: secret).delete_all }
+        it { target.server.should eql(BigbluebuttonServer.default) }
+      end
+
+      context "the institution has no secret" do
+        before { target.update_attributes(secret: nil) }
+        it { target.server.should eql(BigbluebuttonServer.default) }
+      end
+
+      context "the institution has an empty secret" do
+        before { target.update_attribute(:secret, "  ") }
+        it { target.server.should eql(BigbluebuttonServer.default) }
+      end
+    end
+
+    context "uses the secret passed as argument" do
+      let(:secret2) { SecureRandom.hex(16) }
+      let!(:server2) { FactoryGirl.create(:bigbluebutton_server, secret: secret2) }
+      it { target.server(secret2).should eql(server2) }
+    end
+  end
+
+  describe "#create_server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let!(:target) { FactoryGirl.create(:institution, secret: secret) }
+    before { BigbluebuttonServer.where(secret: secret).delete_all }
+
+    it "creates a server with the institution's secret" do
+      expect { target.create_server }.to change{ BigbluebuttonServer.count }.by(1)
+      server = BigbluebuttonServer.last
+      server.url.should eql(BigbluebuttonServer.default.url)
+      server.secret.should eql(secret)
+      server.name.should eql(target.name)
+    end
+
+    context "doesn't create a new server if" do
+      it "there is already a server with the target secret" do
+        FactoryGirl.create(:bigbluebutton_server, secret: secret)
+        expect { target.create_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has no secret" do
+        target.update_attributes(secret: nil)
+        expect { target.create_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has an empty secret" do
+        target.update_attributes(secret: "  ")
+        expect { target.create_server }.not_to change{ BigbluebuttonServer.count }
+      end
+    end
+  end
+
+  describe "#destroy_server" do
+    let(:secret) { SecureRandom.hex(16) }
+    let!(:target) { FactoryGirl.create(:institution, secret: secret) }
+
+    it "removes the server with the institution's secret" do
+      expect { target.destroy_server }.to change{ BigbluebuttonServer.count }.by(-1)
+      BigbluebuttonServer.where(secret: secret).count.should be(0)
+    end
+
+    context "doesn't remove the server if" do
+      it "the institution has no secret" do
+        target.update_attributes(secret: nil)
+        expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the institution has an empty secret" do
+        target.update_attributes(secret: "  ")
+        expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "another institution has the same secret" do
+        FactoryGirl.create(:institution, secret: secret)
+        expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the server found is the default" do
+        BigbluebuttonServer.default.update_attributes(secret: secret)
+        expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
+      end
+    end
+
+    it "uses the secret passed as argument"
+  end
+
   it "#approved_users"
 
   describe "#full?" do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161031151727) do
+ActiveRecord::Schema.define(version: 20170210192526) do
 
   create_table "activities", force: true do |t|
     t.integer  "trackable_id"
@@ -224,9 +224,9 @@ ActiveRecord::Schema.define(version: 20161031151727) do
     t.string   "url"
     t.datetime "starts_on"
     t.datetime "ends_on"
-    t.boolean  "ready",           default: false
-    t.boolean  "sent",            default: false
-    t.boolean  "result",          default: false
+    t.boolean  "ready",            default: false
+    t.boolean  "sent",             default: false
+    t.boolean  "result",           default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "invitation_group"

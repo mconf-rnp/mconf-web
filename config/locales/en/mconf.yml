@@ -563,6 +563,9 @@ en:
     edit:
       editing_server: "Editing server '%{server}'"
     index:
+      default_server: "Default server"
+      institution_servers: "Institution servers"
+      institution_servers_tip: "These servers are automatically managed when institutions are created, updated or removed. Their URL will always be the URL of the default server. Don't change them unless you really know what you're doing."
       list_of_servers: "List of all registered servers"
       table:
         links: "Links"

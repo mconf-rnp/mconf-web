@@ -6,6 +6,7 @@ body.custom_bigbluebutton_servers.index {
   table.server-table {
     text-align: left;
     width: 100%;
+    margin-bottom: 50px;
 
     th:last-child {
       text-align: right;
@@ -24,7 +25,6 @@ body.custom_bigbluebutton_servers.index {
         float: right;
       }
     }
-
   }
 
 }
