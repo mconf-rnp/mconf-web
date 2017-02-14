@@ -42,7 +42,8 @@ class ManageController < ApplicationController
     end
 
     # ignore this filter for institution admins
-    if params[:institutions].present? && !current_user.institution_admin?
+    # here we add the superuser? check to avoid institutional admins to use this filter unless they are also global admin
+    if params[:institutions].present? && current_user.superuser?
       permalinks = params[:institutions].split(',')
       ids = Institution.where(permalink: permalinks).ids
       users = Permission.where(subject_type: 'Institution', subject_id: ids).pluck(:user_id)
