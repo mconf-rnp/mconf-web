@@ -275,6 +275,16 @@ describe ManageController do
             let(:params) { {institutions: 'inexistent-institution,inexistent-institutions2'} }
             it { assigns(:users).count.should be(0) }
           end
+
+          context "filters by institution even when admin is also institution admin" do
+            before { institution.add_member!(user, 'Admin') }
+            before { sign_in user }
+            let(:institutions_array) { [institution, institution2] }
+            let(:params) { {institutions: institutions} }
+
+            it { assigns(:users).count.should be(1) }
+            it { assigns(:users).should include(users[0]) }
+          end
         end
 
         context "mixed params" do
@@ -493,6 +503,13 @@ describe ManageController do
 
           it { assigns(:users).count.should be(2) }
           it { assigns(:users).should include(users[0], users[4]) }
+        end
+
+        context "fails to filter by institution" do
+          let(:params) { {institutions: "another institution"} }
+
+          it { assigns(:users).count.should be(5) }
+          it { assigns(:users).should include(users[0], users[1], users[3], users[4], users[5]) }
         end
       end
 
