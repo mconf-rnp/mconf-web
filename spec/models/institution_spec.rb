@@ -187,6 +187,11 @@ describe Institution do
         expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
       end
 
+      it "the server has recordings" do
+        FactoryGirl.create(:bigbluebutton_recording, server: target.server)
+        expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
+      end
+
       it "the server found is the default" do
         BigbluebuttonServer.default.update_attributes(secret: secret)
         expect { target.destroy }.not_to change{ BigbluebuttonServer.count }
@@ -280,6 +285,11 @@ describe Institution do
 
       it "another institution has the same secret" do
         FactoryGirl.create(:institution, secret: secret)
+        expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
+      end
+
+      it "the server has recordings" do
+        FactoryGirl.create(:bigbluebutton_recording, server: target.server)
         expect { target.destroy_server }.not_to change{ BigbluebuttonServer.count }
       end
 

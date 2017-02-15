@@ -66,9 +66,11 @@ class Institution < ActiveRecord::Base
     secret ||= self.secret
     unless secret.blank?
 
-      # don't destroy if another institution is using the server
-      unless Institution.where(secret: secret).where.not(id: self.id).count > 0
-        selected_server = self.server(secret)
+      # don't destroy if another institution is using the server or if the
+      # server has recordings
+      selected_server = self.server(secret)
+      unless Institution.where(secret: secret).where.not(id: self.id).count > 0 ||
+             selected_server.recordings.count > 0
         selected_server.destroy unless selected_server == BigbluebuttonServer.default
       end
     end
