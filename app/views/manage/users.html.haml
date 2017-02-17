@@ -9,7 +9,7 @@
       = text_field_tag :users_filter_text, params[:q], placeholder: t('.filter_name_or_username'), 'data-load-url' =>  manage_users_path, :'data-target' => '#users-list', :'data-filter' => '#filter-total', class: 'resource-filter'
 
     .search-institution
-      - unless current_user.institution_admin?
+      - unless (current_user.institution_admin? && !current_user.superuser?)
         .institution-filter
           = text_field_tag :institutions, '', placeholder: t('.filter_institution'), class: 'string'
 

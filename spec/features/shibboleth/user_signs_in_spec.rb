@@ -317,7 +317,7 @@ describe 'User signs in via shibboleth' do
 
     context "when he was in the frontpage" do
       before {
-        visit login_url
+        visit login_path
         login_link.click
       }
 

@@ -142,7 +142,7 @@ describe ApplicationController do
         context "and the user is not the owner" do
           context "and the guest role is enabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(true)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(true)
               controller.stub(:current_user).and_return(FactoryGirl.create(:user))
             }
             before(:each) { get :index, :room_id => room.id }
@@ -151,7 +151,7 @@ describe ApplicationController do
 
           context "and the guest role is disabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(false)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(false)
               controller.stub(:current_user).and_return(FactoryGirl.create(:user))
             }
             before(:each) { get :index, :room_id => room.id }
@@ -162,7 +162,7 @@ describe ApplicationController do
         context "and there's no user logged" do
           context "and the guest role is enabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(true)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(true)
               controller.stub(:current_user).and_return(nil)
             }
             before(:each) { get :index, :room_id => room.id }
@@ -171,7 +171,7 @@ describe ApplicationController do
 
           context "and the guest role is disabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(false)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(false)
               controller.stub(:current_user).and_return(nil)
             }
             before(:each) { get :index, :room_id => room.id }
@@ -343,7 +343,7 @@ describe ApplicationController do
         context "and the user is not a member of the space" do
           context "and the guest role is enabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(true)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(true)
               controller.stub(:current_user).and_return(user)
             }
             before(:each) { get :index, :room_id => room.id }
@@ -352,7 +352,7 @@ describe ApplicationController do
 
           context "and the guest role is disabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(false)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(false)
               controller.stub(:current_user).and_return(user)
             }
             before(:each) { get :index, :room_id => room.id }
@@ -363,7 +363,7 @@ describe ApplicationController do
         context "and it's an anonymous user" do
           context "and the guest role is enabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(true)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(true)
               controller.stub(:current_user).and_return(nil)
             }
             before(:each) { get :index, :room_id => room.id }
@@ -372,7 +372,7 @@ describe ApplicationController do
 
           context "and the guest role is disabled" do
             before {
-              BigbluebuttonRoom.stub(:guest_support).and_return(false)
+              BigbluebuttonRails.configuration.stub(:guest_support).and_return(false)
               controller.stub(:current_user).and_return(nil)
             }
             before(:each) { get :index, :room_id => room.id }

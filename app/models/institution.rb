@@ -25,6 +25,57 @@ class Institution < ActiveRecord::Base
   after_initialize :init
   before_validation :validate_and_adjust_recordings_disk_quota
 
+  # Create and remove web conference servers dynamically when an institution is
+  # created, destroyed, or changed. This is how we allow institutions to have their
+  # own secret (and so their own web conference server).
+  after_create :create_server
+  after_destroy :destroy_server
+  after_update if: :secret_changed? do
+    destroy_server(self.secret_was)
+    create_server unless self.secret.blank?
+  end
+
+  # Returns the web conference server associated with this institution.
+  # Will always return a server, falling back to the default when needed.
+  def server(secret=nil)
+    secret ||= self.secret
+
+    selected_server = BigbluebuttonServer.default
+    unless secret.blank?
+      s = BigbluebuttonServer.find_by(secret: secret)
+      selected_server = s if s.present?
+    end
+    selected_server
+  end
+
+  # Create a web conference server to be used by this institution.
+  def create_server
+    if !self.secret.blank? && !BigbluebuttonServer.find_by(secret: self.secret)
+      BigbluebuttonServer.create(
+        {
+          name: self.name,
+          url: BigbluebuttonServer.default.url,
+          secret: self.secret
+        }
+      )
+    end
+  end
+
+  # Removes the web conference server associated with this institution.
+  def destroy_server(secret=nil)
+    secret ||= self.secret
+    unless secret.blank?
+
+      # don't destroy if another institution is using the server or if the
+      # server has recordings
+      selected_server = self.server(secret)
+      unless Institution.where(secret: secret).where.not(id: self.id).count > 0 ||
+             selected_server.recordings.count > 0
+        selected_server.destroy unless selected_server == BigbluebuttonServer.default
+      end
+    end
+  end
+
   def self.roles
     ['User', 'Admin'].map { |r| Role.find_by_name(r) }
   end

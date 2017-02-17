@@ -4,35 +4,47 @@
 # This file is licensed under the Affero General Public License version
 # 3 or later. See the LICENSE file.
 
+BigbluebuttonRails.configure do |config|
+  config.guest_support = true
+
+  # New method to select a server for a room
+  config.select_server = Proc.new do |room, api_method=nil|
+    room.server_considering_secret(api_method)
+  end
+
+  # Set the invitation URL to the full URL of the room
+  config.get_invitation_url = Proc.new do |room|
+    host = Site.current.domain_with_protocol
+    Rails.application.routes.url_helpers.join_webconf_url(room, host: host)
+  end
+
+  # Add custom metadata to all create calls
+  config.get_dynamic_metadata = Proc.new do |room|
+    host = Site.current.domain_with_protocol
+    meta = {
+      "mconfweb-url" => Rails.application.routes.url_helpers.root_url(host: host),
+      "mconfweb-room-type" => room.try(:owner).try(:class).try(:name)
+    }
+
+    institution = room.try(:owner).try(:institution)
+    if institution.present?
+      name = institution.try(:name) || ""
+      acronym = institution.try(:acronym) || ""
+      meta.merge!(
+        {
+          "mconfweb-institution-name" => name,
+          "mconfweb-institution-acronym" => acronym
+        }
+      )
+    end
+
+    meta
+  end
+end
+
 Rails.application.config.to_prepare do
 
-  # Monkey-patches to add support for guest users in bigbluebutton_rails.
-  # TODO: This is not standard in BBB yet, so this should be temporary and might
-  #       be moved to bigbluebutton_rails in the future.
-  BigbluebuttonRoom.instance_eval do
-    @guest_support = true
-    class << self; attr_reader :guest_support; end
-  end
   BigbluebuttonRoom.class_eval do
-    # Copy of the default Bigbluebutton#join_url with support to :guest
-    def join_url(username, role, key=nil, options={})
-      require_server
-
-      case role
-      when :moderator
-        r = self.server.api.join_meeting_url(self.meetingid, username, self.moderator_api_password, options)
-      when :attendee
-        r = self.server.api.join_meeting_url(self.meetingid, username, self.attendee_api_password, options)
-      when :guest
-        params = { :guest => true }.merge(options)
-        r = self.server.api.join_meeting_url(self.meetingid, username, self.attendee_api_password, params)
-      else
-        r = self.server.api.join_meeting_url(self.meetingid, username, map_key_to_internal_password(key), options)
-      end
-
-      r.strip! unless r.nil?
-      r
-    end
 
     # Returns whether the `user` created the current meeting on this room
     # or not. Has to be called after a `fetch_meeting_info`, otherwise will always
@@ -51,54 +63,36 @@ Rails.application.config.to_prepare do
       owner_type == "Space" && Space.where(:id => owner_id, :public => true).present?
     end
 
-    def invitation_url
-      Rails.application.routes.url_helpers.join_webconf_url(self, host: Site.current.domain_with_protocol)
-    end
+    # Selects a server to use with this room considering institution secrets.
+    # If the room has an institution, it has to use a server with the salt created by
+    # the institution.
+    def server_considering_secret(api_method=nil)
+      default = BigbluebuttonServer.default
 
-    def dynamic_metadata
-      meta = {
-        "mconfweb-url" => Rails.application.routes.url_helpers.root_url(host: Site.current.domain_with_protocol),
-        "mconfweb-room-type" => self.try(:owner).try(:class).try(:name)
-      }
-
-      institution = self.try(:owner).try(:institution)
-      if institution.present?
-        name = institution.try(:name) || ""
-        acronym = institution.try(:acronym) || ""
-        meta.merge!({ "mconfweb-institution-name" => name, "mconfweb-institution-acronym" => acronym })
-      end
-
-      meta
-    end
-
-    # Selects always the default server, but sets on it the shared secret of the institution that
-    # owns this room, if any.
-    def select_server(api_method=nil)
-      server = BigbluebuttonServer.default
-
+      # get the associated objects depending on which type of model this is
+      Rails.logger.info "Checking server for the room #{self.meetingid} (#{self.create_time})"
       meeting = self.get_current_meeting
+      owner = self.try(:owner)
+      institution = owner.try(:institution)
+
+      # if there's a meeting running, use the same server that was used to create it
       if meeting.present? && !meeting.server_secret.blank? && !meeting.ended?
-        Rails.logger.info "#select_server: selected the secret from the meeting for #{self.meetingid}, #{self.create_time}"
-        server.secret = meeting.server_secret
-      elsif self.owner && self.owner.institution && !self.owner.institution.secret.blank?
-        Rails.logger.info "#select_server: selected the secret from the institution for #{self.meetingid}, #{self.create_time}"
-        server.secret = self.owner.institution.secret
+        selected = BigbluebuttonServer.new(url: default.url, secret: meeting.server_secret)
+        Rails.logger.info "Selected the server set in the meeting (#{selected.url}, #{selected.secret})"
+
+      # if the object is associated with an institution, use its secret
+      elsif owner.present? && institution.present?#  && !institution.secret.blank?
+        selected = institution.server
+        Rails.logger.info "Selected the server set in the institution (#{selected.url}, #{selected.secret})"
+
+      # no meeting and no institution with secret, use the default server
       else
-        Rails.logger.info "#select_server: selected the secret from the server for #{self.meetingid}, #{self.create_time}"
+        selected = default
+        Rails.logger.info "Selected the default server (#{selected.url}, #{selected.secret})"
       end
 
-      server
+      selected
     end
-  end
-
-  BigbluebuttonServer.instance_eval do
-
-    # The server used on Mconf-Web is always the first one. We add this method
-    # to wrap it and make it easier to change in the future.
-    def default
-      self.first
-    end
-
   end
 
   BigbluebuttonMeeting.instance_eval do
@@ -122,14 +116,14 @@ Rails.application.config.to_prepare do
     include UpdateInstitutionRecordingsDisk
   end
 
-  BigbluebuttonRecording.class_eval do
+  BigbluebuttonRecording.instance_eval do
 
     # Search recordings based on a list of words
     scope :search_by_terms, -> (words) {
       query = joins(:room).includes(:room)
 
       if words.present?
-        words ||= []  
+        words ||= []
         words = [words] unless words.is_a?(Array)
         query_strs = []
         query_params = []
@@ -149,7 +143,6 @@ Rails.application.config.to_prepare do
           ]
         end
         query = query.where(query_strs.join(' OR '), *query_params.flatten).order(query_orders.join(' + ') + " DESC")
-     
       end
 
       query
@@ -170,4 +163,15 @@ Rails.application.config.to_prepare do
       where.not(id: BigbluebuttonPlaybackFormat.select(:recording_id).distinct)
     }
   end
+
+  BigbluebuttonServer.instance_eval do
+
+    # When the URL of the default server changes, change the URL of all institution servers.
+    after_update if: :url_changed? do
+      if BigbluebuttonServer.default.id == self.id
+        BigbluebuttonServer.where.not(id: self.id).update_all(url: self.url)
+      end
+    end
+  end
+
 end

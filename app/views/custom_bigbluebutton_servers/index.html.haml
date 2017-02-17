@@ -3,7 +3,25 @@
 = content_for :sidebar do
   = render 'shared/webconf_index_links'
 
-%h3= t('.list_of_servers')
+- default_server = BigbluebuttonServer.default
+
+%h3= t('.default_server')
+%table.server-table.table-striped.table-hover.table-condensed
+  %thead
+    %tr
+      %th= t('.table.server_name')
+      %th= t('.table.url')
+      %th= t('.table.links')
+  %tbody
+    %tr
+      %td= link_to default_server.name, bigbluebutton_server_path(default_server)
+      %td= default_server.url
+      %td
+        %ul.access-links
+          %li= link_to t('_other.edit'), edit_bigbluebutton_server_path(default_server), :class => "btn btn-mini"
+
+%h3= t('.institution_servers')
+.alert.alert-gray= t('.institution_servers_tip')
 %table.server-table.table-striped.table-hover.table-condensed
   %thead
     %tr
@@ -12,9 +30,10 @@
       %th= t('.table.links')
   %tbody
     - @servers.each do |server|
-      %tr
-        %td= link_to server.name, bigbluebutton_server_path(server)
-        %td= server.url
-        %td
-          %ul.access-links
-            %li= link_to t('_other.edit'), edit_bigbluebutton_server_path(server), :class => "btn btn-mini"
+      - if server != default_server
+        %tr
+          %td= link_to server.name, bigbluebutton_server_path(server)
+          %td= server.url
+          %td
+            %ul.access-links
+              %li= link_to t('_other.edit'), edit_bigbluebutton_server_path(server), :class => "btn btn-mini"

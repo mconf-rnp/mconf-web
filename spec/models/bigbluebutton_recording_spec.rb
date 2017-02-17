@@ -43,7 +43,7 @@ describe BigbluebuttonRecording do
   describe "update institution disk size after CREATING a recording" do
     let(:owner) { FactoryGirl.create(:space) }
     let(:room) { FactoryGirl.create(:bigbluebutton_room, owner: owner) }
-    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server, size: 500) }
+    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, size: 500) }
 
     before {
       allow(owner.institution).to receive(:update_recordings_disk_used!)
@@ -55,7 +55,7 @@ describe BigbluebuttonRecording do
   describe "update institution disk size after UPDATING a recording" do
     let(:owner) { FactoryGirl.create(:space) }
     let(:room) { FactoryGirl.create(:bigbluebutton_room, owner: owner) }
-    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room, server: room.server) }
+    let!(:recording) { FactoryGirl.create(:bigbluebutton_recording, room: room) }
 
     before {
       allow(owner.institution).to receive(:update_recordings_disk_used!).at_least(:once).and_call_original
