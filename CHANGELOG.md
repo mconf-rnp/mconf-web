@@ -1,5 +1,14 @@
 # Change Log
 
+
+## [v2.4.0-rnp1] - 2017-03-13
+
+A merge of the base Mconf-Web 2.4.0 with RNP's version.
+
+* [rnp#81] Insitutional admins can see and edit recordings of their institution in the
+  management page of recordings.
+
+
 ## [2.4.0] - 2017-01-21
 
 Includes improvements in the management pages, a new management page for recordings,
@@ -82,6 +91,22 @@ Also includes several bug fixes over the previous version.
   register as an anonymous user in an event. Off by default, can be turned in and
   configured in the website management page.
 * Security fixes by upgrading uglifier and nokogiri.
+
+
+## [v2.2.0-rnp3] - 2017-02-16
+
+* [#904] Add list of attendees to the .ICS file sent with web conference invitations.
+* [rnp#85] Add more information in the contents of the email sent with web conference invitations.
+* [rnp#90] Fix bug that prevented global admins that were also institutional admins from seeing the filter of institutions in the management list of users.
+* [rnp#89] Fix the update of recordings for institutions with secrets. The solution involved several changes in how the secrets are implemented for institutions in general, not only for recordings.
+
+
+## [v2.2.0-rnp2] - 2017-01-26
+
+* Update the link to "Is my device compatible?" (https://wiki.rnp.br/pages/viewpage.action?pageId=90402465).
+* Fix manage link in the sidenav for normal users and institutional admins.
+* Hide start link in sidenav when the user can't start a conference.
+
 
 ## [2.2.0-rnp1] - 2016-11-08
 
@@ -366,8 +391,11 @@ This is a minor update over 0.8 that was developed in parallel with 2.0.
 * First version in production and documentation on [[how to setup a production server|Deployment]]
 * Several other bugs and features implemented.
 
+[2.4.0-rnp1]: https://github.com/mconf-rnp/mconf-web/compare/v2.4.0...v2.4.0-rnp1
 [2.4.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.4.0
 [2.3.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.3.0
+[2.2.0-rnp3]: https://github.com/mconf-rnp/mconf-web/compare/v2.2.0-rnp2...v2.2.0-rnp3
+[2.2.0-rnp2]: https://github.com/mconf-rnp/mconf-web/compare/v2.2.0-rnp1...v2.2.0-rnp2
 [2.2.0-rnp1]: https://github.com/mconf-rnp/mconf-web/compare/v2.2.0...v2.2.0-rnp1
 [2.2.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.2.0
 [2.1.0]: https://github.com/mconf/mconf-web/issues?q=milestone%3Av2.1.0
