@@ -850,9 +850,10 @@ describe ManageController do
           @s5 = FactoryGirl.create(:space, :disabled => true, :institution => FactoryGirl.create(:institution))
         }
         before(:each) { get :spaces }
-        it { assigns(:spaces).count.should be(2) }
+        it { assigns(:spaces).count.should be(3) }
         it { assigns(:spaces).should include(@s1) }
         it { assigns(:spaces).should include(@s2) }
+        it { assigns(:spaces).should include(@s3) }
       end
 
       context "orders @spaces by name" do

@@ -542,7 +542,6 @@ describe Institution do
   end
 
   describe "#add_member!" do
-
     context "when user has no previous institution" do
       let(:user) { FactoryGirl.create(:user) }
       let(:target) { FactoryGirl.create(:institution) }
@@ -574,6 +573,51 @@ describe Institution do
       it {
         user # force the user to be created before the call below
         expect { target.remove_member!(user) }.to change(target.users, :count).by(-1)
+      }
+    end
+  end
+
+  describe "#change_role!" do
+    context "change to Admin" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+      before { target.add_member!(user, 'User') }
+
+      it {
+        target.change_role!(user, 'Admin')
+        target.user_role(user).should eql('Admin')
+      }
+    end
+
+    context "change to User" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+      before { target.add_member!(user, 'Admin') }
+
+      it {
+        target.change_role!(user, 'User')
+        target.user_role(user).should eql('User')
+      }
+    end
+
+    context "doesn't change anything if setting the same role" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+      before { target.add_member!(user, 'User') }
+
+      it {
+        target.change_role!(user, 'User')
+        target.user_role(user).should eql('User')
+      }
+    end
+
+    context "doesn't do anything if the user is not a member" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:target) { FactoryGirl.create(:institution) }
+
+      it {
+        target.change_role!(user, 'User')
+        target.user_role(user).should be_nil
       }
     end
   end
@@ -615,6 +659,15 @@ describe Institution do
       context "if an admin" do
         before { target.add_member!(user, "Admin") }
         it { target.user_role(user).should eql("Admin") }
+      end
+
+      context "if not a member" do
+        it { target.user_role(user).should be_nil }
+      end
+
+      context "if member of another institution" do
+        before { FactoryGirl.create(:institution).add_member!(user, "Admin") }
+        it { target.user_role(user).should be_nil }
       end
     end
   end

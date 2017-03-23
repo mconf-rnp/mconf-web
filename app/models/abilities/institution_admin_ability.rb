@@ -61,10 +61,14 @@ module Abilities
 
       # Institutional admins can edit their institution's spaces and all the resources
       # associated with it, exactly an admin of the space would
-      can [:show, :destroy, :edit, :approve, :disapprove, :update, :user_permissions,
-           :webconference_options, :webconference, :recordings], Space do |space|
+      can [:show, :destroy, :edit, :approve, :disapprove, :update,
+           :user_permissions, :webconference_options, :webconference,
+           :recordings, :disable, :enable, :edit_recording], Space do |space|
         !space.disabled &&
           is_institution_admin_of_space(user, space)
+      end
+      can :enable, Space do |space|
+        is_institution_admin_of_space(user, space)
       end
       can [:show, :edit, :update], Permission do |perm|
         case perm.subject_type

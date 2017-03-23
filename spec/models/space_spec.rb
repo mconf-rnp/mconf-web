@@ -1361,7 +1361,7 @@ describe Space do
 
           it {
             allowed = [:create, :new, :select, :show, :index, :destroy, :edit, :update, :user_permissions,
-                       :webconference_options, :webconference, :recordings, :index_event]
+                       :webconference_options, :webconference, :recordings, :index_event, :disable, :enable, :edit_recording]
             should_not be_able_to_do_anything_to(target).except(allowed)
           }
         end
@@ -1438,7 +1438,7 @@ describe Space do
 
           it {
             allowed = [:create, :new, :select, :show, :index, :destroy, :edit, :update, :user_permissions,
-                       :webconference_options, :webconference, :recordings]
+                       :webconference_options, :webconference, :recordings, :disable, :enable, :edit_recording]
             should_not be_able_to_do_anything_to(target).except(allowed)
           }
         end
@@ -1449,7 +1449,7 @@ describe Space do
           before { Site.current.update_attributes(forbid_user_space_creation: true) }
 
           context "without an institution for the user" do
-            before { user.update_attributes institution: nil }
+            before { user.update_attributes(institution: nil) }
 
             it { should_not be_able_to(:create, Space) }
             it { should_not be_able_to(:new, Space) }
@@ -1461,6 +1461,12 @@ describe Space do
 
               it { should_not be_able_to(:create, Space) }
               it { should_not be_able_to(:new, Space) }
+
+              context "if the user is an institution admin" do
+                before { user.institution.change_role!(user, 'Admin') }
+                it { should be_able_to(:create, Space) }
+                it { should be_able_to(:new, Space) }
+              end
             end
 
             context "with space creation allowed" do

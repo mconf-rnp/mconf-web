@@ -122,18 +122,26 @@ class Institution < ActiveRecord::Base
     !can_record_limit.nil? && (users_that_can_record.count >= can_record_limit)
   end
 
-  def add_member! u, role = 'User'
-    # Adds the user to the institution and sets his role as `role`
-    p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
-    p ||= Permission.new :user => u
+  # Adds the user to the institution and sets his role as `role`
+  def add_member!(u, role = 'User')
+    p = Permission.find_by(user: u, subject_type: self.class.name)
+    p ||= Permission.new user: u
     p.subject = self
     p.role = Role.find_by_name(role)
     p.save!
   end
 
-  def remove_member! u, role = 'User'
-    p = Permission.where(:user_id => u.id, :subject_type => 'Institution').first
+  def remove_member!(u)
+    p = Permission.find_by(user: u, subject_type: self.class.name)
     p.destroy unless p.nil?
+  end
+
+  def change_role!(user, role='User')
+    p = Permission.find_by(user: user, subject: self)
+    if p.present?
+      p.role = Role.find_by_name(role)
+      p.save!
+    end
   end
 
   def unapproved_users
@@ -150,8 +158,8 @@ class Institution < ActiveRecord::Base
     n
   end
 
-  def user_role user
-    p = Permission.where(:user_id => user.id, :subject_type => 'Institution').first
+  def user_role(user)
+    p = Permission.find_by(user: user, subject: self)
     p.role.name unless p.nil? or p.role.nil?
   end
 

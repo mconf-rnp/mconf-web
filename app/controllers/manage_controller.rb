@@ -71,7 +71,7 @@ class ManageController < ApplicationController
     if current_user.superuser?
       query = Space.with_disabled
     else
-      query = current_user.institution.spaces
+      query = current_user.institution.spaces.with_disabled
     end
 
     words = params[:q].try(:split, /\s+/)
