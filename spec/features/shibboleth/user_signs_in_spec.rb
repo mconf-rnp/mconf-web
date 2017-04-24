@@ -406,3 +406,4 @@ describe 'User signs in via shibboleth' do
 
   end
 end
+ 

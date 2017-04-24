@@ -8,9 +8,10 @@ en:
         force_shib_login: Force login only via federation
         identifier: Identifier
         name: Name
-        recordings_disk_quota: Disk quota for recordings
+        recordings_disk_quota_human: Disk quota for recordings
         recordings_disk_used: Disk space used by recordings
         require_space_approval: "Moderate spaces"
+        secret: "Web conference server shared secret"
         user_limit: Maximum of members
       space:
         institution_id: "Institution"
@@ -29,7 +30,18 @@ en:
         webconferencia: "Web Conference"
         webinar: "Webinar"
   custom_bigbluebutton_rooms:
+    invite:
+      back: "Back"
+      confirm: "Confirm"
+      confirmation: "Confirmation"
+    invite_header:
+      footer: "To participate, sign in below"
+      meeting_type: "This is a <b>%{type}</b> conference. The meeting is currently:"
+      private: "private"
+      public: "public"
+      title: "Welcome to the conference room: <b>%{name}</b>"
     invite_userid:
+      login_title: "Login"
       non_member:
         title: "I don't have an account"
   institution:
@@ -50,6 +62,28 @@ en:
     users:
       title: "Users in the institution %{name}"
   frontpage:
+    footer_guides:
+      links:
+        mconf_tec: "Mconf Technology"
+        requirements: "Usage requirements"
+        service_page: "More about this service"
+        user_guide: "User manuals"
+    show:
+      section-1:
+        headline: "Welcome to the web portal of RNP's <b>web conference</b> service"
+        login: "sign in"
+      section-2:
+        headline: "The web conference is a communication and collaboration service of RNP that promotes virtual encounters between two or more participants. The service allows geographically distant participants to share audio, video, text, images, whiteboard and the screen of their computers."
+      section-3:
+        block-security:
+          title: "Safe environment"
+          text: "The web conference rooms can be public or private. Moreover, all the communication between the components of the service is done safely with the use of digital certificates from ICPEdu"
+        block-spaces:
+          title: "Spaces"
+          text: "Bring together groups of users with a common objective. Ideal to unite collaborators of a project, idea or specific job"
+        block-scheduling:
+          title: "Easy scheduling"
+          text: "Easy scheduling system for web conferences and participant invitation"
     sign_in_and_title:
       headline: "Web conference service portal"
   layouts:
@@ -61,6 +95,23 @@ en:
       links:
         check: "Check software requirements"
         user_guide: "User manual"
+    rnp_sidenav:
+      compatibility: "Is my device compatible?"
+      home: "Home"
+      invite: "Send a meeting invitation"
+      login: "Login"
+      logout: "Logout"
+      mconf_tec: "Mconf Technology"
+      manage: "Manage"
+      menu: "Menu"
+      my_room: "My room"
+      recordings: "See recordings"
+      requirements: "Usage requirements"
+      service_page: "More about this service"
+      space_room: "Space's room"
+      spaces: "Spaces"
+      start_meeting: "Start a meeting"
+      user_guide: "User manuals"
   manage:
     institution:
       can_record_users:
@@ -95,21 +146,29 @@ en:
   sessions:
     login_form:
       email_or_login: "Email"
-    login_form_area:
+    login_form:
+      email_or_username: "Email"
+      local:
+        subtitle: "Sign in using a non-federated account"
+        title: "Local account"
+        toggle: "Back to the federated sign in"
       login: "Login"
-      title: "I already have an account"
-      member:
-        email_or_username: "Email"
-        non_federated_click: "My account is not federated"
-        non_federated_title: "Access using a local account"
-        password: "Password"
-        shibboleth:
-          click_here: "Login"
+      password: "Password"
+      remember_me: "Remember me"
+      shibboleth:
+        title: "I have an account"
+        toggle: "My account is not federated"
+    login_form_area:
+      title: "Login"
     new:
       cafe_alt: "CAFe: Comunidade Acadêmica Federada"
       federated_authentication: "Federated authentication"
       local_authentication: "Local authentication"
       sign_in_federation: "Login"
+  shared:
+    recording_list:
+      unpublish: Remove
+      unpublish_confirm: "Are you sure you want to remove this recording?"
   shibboleth:
     create_association:
       institution_not_registered: "Sorry, but you are not allowed to access this application because your institution has not adhered to Mconf yet."
@@ -123,9 +182,10 @@ en:
         forbid_user_space_creation: "Only administrators of the institution will be able to create spaces"
         force_shib_login: "When enabled the user will only be allowed to login via federation"
         identifier: "Identifier to match users that will belong to this institution. You can use multiple values, one per line, as regular expression. The comparisons are case-insensitive and the strings are trimmed. If a user is identified in the federation as \"user@sub.institution.org\", for example, one possible value to match this user would be \"(.*\\.)?institution\\.org\", that would match any subdomain of an institution."
-        recordings_disk_quota: "Maximum disk space that can be used by recordings from this institution (e.g. '100 GB', '200 GiB', '1500000000')."
+        recordings_disk_quota_human: "Maximum disk space that can be used by recordings from this institution (e.g. '100 GB', '200 GiB', '1500000000')."
         recordings_disk_used: "Current disk space being used by recordings from this institution."
         require_space_approval: "When checked, spaces have to be approved by an administrator of the institution before other users can see and use them"
+        secret: "The shared secret to use when making API calls to the web conference server. If empty, will use the default secret."
         user_limit: "Optional. Enter a number to limit how many users can be part of this institution. Leave it empty to set no limits."
   spaces:
     edit:

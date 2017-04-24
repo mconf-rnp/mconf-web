@@ -7,6 +7,37 @@ describe Institution do
     FactoryGirl.build(:institution).should be_valid
   end
 
+  context "initializes" do
+    context "#secret" do
+      context "if the institution is a new record" do
+        subject { Institution.new }
+        it { subject.secret.should_not be_nil }
+        it { subject.secret.length.should eql(32) }
+        it("is valid") {
+          valid_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+          subject.secret.each_char do |c|
+            valid_chars.should include(c)
+          end
+        }
+      end
+
+      context "if the institution is not a new record" do
+        context "and has a secret set" do
+          let(:secret) { "my-very-secret-test-secret" }
+          let(:target) { FactoryGirl.create(:institution, secret: secret) }
+          subject { Institution.find(target.id) }
+          it { subject.secret.should eql(secret) }
+        end
+
+        context "and has a blank secret" do
+          let(:target) { FactoryGirl.create(:institution, secret: nil) }
+          subject { Institution.find(target.id) }
+          it { subject.secret.should be_nil }
+        end
+      end
+    end
+  end
+
   it { should have_many(:permissions).dependent(:destroy) }
   it { should have_many(:spaces) }
   it { should have_many(:users) }
@@ -77,12 +108,12 @@ describe Institution do
 
     context "false if the user limit is nil" do
       before { target.update_attributes(:user_limit => nil) }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "false if the user limit is an empty string" do
       before { target.update_attributes(:user_limit => "") }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "false if the number of approved users has not reached the limit yet" do
@@ -90,7 +121,7 @@ describe Institution do
         FactoryGirl.create(:user, :institution => target)
         target.update_attributes(:user_limit => 2)
       }
-      it { target.full?.should be_falsey }
+      it { target.full?.should be(false) }
     end
 
     context "true if the number of approved users is equal the limit" do
@@ -172,39 +203,39 @@ describe Institution do
     let(:institution) { FactoryGirl.create(:institution) }
 
     context 'using a filesize' do
-      before { institution.update_attributes(recordings_disk_quota: '50 Mb'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(50*(10**6)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '50 Mb'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(50*(10**6)) }
     end
 
     context 'using another filesize' do
-      before { institution.update_attributes(recordings_disk_quota: '50 Mib'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(50*(1024**2)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '50 Mib'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(50*(1024**2)) }
     end
 
     context 'using a filesize without the b (300 M -> 300 Mb)' do
-      before { institution.update_attributes(recordings_disk_quota: '300 M'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(300*(10**6)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '300 M'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(300*(10**6)) }
     end
 
     context 'using a filesize without the b (20 G -> 20 Gb)' do
-      before { institution.update_attributes(recordings_disk_quota: '20 G'); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(20*(10**9)) }
+      before { institution.update_attributes(recordings_disk_quota_human: '20 G'); institution.reload }
+      it { institution.recordings_disk_quota.should eq(20*(10**9)) }
     end
 
     context 'using a number of bytes' do
       before { institution.update_attributes(recordings_disk_quota: 8000); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(8000) }
+      it { institution.recordings_disk_quota.should eq(8000) }
     end
 
     context 'using an empty value' do
       before { institution.update_attributes(recordings_disk_quota: ''); institution.reload }
-      it { institution.recordings_disk_quota.to_i.should eq(0) }
+      it { institution.recordings_disk_quota.should eq(nil) }
     end
 
     context 'using an invalid value' do
-      before { institution.update_attributes(recordings_disk_quota: 'incorrect') }
+      before { institution.update_attributes(recordings_disk_quota_human: 'incorrect') }
       it { institution.should_not be_valid }
-      it { institution.errors[:recordings_disk_quota].size.should eq(1) }
+      it { institution.errors[:recordings_disk_quota_human].size.should eq(1) }
     end
 
   end
@@ -268,6 +299,44 @@ describe Institution do
       let(:owners) { [] }
 
       it { target.recordings_disk_used.to_i.should eq(0) }
+    end
+
+    context "doesn't consider unpublished recordings" do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 2),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 3),
+        FactoryGirl.create(:bigbluebutton_recording, published: false, size: 4),
+        FactoryGirl.create(:bigbluebutton_recording, published: false, size: 5),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, size: 6)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target)
+      ]}
+
+      it { target.recordings_disk_used.to_i.should eq(11) }
+    end
+
+    context "doesn't consider unavailable recordings" do
+      let(:recordings) {[
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: true, size: 2),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 3),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 4),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: false, size: 5),
+        FactoryGirl.create(:bigbluebutton_recording, published: true, available: true, size: 6)
+      ]}
+      let(:owners) {[
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:user, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target),
+        FactoryGirl.create(:space_with_associations, institution: target)
+      ]}
+
+      it { target.recordings_disk_used.to_i.should eq(8) }
     end
   end
 

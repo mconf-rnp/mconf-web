@@ -1,1 +1,28 @@
-= render 'frontpage/sign_in_and_title'
+-# = render 'frontpage/sign_in_and_title'
+
+.section-1
+  .headline
+    = t(".section-1.headline").html_safe
+  = link_to t(".section-1.login"), login_path, class: "btn btn-large btn-transp"
+
+.section-2
+  = image_tag "rnp/site_logo_conferencia_web.png", size: "513x70"
+  .headline
+    = t(".section-2.headline")
+
+.section-3
+  %ul
+    %li.feature-block.feature-block-1
+      .content
+        .title= t(".section-3.block-security.title")
+        .text= t(".section-3.block-security.text")
+    %li.feature-block.feature-block-2
+      .content
+        .title= t(".section-3.block-spaces.title")
+        .text= t(".section-3.block-spaces.text")
+    %li.feature-block.feature-block-3
+      .content
+        .title= t(".section-3.block-scheduling.title")
+        .text= t(".section-3.block-scheduling.text")
+
+= render 'frontpage/footer_guides'

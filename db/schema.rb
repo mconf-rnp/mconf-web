@@ -49,15 +49,19 @@ ActiveRecord::Schema.define(version: 20160707152830) do
     t.string   "meetingid"
     t.string   "name"
     t.datetime "start_time"
-    t.boolean  "running",      default: false
-    t.boolean  "recorded",     default: false
+    t.boolean  "running",                                default: false
+    t.boolean  "recorded",                               default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.string   "creator_name"
+    t.string   "server_url"
+    t.string   "server_secret"
+    t.decimal  "create_time",   precision: 14, scale: 0
+    t.boolean  "ended",                                  default: false
   end
 
-  add_index "bigbluebutton_meetings", ["meetingid", "start_time"], name: "index_bigbluebutton_meetings_on_meetingid_and_start_time", unique: true, using: :btree
+  add_index "bigbluebutton_meetings", ["meetingid", "create_time"], name: "index_bigbluebutton_meetings_on_meetingid_and_create_time", unique: true, using: :btree
 
   create_table "bigbluebutton_metadata", force: true do |t|
     t.integer  "owner_id"
@@ -159,7 +163,7 @@ ActiveRecord::Schema.define(version: 20160707152830) do
   create_table "bigbluebutton_servers", force: true do |t|
     t.string   "name"
     t.string   "url"
-    t.string   "salt"
+    t.string   "secret"
     t.string   "version"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -200,11 +204,12 @@ ActiveRecord::Schema.define(version: 20160707152830) do
     t.integer  "user_limit"
     t.integer  "can_record_limit"
     t.text     "identifier"
-    t.boolean  "force_shib_login",           default: false
-    t.boolean  "require_space_approval",     default: true
-    t.boolean  "forbid_user_space_creation", default: true
-    t.string   "recordings_disk_used",       default: "0"
-    t.string   "recordings_disk_quota",      default: "0"
+    t.boolean  "force_shib_login",                     default: false
+    t.boolean  "require_space_approval",               default: true
+    t.boolean  "forbid_user_space_creation",           default: true
+    t.integer  "recordings_disk_used",       limit: 8, default: 0
+    t.integer  "recordings_disk_quota",      limit: 8, default: 0
+    t.string   "secret"
   end
 
   create_table "invitations", force: true do |t|

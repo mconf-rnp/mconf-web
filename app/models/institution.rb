@@ -22,6 +22,7 @@ class Institution < ActiveRecord::Base
 
   validates :permalink, :presence => true
 
+  after_initialize :init
   before_validation :validate_and_adjust_recordings_disk_quota
 
   def self.roles
@@ -106,7 +107,7 @@ class Institution < ActiveRecord::Base
   # Call this to query all recordings belonging to this institution (users and spaces)
   # and get a sum of their sizes in the 'recordings_disk_used' field
   def update_recordings_disk_used!
-    size = self.recordings.sum(:size)
+    size = self.recordings.where(published: true, available: true).sum(:size)
     update_attribute(:recordings_disk_used, size)
   end
 
@@ -136,18 +137,26 @@ class Institution < ActiveRecord::Base
     BigbluebuttonRecording.where(room_id: room_ids)
   end
 
+  attr_accessor :recordings_disk_quota_human
+
   private
 
+  def init
+    if self.new_record?
+      self[:secret] ||= random_secret
+    end
+  end
+
   def validate_and_adjust_recordings_disk_quota
-    if recordings_disk_quota_changed?
-      if self.recordings_disk_quota.blank?
+    if !recordings_disk_quota_human.nil?
+      if self.recordings_disk_quota_human.blank?
         write_attribute(:recordings_disk_quota, nil)
       else
-        value = Mconf::Filesize.convert(self.recordings_disk_quota)
+        value = Mconf::Filesize.convert(self.recordings_disk_quota_human)
         if value.nil?
-          self.errors.add(:recordings_disk_quota, :invalid)
+          self.errors.add(:recordings_disk_quota_human, :invalid)
         else
-          write_attribute(:recordings_disk_quota, value.to_s)
+          write_attribute(:recordings_disk_quota, value)
         end
       end
     end
@@ -159,6 +168,16 @@ class Institution < ActiveRecord::Base
 
   def is_filesize? n
     Filesize.parse(n)[:type].present?
+  end
+
+  def random_secret(length=32)
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    text = ""
+    length.times do
+      pos = (rand() * chars.length).floor
+      text += chars[pos]
+    end
+    text
   end
 
 end
