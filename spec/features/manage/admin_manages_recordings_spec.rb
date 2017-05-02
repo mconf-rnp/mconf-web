@@ -157,15 +157,15 @@ def have_link_to_edit_bigbluebutton_recording(recording)
 end
 
 def have_link_to_unpublish_bigbluebutton_recording(recording)
-  have_css("a[href='#{unpublish_bigbluebutton_recording_path(recording)}'][data-method='post']")
+  have_css("a[href='#{unpublish_bigbluebutton_recording_path(recording, redir_url: manage_recordings_path)}'][data-method='post']")
 end
 
 def have_link_to_publish_bigbluebutton_recording(recording)
-  have_css("a[href='#{publish_bigbluebutton_recording_path(recording)}'][data-method='post']")
+  have_css("a[href='#{publish_bigbluebutton_recording_path(recording, redir_url: manage_recordings_path)}'][data-method='post']")
 end
 
 def have_link_to_delete_bigbluebutton_recording(recording)
-  have_css("a[href='#{bigbluebutton_recording_path(recording, :redir_url => manage_recordings_path)}'][data-method='delete']")
+  have_css("a[href='#{bigbluebutton_recording_path(recording, redir_url: manage_recordings_path)}'][data-method='delete']")
 end
 
 def have_link_to_showplayback_bigbluebutton_recording(recording)
