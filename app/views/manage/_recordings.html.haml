@@ -13,15 +13,15 @@
 
     - if recording.available
       - if !recording.published
-        = link_to publish_bigbluebutton_recording_path(recording), :data => { :confirm => t('are_you_sure') }, :method => :post do
+        = link_to publish_bigbluebutton_recording_path(recording, redir_url: manage_recordings_path), :data => { :confirm => t('are_you_sure') }, :method => :post do
           = icon_publish(:alt => t('.publish'), :title => t('.publish'))
 
     - if recording.available
       - if recording.published
-        = link_to unpublish_bigbluebutton_recording_path(recording), :data => { :confirm => t('are_you_sure') }, :method => :post do
+        = link_to unpublish_bigbluebutton_recording_path(recording, redir_url: manage_recordings_path), :data => { :confirm => t('are_you_sure') }, :method => :post do
           = icon_unpublish(:alt => t('.unpublish'), :title => t('.unpublish'))
 
-    = link_to bigbluebutton_recording_path(recording, :redir_url => manage_recordings_path), :data => { :confirm => t('.confirm_delete') }, :method => :delete do
+    = link_to bigbluebutton_recording_path(recording, redir_url: manage_recordings_path), :data => { :confirm => t('.confirm_delete') }, :method => :delete do
       = icon_delete(:alt => t('.delete'), :title => t('.delete'))
 
   .thread-title
