@@ -154,21 +154,18 @@ describe SpaceNotificationsWorker, type: :worker do
       context "notifies space admins when the space is approved" do
 
         context "for multiple admins" do
-          let(:approver) { FactoryGirl.create(:superuser) }
-          let(:space1) { FactoryGirl.create(:space, approved: true) }
+          let(:space1) { FactoryGirl.create(:space, approved: false) }
           let(:activity1) { RecentActivity.where(key: 'space.approved', trackable_id: space1.id).first }
-          let(:space2) { FactoryGirl.create(:space, approved: true) }
+          let(:space2) { FactoryGirl.create(:space, approved: false) }
           let(:activity2) { RecentActivity.where(key: 'space.approved', trackable_id: space2.id).first }
 
           before {
+            space1.approve!
             space1.add_member!(FactoryGirl.create(:user), 'Admin')
             space1.new_activity('create', space1.admins.first)
-            space1.approve!
-            space1.create_approval_notification(approver)
+            space2.approve!
             space2.add_member!(FactoryGirl.create(:user), 'Admin')
             space2.new_activity('create', space2.admins.first)
-            space2.approve!
-            space2.create_approval_notification(approver)
             worker.perform
           }
 
@@ -272,12 +269,10 @@ describe SpaceNotificationsWorker, type: :worker do
           space1.add_member!(FactoryGirl.create(:user), 'Admin')
           space1.new_activity('create', space1.admins.first)
           space1.approve!
-          space1.create_approval_notification(approver)
 
           space2.add_member!(FactoryGirl.create(:user), 'Admin')
           space2.new_activity('create', space2.admins.first)
           space2.approve!
-          space2.create_approval_notification(approver)
 
           worker.perform
         }
