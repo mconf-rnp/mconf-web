@@ -23,7 +23,7 @@ describe SpaceApprovedSenderWorker, type: :worker do
       before {
         space.add_member!(user, 'Admin')
         space.approve!
-        space.create_approval_notification(approver)
+        space.create_approval_notification
         worker.perform(activity.id)
       }
 
@@ -36,7 +36,7 @@ describe SpaceApprovedSenderWorker, type: :worker do
       before {
         space.add_member!(user, 'Admin')
         space.approve!
-        space.create_approval_notification(approver)
+        space.create_approval_notification
         activity.update_attributes(notified: true)
         worker.perform(activity.id)
       }

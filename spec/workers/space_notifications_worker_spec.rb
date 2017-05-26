@@ -154,9 +154,11 @@ describe SpaceNotificationsWorker, type: :worker do
       context "notifies space admins when the space is approved" do
 
         context "for multiple admins" do
-          let(:space1) { FactoryGirl.create(:space, approved: false) }
+          let(:institution1) { FactoryGirl.create(:institution, require_space_approval: true) }
+          let(:institution2) { FactoryGirl.create(:institution, require_space_approval: true) }
+          let(:space1) { FactoryGirl.create(:space, approved: false, institution: institution1) }
           let(:activity1) { RecentActivity.where(key: 'space.approved', trackable_id: space1.id).first }
-          let(:space2) { FactoryGirl.create(:space, approved: false) }
+          let(:space2) { FactoryGirl.create(:space, approved: false, institution: institution2) }
           let(:activity2) { RecentActivity.where(key: 'space.approved', trackable_id: space2.id).first }
 
           before {
@@ -256,24 +258,20 @@ describe SpaceNotificationsWorker, type: :worker do
       end
 
       context "notifies space admins of approval if institution is moderated" do
-        let(:approver) { FactoryGirl.create(:user) }
-        let(:institution) { approver.institution }
-        let(:space1) { FactoryGirl.create(:space, institution: institution) }
+        let(:institution) { FactoryGirl.create(:institution, require_space_approval: true) }
+        let(:approver) { FactoryGirl.create(:user, institution: institution) }
+        let(:space1) { FactoryGirl.create(:space, institution: institution, approved: false) }
         let(:activity1) { RecentActivity.where(key: 'space.approved', trackable_id: space1.id).first }
-        let(:space2) { FactoryGirl.create(:space, institution: institution) }
+        let(:space2) { FactoryGirl.create(:space, institution: institution, approved: false) }
         let(:activity2) { RecentActivity.where(key: 'space.approved', trackable_id: space2.id).first }
 
         before {
-          institution.update_attribute(:require_space_approval, true)
-
+          space1.approve!
           space1.add_member!(FactoryGirl.create(:user), 'Admin')
           space1.new_activity('create', space1.admins.first)
-          space1.approve!
-
+          space2.approve!
           space2.add_member!(FactoryGirl.create(:user), 'Admin')
           space2.new_activity('create', space2.admins.first)
-          space2.approve!
-
           worker.perform
         }
 
