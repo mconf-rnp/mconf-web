@@ -37,7 +37,7 @@ describe 'Admin manages recordings' do
       before { visit manage_recordings_path }
 
       it { should have_css '.recording-simple', :count => 5 }
-      it { should have_css '.icon-mconf-delete', :count => 5 }
+      it { should have_css '.icon-mconf-remove', :count => 5 }
 
       it { should have_css '.recording-not-available-name', :count => 1 }
 
@@ -78,7 +78,7 @@ describe 'Admin manages recordings' do
 
         it { should have_css '.icon-mconf-edit' }
         it { should have_css '.icon-mconf-unpublish' }
-        it { should have_css '.icon-mconf-delete' }
+        it { should have_css '.icon-mconf-remove' }
         it { should have_css '.icon-mconf-list.enabled' }
         it { should have_link_to_edit_bigbluebutton_recording(recording) }
         it { should have_link_to_unpublish_bigbluebutton_recording(recording) }
@@ -97,7 +97,7 @@ describe 'Admin manages recordings' do
 
         it { should have_css '.icon-mconf-edit' }
         it { should have_css '.icon-mconf-unpublish' }
-        it { should have_css '.icon-mconf-delete' }
+        it { should have_css '.icon-mconf-remove' }
         it { should have_css '.icon-mconf-list.disabled' }
         it { should have_link_to_edit_bigbluebutton_recording(recording) }
         it { should have_link_to_unpublish_bigbluebutton_recording(recording) }
@@ -112,7 +112,7 @@ describe 'Admin manages recordings' do
 
         it { should have_css '.icon-mconf-edit' }
         it { should have_css '.icon-mconf-unpublish' }
-        it { should have_css '.icon-mconf-delete' }
+        it { should have_css '.icon-mconf-remove' }
         it { should have_css '.icon-mconf-list.disabled' }
         it { should have_link_to_edit_bigbluebutton_recording(recording) }
         it { should have_link_to_unpublish_bigbluebutton_recording(recording) }
@@ -127,7 +127,7 @@ describe 'Admin manages recordings' do
 
         it { should have_css '.icon-mconf-edit' }
         it { should have_css '.icon-mconf-publish' }
-        it { should have_css '.icon-mconf-delete' }
+        it { should have_css '.icon-mconf-remove' }
         it { should have_css '.icon-mconf-list.disabled' }
         it { should have_link_to_edit_bigbluebutton_recording(recording) }
         it { should have_link_to_publish_bigbluebutton_recording(recording) }
@@ -141,7 +141,7 @@ describe 'Admin manages recordings' do
         subject { page.find("#recording-#{recording.id}") }
 
         it { should have_css '.icon-mconf-edit' }
-        it { should have_css '.icon-mconf-delete' }
+        it { should have_css '.icon-mconf-remove' }
         it { should_not have_css '.icon-mconf-list' }
         it { should have_link_to_edit_bigbluebutton_recording(recording) }
         it { should have_link_to_delete_bigbluebutton_recording(recording) }

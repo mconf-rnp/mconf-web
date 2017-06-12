@@ -22,7 +22,7 @@
           = icon_unpublish(:alt => t('.unpublish'), :title => t('.unpublish'))
 
     = link_to bigbluebutton_recording_path(recording, :redir_url => manage_recordings_path), :data => { :confirm => t('.confirm_delete') }, :method => :delete do
-      = icon_delete(:alt => t('.delete'), :title => t('.delete'))
+      = icon_delete_rec(:alt => t('.delete'), :title => t('.delete'))
 
   .thread-title
     - if recording.available
@@ -39,10 +39,10 @@
 
   .recording-metadata
     %div.metadata-published
-      - if recording.published?
-        .badge.badge-success= t('.published')
-      - else
-        .badge.badge-important= t('.unpublished')
+      - unless recording.published?
+        .badge.badge-important.tooltipped{title: t('.tooltip_in_bin')}
+          = t('.unpublished')
+
     %div.metadata-size
       .badge
         = human_file_size(recording.size)
