@@ -144,11 +144,15 @@ module IconsHelper
   end
 
   def icon_publish(options={})
-    icon_constructor nil, "icon-awesome icon-eye-open icon-mconf-publish", options
+    icon_constructor nil, "icon-awesome icon-trash icon-mconf-publish", options
   end
 
   def icon_unpublish(options={})
-    icon_constructor nil, "icon-awesome icon-eye-close icon-mconf-unpublish", options
+    icon_constructor nil, "icon-awesome icon-trash icon-mconf-unpublish", options
+  end
+
+  def icon_delete_rec(options={})
+    icon_constructor nil, "icon-awesome icon-remove icon-mconf-remove", options
   end
 
   def icon_mobile(options={})
